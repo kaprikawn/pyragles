@@ -4,7 +4,7 @@ CFLAGS=-Wall -std=c++11 -std=gnu++11
 
 LDFLAGS=-lSDL2 -lGLESv2
 
-SOURCES=main.cpp
+SOURCES=inputHandler.cpp game.cpp main.cpp
 
 EXECUTABLE=a.out
 
