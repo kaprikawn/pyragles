@@ -1,6 +1,7 @@
 #include <iostream>
 #include <GLES2/gl2.h>
 #include "game.hpp"
+#include "triangle.hpp"
 
 Game* Game::instance_ = 0;
 
@@ -24,13 +25,7 @@ bool Game::init( const char* title, int xpos, int ypos, int width, int height, i
     return false;
   }
   
-  SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
-  SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
-  SDL_GL_SetSwapInterval( 0 );
-  SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-  SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
-  
-  context_ = SDL_GL_CreateContext( window_ );
+  TheTriangle::Instance() -> init();
   
   running_ = true;
   
@@ -39,6 +34,15 @@ bool Game::init( const char* title, int xpos, int ypos, int width, int height, i
 
 void Game::handleInputs() {
   TheInputHandler::Instance() -> update();
+}
+
+void Game::update() {
+  // placeholder
+  return;
+}
+
+void Game::render() {
+  TheTriangle::Instance() -> render();
 }
 
 void Game::clean() {
