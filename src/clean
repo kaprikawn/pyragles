@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [ -f CMakeCache.txt ]
+then
+  rm CMakeCache.txt
+fi
+
+if [ -d CMakeFiles ]
+then
+  rm -rf CMakeFiles
+fi
+
+if [ -f cmake_install.cmake ]
+then
+  rm cmake_install.cmake
+fi
+
+if [ -f Makefile ]
+then
+  echo '' > Makefile
+fi
+
+if [ -f a.out ]
+then
+  rm a.out
+fi
+
+exit 0
+

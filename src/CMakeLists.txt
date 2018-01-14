@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 project( pyragles )
 
-add_executable( a.out inputHandler.cpp game.cpp main.cpp )
+add_executable( a.out triangle.cpp inputHandler.cpp game.cpp main.cpp )
 
 include( FindPkgConfig )
 
