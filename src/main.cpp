@@ -9,8 +9,8 @@ int main( int argc, char* args[] ) {
   Uint32  msFrameDiff_ = 0;
   //float   dt_ = 0.0f;
   
-  const int   WIDTH         = 300;
-  const int   HEIGHT        = 300;
+  const int   WIDTH         = 1280;
+  const int   HEIGHT        = 720;
   const int   FPS           = 60;
   const float DELAY_TIME    = 1000.0f / FPS;
   
@@ -25,6 +25,8 @@ int main( int argc, char* args[] ) {
     //dt_ = msFrameDiff_ / 1000.0f; 
     
     TheGame::Instance() -> handleInputs();
+    TheGame::Instance() -> update();
+    TheGame::Instance() -> render();
     
     if( msFrameDiff_ < DELAY_TIME ) {
       SDL_Delay( ( DELAY_TIME - msFrameDiff_ ) );
