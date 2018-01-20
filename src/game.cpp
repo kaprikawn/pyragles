@@ -24,9 +24,9 @@ bool Game::init( const char* title, int xpos, int ypos, int width, int height, i
     return false;
   }
   
-  //TheTriangle::Instance() -> init();
+  shader = new Shader();
   
-  shader = new Shader( "./shaders/triangle" );
+  shader -> init();
   
   running_ = true;
   
@@ -43,7 +43,6 @@ void Game::update() {
 }
 
 void Game::render() {
-  //TheTriangle::Instance() -> render();
   shader -> render();
 }
 

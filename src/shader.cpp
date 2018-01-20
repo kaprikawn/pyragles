@@ -3,53 +3,7 @@
 #include <iostream>
 #include "game.hpp"
 
-Shader::Shader( const std::string& filename ) {
-  
-  std::string vs = load( filename + ".vs" );
-  std::string fs = load( filename + ".fs" );
-  
-  program_  = glCreateProgram();
-  
-  vs_ = create( load( filename + ".vs" ), GL_VERTEX_SHADER );
-  fs_ = create( load( filename + ".fs" ), GL_FRAGMENT_SHADER );
-  
-  glAttachShader( program_, vs_ );
-  glAttachShader( program_, fs_ );
-  
-  glLinkProgram( program_ );
-  glUseProgram( program_ );
-  
-  u_time_loc = glGetUniformLocation( program_, "u_time" );
-  u_time = 0.0f;
-	
-	// create vbo
-	GLuint vbo;
-	glGenBuffers( 1, &vbo );
-	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-	float vertex_data[] = { 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-	glBufferData( GL_ARRAY_BUFFER, sizeof( vertex_data ), vertex_data, GL_STATIC_DRAW );
- 
-	// setup vertex attribs
-	GLuint va_position = 0;
-	glEnableVertexAttribArray( va_position );
-	glVertexAttribPointer( va_position, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*) 0 );
- 
-	glClearColor( 0.4, 0.6, 0.8, 1.0 );
-	
-}
-
-void Shader::render() {
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  glUniform1f( u_time_loc, u_time += 1.0f / 60.0f );
-  glDrawArrays( GL_TRIANGLES, 0, 3 );
-  SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
-}
-
-void Shader::bind() {
-  glUseProgram( program_ );
-}
-
-std::string Shader::load( const std::string& filename ) {
+std::string getFile( const std::string& filename ) {
   
   std::ifstream file;
   file.open( ( filename ).c_str() );
@@ -69,25 +23,7 @@ std::string Shader::load( const std::string& filename ) {
   return output;
 }
 
-GLuint Shader::create( const std::string& text, unsigned int type ) {
-
-  GLuint shader = glCreateShader( type );
-  
-  const GLchar* p[1];
-  p[0] = text.c_str();
-  GLint lengths[1];
-  lengths[0] = text.length();
-    
-  glShaderSource( shader, 1, p, lengths );
-  
-  glCompileShader( shader );
-  glGetShaderiv( shader, GL_COMPILE_STATUS, &isCompiled_ );
-  
-  return shader;
-}
-
-void Shader::checkShaderError( GLuint shader, GLuint flag, bool isProgram, const std::string& errorMessage ) {
-
+void checkShaderError( GLuint shader, GLuint flag, bool isProgram, const std::string& errorMessage ) {
   GLint success = 0;
   GLchar error[ 1024 ] = { 0 };
   
@@ -106,4 +42,94 @@ void Shader::checkShaderError( GLuint shader, GLuint flag, bool isProgram, const
     
     std::cerr << errorMessage << ": '" << error << "'" << std::endl;
   }
+}
+
+GLuint Shader::load( const char* shaderSrc, GLenum type ) {
+  
+  GLuint  shader;
+  
+  // create the shader object
+  shader = glCreateShader( type );
+  
+  if( shader == 0 ) {
+    return 0;
+  }
+  
+  // load the shader source
+  glShaderSource( shader, 1, &shaderSrc, NULL );
+  
+  // compile the shader
+  glCompileShader( shader );
+  
+  // check the compile status
+  //glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
+  checkShaderError( shader, GL_COMPILE_STATUS, false, "Error compiling shader!");
+  
+  return shader;
+}
+
+int Shader::init() {
+  
+  GLuint  vs;
+  GLuint  fs;
+  
+  std::string vsSrcStr = getFile( "./shaders/triangle.vs" );
+  std::string fsSrcStr = getFile( "./shaders/triangle.fs" );
+  
+  const GLchar* vsSrc;
+  const GLchar* fsSrc;
+  vsSrc = vsSrcStr.c_str();
+  fsSrc = fsSrcStr.c_str();
+  
+  // load the vertex / fragment shaders
+  vs = load( vsSrc, GL_VERTEX_SHADER );
+  fs = load( fsSrc, GL_FRAGMENT_SHADER );
+  
+  // create the program object
+  program_ = glCreateProgram();
+  
+  if( program_ == 0 ) {
+    return 0;
+  }
+  
+  glAttachShader( program_, vs );
+  glAttachShader( program_, fs );
+  
+  // bind vPosition to attribute 0
+  glBindAttribLocation( program_, 0, "vPosition" );
+  
+  // link the program
+  glLinkProgram( program_ );
+  
+  // check the link status
+  checkShaderError( program_, GL_LINK_STATUS, true, "Error linking shader program");
+  
+  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+  
+  return 0;
+}
+
+void Shader::render() {
+  GLfloat vVertices[] = {   0.0f, 0.5f, 0.0f
+                          , -0.5f, -0.5f, 0.0f
+                          , 0.5f, -0.5f, 0.0f };
+  
+  // set the viewport
+  glViewport( 0, 0, 1280, 720 );
+  
+  // clear the colour buffer
+  glClear( GL_COLOR_BUFFER_BIT );
+  
+  // use the program object
+  glUseProgram( program_ );
+  
+  // load the vertex data
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, vVertices );
+  glEnableVertexAttribArray( 0 );
+  
+  glDrawArrays( GL_TRIANGLES, 0, 3 );
+  
+  SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
+  
+  
 }
