@@ -6,7 +6,7 @@ cmake . || exit 1
 
 make || exit 1
 
-./a.out
+./exe
 
 exit 0
 
