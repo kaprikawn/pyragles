@@ -17,12 +17,17 @@ fi
 
 if [ -f Makefile ]
 then
-  echo '' > Makefile
+  rm Makefile
 fi
 
 if [ -f a.out ]
 then
   rm a.out
+fi
+
+if [ -f exe ]
+then
+  rm exe
 fi
 
 exit 0

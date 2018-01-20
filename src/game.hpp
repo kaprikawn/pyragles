@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "inputHandler.hpp"
+#include "shader.hpp"
 
 class Game {
   private:
@@ -11,6 +12,8 @@ class Game {
     
     bool          running_;
     static Game*  instance_;
+    
+    Shader*       shader;
     
     Game(){}
     

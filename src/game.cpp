@@ -1,7 +1,6 @@
 #include <iostream>
 #include <GLES2/gl2.h>
 #include "game.hpp"
-#include "triangle.hpp"
 
 Game* Game::instance_ = 0;
 
@@ -25,7 +24,9 @@ bool Game::init( const char* title, int xpos, int ypos, int width, int height, i
     return false;
   }
   
-  TheTriangle::Instance() -> init();
+  //TheTriangle::Instance() -> init();
+  
+  shader = new Shader( "./shaders/triangle" );
   
   running_ = true;
   
@@ -42,7 +43,8 @@ void Game::update() {
 }
 
 void Game::render() {
-  TheTriangle::Instance() -> render();
+  //TheTriangle::Instance() -> render();
+  shader -> render();
 }
 
 void Game::clean() {
