@@ -10,6 +10,9 @@ class Shader {
     GLuint    programObject_;
     GLfloat   vertices_[9];
     
+    GLint     positionLoc_;
+    GLint     mvpLoc_;
+    
   public:
     GLuint  load( const char* shaderSrc, GLenum type );
     int     init();
