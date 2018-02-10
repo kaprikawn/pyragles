@@ -9,6 +9,11 @@ class Shader {
   private:
     GLuint    programObject_;
     GLfloat   vertices_[9];
+    GLuint    elements_[3];
+    
+    GLuint    vao_;
+    GLuint    ebo_;
+    
     
     GLint     positionLoc_;
     GLint     mvpLoc_;

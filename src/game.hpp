@@ -5,6 +5,9 @@
 #include "inputHandler.hpp"
 #include "shader.hpp"
 
+#define windowWidth 1280
+#define windowHeight 720
+
 class Game {
   private:
     SDL_Window*     window_;
