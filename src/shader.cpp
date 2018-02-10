@@ -119,6 +119,13 @@ int Shader::init() {
   // set the viewport
   glViewport( 0, 0, 1280, 720 );
   
+  // use the program object
+  glUseProgram( programObject_ );
+  
+  // load the vertex data
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, vertices_ );
+  glEnableVertexAttribArray( 0 );
+  
   return 0;
 }
 
@@ -126,13 +133,6 @@ void Shader::render() {
   
   // clear the colour buffer
   glClear( GL_COLOR_BUFFER_BIT );
-  
-  // use the program object
-  glUseProgram( programObject_ );
-  
-  // load the vertex data
-  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, vertices_ );
-  glEnableVertexAttribArray( 0 );
   
   glDrawArrays( GL_TRIANGLES, 0, 3 );
   
