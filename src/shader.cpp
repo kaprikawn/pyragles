@@ -95,9 +95,6 @@ int Shader::init() {
   glAttachShader( programObject_, vs );
   glAttachShader( programObject_, fs );
   
-  // bind vPosition to attribute 0
-  glBindAttribLocation( programObject_, 0, "aPosition" );
-  
   // link the program
   glLinkProgram( programObject_ );
   
@@ -122,9 +119,13 @@ int Shader::init() {
   // use the program object
   glUseProgram( programObject_ );
   
+  positionLoc_    = glGetAttribLocation( programObject_, "aPosition" );
+  
+  mvpLoc_         = glGetUniformLocation( programObject_, "uMvpMatrix" );
+  
   // load the vertex data
-  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, vertices_ );
-  glEnableVertexAttribArray( 0 );
+  glVertexAttribPointer( positionLoc_, 3, GL_FLOAT, GL_FALSE, 0, vertices_ );
+  glEnableVertexAttribArray( positionLoc_ );
   
   return 0;
 }
