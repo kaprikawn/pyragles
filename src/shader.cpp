@@ -86,46 +86,53 @@ int Shader::init() {
   fs = load( fsSrc, GL_FRAGMENT_SHADER );
   
   // create the program object
-  program_ = glCreateProgram();
+  programObject_ = glCreateProgram();
   
-  if( program_ == 0 ) {
+  if( programObject_ == 0 ) {
     return 0;
   }
   
-  glAttachShader( program_, vs );
-  glAttachShader( program_, fs );
+  glAttachShader( programObject_, vs );
+  glAttachShader( programObject_, fs );
   
   // bind vPosition to attribute 0
-  glBindAttribLocation( program_, 0, "vPosition" );
+  glBindAttribLocation( programObject_, 0, "aPosition" );
   
   // link the program
-  glLinkProgram( program_ );
+  glLinkProgram( programObject_ );
   
   // check the link status
-  checkShaderError( program_, GL_LINK_STATUS, true, "Error linking shader program");
+  checkShaderError( programObject_, GL_LINK_STATUS, true, "Error linking shader program");
   
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+  
+  vertices_[0] =  0.0f;
+  vertices_[1] =  0.5f;
+  vertices_[2] =  0.0f;
+  vertices_[3] = -0.5f;
+  vertices_[4] = -0.5f;
+  vertices_[5] =  0.0f;
+  vertices_[6] =  0.5f;
+  vertices_[7] = -0.5f;
+  vertices_[8] =  0.0f;
+  
+  // set the viewport
+  glViewport( 0, 0, 1280, 720 );
+  
+  // use the program object
+  glUseProgram( programObject_ );
+  
+  // load the vertex data
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, vertices_ );
+  glEnableVertexAttribArray( 0 );
   
   return 0;
 }
 
 void Shader::render() {
-  GLfloat vVertices[] = {   0.0f, 0.5f, 0.0f
-                          , -0.5f, -0.5f, 0.0f
-                          , 0.5f, -0.5f, 0.0f };
-  
-  // set the viewport
-  glViewport( 0, 0, 1280, 720 );
   
   // clear the colour buffer
   glClear( GL_COLOR_BUFFER_BIT );
-  
-  // use the program object
-  glUseProgram( program_ );
-  
-  // load the vertex data
-  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, vVertices );
-  glEnableVertexAttribArray( 0 );
   
   glDrawArrays( GL_TRIANGLES, 0, 3 );
   

@@ -1,10 +1,17 @@
 #!/bin/bash
 
+let cores=`grep -c ^processor /proc/cpuinfo`
+
 clear
 
 cmake . || exit 1
 
-make || exit 1
+if [[ $cores -gt 1 ]]
+then
+  make -j${cores} || exit 1
+else
+  make || exit 1
+fi
 
 ./exe
 
