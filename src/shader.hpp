@@ -7,7 +7,9 @@
 
 class Shader {
   private:
-    GLuint  program_;
+    GLuint    programObject_;
+    GLfloat   vertices_[9];
+    
   public:
     GLuint  load( const char* shaderSrc, GLenum type );
     int     init();
