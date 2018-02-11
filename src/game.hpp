@@ -25,7 +25,7 @@ class Game {
     
     bool init( const char* title, int xpos, int ypos, int width, int height, int flags );
     void handleInputs();
-    void update();
+    void update( float dt );
     void render();
     void clean();
     void quit();

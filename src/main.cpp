@@ -23,7 +23,7 @@ int main( int argc, char* args[] ) {
     dt_ = msFrameDiff_ / 1000.0f; 
     
     TheGame::Instance() -> handleInputs();
-    TheGame::Instance() -> update();
+    TheGame::Instance() -> update( dt_ );
     TheGame::Instance() -> render();
     
     if( msFrameDiff_ < DELAY_TIME ) {
