@@ -103,31 +103,56 @@ int Shader::init() {
   
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
   
-  vertices_[0] =  0.0f;
-  vertices_[1] =  0.5f;
-  vertices_[2] =  0.0f;
-  vertices_[3] = -0.5f;
-  vertices_[4] = -0.5f;
-  vertices_[5] =  0.0f;
-  vertices_[6] =  0.5f;
-  vertices_[7] = -0.5f;
-  vertices_[8] =  0.0f;
+  GLfloat vertices[] = {
+      -0.5f,  0.5f, 0.0f // top left
+    , -0.5f, -0.5f, 0.0f // bottom left
+    ,  0.5f, -0.5f, 0.0f // bottom right
+    
+    ,  0.5f,  0.5f, 0.0f // top right
+    , -0.5f,  0.5f, 0.5f // top left
+    ,  0.5f, -0.5f, 0.0f // bottom right
+  };
   
-  // set the viewport
-  glViewport( 0, 0, 1280, 720 );
+  for( unsigned int i = 0; i < ( sizeof( vertices ) / sizeof( *vertices ) ); i++ ) {
+    vertices_[i] = vertices[i];
+  }
+  
+  glGenBuffers( 1, &vao_ );
+  glBindBuffer( GL_ARRAY_BUFFER, vao_ );
+  glBufferData( GL_ARRAY_BUFFER, sizeof( vertices_ ), vertices_, GL_STATIC_DRAW );
+  
+  
+  GLuint elements[] = {
+      0, 1, 2
+    , 0, 3, 2
+  };
+  for( unsigned int i = 0; i < ( sizeof( elements ) / sizeof( *elements ) ); i++ ) {
+    elements_[i] = elements[i];
+  }
+    
+  glGenBuffers( 1, &ebo_ );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ebo_ );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( elements_ ), elements_, GL_STATIC_DRAW );
   
   // use the program object
   glUseProgram( programObject_ );
   
-  positionLoc_    = glGetAttribLocation( programObject_, "aPosition" );
+  positionLoc_    = glGetAttribLocation( programObject_, "position" );
   
-  mvpLoc_         = glGetUniformLocation( programObject_, "uMvpMatrix" );
+  mvpLoc_         = glGetUniformLocation( programObject_, "mvpMatrix" );
   
   // load the vertex data
-  glVertexAttribPointer( positionLoc_, 3, GL_FLOAT, GL_FALSE, 0, vertices_ );
+  glVertexAttribPointer( positionLoc_, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
   glEnableVertexAttribArray( positionLoc_ );
   
+  // set the viewport
+  glViewport( 0, 0, windowWidth, windowHeight );
+  
   return 0;
+}
+
+void Shader::update( float dt ) {
+
 }
 
 void Shader::render() {
@@ -135,7 +160,9 @@ void Shader::render() {
   // clear the colour buffer
   glClear( GL_COLOR_BUFFER_BIT );
   
-  glDrawArrays( GL_TRIANGLES, 0, 3 );
+  //glDrawArrays( GL_TRIANGLES, 0, 6 );
+  glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+  //glDrawElements( GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, indices_ );
   
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
   

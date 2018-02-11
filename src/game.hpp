@@ -5,6 +5,9 @@
 #include "inputHandler.hpp"
 #include "shader.hpp"
 
+#define windowWidth 1280
+#define windowHeight 720
+
 class Game {
   private:
     SDL_Window*     window_;
@@ -22,7 +25,7 @@ class Game {
     
     bool init( const char* title, int xpos, int ypos, int width, int height, int flags );
     void handleInputs();
-    void update();
+    void update( float dt );
     void render();
     void clean();
     void quit();

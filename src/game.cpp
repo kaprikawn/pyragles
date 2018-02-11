@@ -37,9 +37,12 @@ void Game::handleInputs() {
   TheInputHandler::Instance() -> update();
 }
 
-void Game::update() {
-  // placeholder
-  return;
+void Game::update( float dt ) {
+  if( dt > 0.1f ) {
+    dt = 0.0f;
+  }
+
+  shader -> update( dt );
 }
 
 void Game::render() {

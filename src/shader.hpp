@@ -8,7 +8,12 @@
 class Shader {
   private:
     GLuint    programObject_;
-    GLfloat   vertices_[9];
+    GLfloat   vertices_[18];
+    GLuint    elements_[6];
+    
+    GLuint    vao_;
+    GLuint    ebo_;
+    
     
     GLint     positionLoc_;
     GLint     mvpLoc_;
@@ -16,6 +21,7 @@ class Shader {
   public:
     GLuint  load( const char* shaderSrc, GLenum type );
     int     init();
+    void    update( float dt );
     void    render();
     
 };
