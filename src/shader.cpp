@@ -103,7 +103,7 @@ int Shader::init() {
   
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
   
-  GLfloat vertices[] = {
+  vertices_ = {
       -0.5f,  0.5f, 0.0f // top left
     , -0.5f, -0.5f, 0.0f // bottom left
     ,  0.5f, -0.5f, 0.0f // bottom right
@@ -113,26 +113,19 @@ int Shader::init() {
     ,  0.5f, -0.5f, 0.0f // bottom right
   };
   
-  for( unsigned int i = 0; i < ( sizeof( vertices ) / sizeof( *vertices ) ); i++ ) {
-    vertices_[i] = vertices[i];
-  }
-  
-  glGenBuffers( 1, &vao_ );
-  glBindBuffer( GL_ARRAY_BUFFER, vao_ );
-  glBufferData( GL_ARRAY_BUFFER, sizeof( vertices_ ), vertices_, GL_STATIC_DRAW );
+  glGenBuffers( 1, &vbo_ );
+  glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
+  glBufferData( GL_ARRAY_BUFFER, vertices_.size() * sizeof( GLfloat ), &vertices_[0], GL_STATIC_DRAW );
   
   
-  GLuint elements[] = {
+  indices_ = {
       0, 1, 2
-    , 0, 3, 2
+    , 2, 0, 3
   };
-  for( unsigned int i = 0; i < ( sizeof( elements ) / sizeof( *elements ) ); i++ ) {
-    elements_[i] = elements[i];
-  }
     
-  glGenBuffers( 1, &ebo_ );
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ebo_ );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( elements_ ), elements_, GL_STATIC_DRAW );
+  glGenBuffers( 1, &ibo_ );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof( indices_[0] ), &indices_[0], GL_STATIC_DRAW );
   
   // use the program object
   glUseProgram( programObject_ );
@@ -161,7 +154,7 @@ void Shader::render() {
   glClear( GL_COLOR_BUFFER_BIT );
   
   //glDrawArrays( GL_TRIANGLES, 0, 6 );
-  glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+  glDrawElements( GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0 );
   //glDrawElements( GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, indices_ );
   
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
