@@ -4,15 +4,20 @@
 #include "SDL.h"
 #include <GLES2/gl2.h>
 #include <string>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <vector>
+
+#define PI 3.1415926535897932384626433832795f
 
 class Shader {
   private:
-    GLuint    programObject_;
-    GLfloat   vertices_[18];
-    GLuint    elements_[6];
+    GLuint                programObject_;
+    std::vector<GLfloat>  vertices_;
+    std::vector<GLuint>   indices_;
     
-    GLuint    vao_;
-    GLuint    ebo_;
+    GLuint    vbo_;
+    GLuint    ibo_;
     
     
     GLint     positionLoc_;
