@@ -16,12 +16,16 @@ class Shader {
     std::vector<GLfloat>  vertices_;
     std::vector<GLuint>   indices_;
     
-    GLuint    vbo_;
-    GLuint    ibo_;
+    GLuint      vbo_;
+    GLuint      ibo_;
     
+    GLint       positionLoc_;
+    GLint       mvpLoc_;
     
-    GLint     positionLoc_;
-    GLint     mvpLoc_;
+    glm::mat4   projection_;
+    glm::mat4   view_;
+    glm::mat4   model_;
+    glm::mat4   mvp_;
     
   public:
     GLuint  load( const char* shaderSrc, GLenum type );

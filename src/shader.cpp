@@ -101,42 +101,43 @@ int Shader::init() {
   // check the link status
   checkShaderError( programObject_, GL_LINK_STATUS, true, "Error linking shader program");
   
-  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+  glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   
   vertices_ = {
-      -0.5f,  0.5f, 0.0f // top left
-    , -0.5f, -0.5f, 0.0f // bottom left
-    ,  0.5f, -0.5f, 0.0f // bottom right
-    
-    ,  0.5f,  0.5f, 0.0f // top right
-    , -0.5f,  0.5f, 0.5f // top left
-    ,  0.5f, -0.5f, 0.0f // bottom right
-  };
+		-1.0f, -1.0f, 0.0f,
+		 1.0f, -1.0f, 0.0f,
+		 0.0f,  1.0f, 0.0f,
+	};
   
   glGenBuffers( 1, &vbo_ );
   glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
   glBufferData( GL_ARRAY_BUFFER, vertices_.size() * sizeof( GLfloat ), &vertices_[0], GL_STATIC_DRAW );
-  
   
   indices_ = {
       0, 1, 2
     , 2, 0, 3
   };
     
-  glGenBuffers( 1, &ibo_ );
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof( indices_[0] ), &indices_[0], GL_STATIC_DRAW );
+  //glGenBuffers( 1, &ibo_ );
+  //glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
+  //glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof( indices_[0] ), &indices_[0], GL_STATIC_DRAW );
   
-  // use the program object
-  glUseProgram( programObject_ );
+  
   
   positionLoc_    = glGetAttribLocation( programObject_, "position" );
-  
   mvpLoc_         = glGetUniformLocation( programObject_, "mvpMatrix" );
   
-  // load the vertex data
-  glVertexAttribPointer( positionLoc_, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
-  glEnableVertexAttribArray( positionLoc_ );
+  projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 100.0f );
+  
+  view_ = glm::lookAt(
+      glm::vec3( 4, 3, 3 )
+    , glm::vec3( 0, 0, 0 )
+    , glm::vec3( 0, 1, 0 )
+  );
+  
+  model_ = glm::mat4( 1.0f );
+  
+  mvp_ = projection_ * view_ * model_;
   
   // set the viewport
   glViewport( 0, 0, windowWidth, windowHeight );
@@ -145,7 +146,19 @@ int Shader::init() {
 }
 
 void Shader::update( float dt ) {
-
+  
+  glClear( GL_COLOR_BUFFER_BIT );
+  
+  // use the program object
+  glUseProgram( programObject_ );
+  
+  // Send our transformation to the currently bound shader, 
+  // in the "MVP" uniform
+	glUniformMatrix4fv( mvpLoc_, 1, GL_FALSE, &mvp_[0][0] );
+	
+	// load the vertex data
+  glVertexAttribPointer( positionLoc_, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
+  glEnableVertexAttribArray( positionLoc_ );
 }
 
 void Shader::render() {
@@ -153,8 +166,8 @@ void Shader::render() {
   // clear the colour buffer
   glClear( GL_COLOR_BUFFER_BIT );
   
-  //glDrawArrays( GL_TRIANGLES, 0, 6 );
-  glDrawElements( GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0 );
+  glDrawArrays( GL_TRIANGLES, 0, 3 ); // 3 indices starting at 0 -> 1 triangle
+  //glDrawElements( GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0 );
   //glDrawElements( GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, indices_ );
   
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
