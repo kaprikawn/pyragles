@@ -5,8 +5,8 @@
 #include "inputHandler.hpp"
 #include "shader.hpp"
 
-#define windowWidth 1280
-#define windowHeight 720
+#define windowWidth 1280.0f
+#define windowHeight 720.0f
 
 class Game {
   private:
