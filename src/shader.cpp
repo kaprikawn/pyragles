@@ -169,9 +169,7 @@ void Shader::render() {
   // clear the colour buffer
   glClear( GL_COLOR_BUFFER_BIT );
   
-  //glDrawArrays( GL_TRIANGLES, 0, 3 ); // 3 indices starting at 0 -> 1 triangle
   glDrawElements( GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0 );
-  //glDrawElements( GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, indices_ );
   
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
   
