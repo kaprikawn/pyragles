@@ -104,13 +104,11 @@ int Shader::init() {
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   
   vertices_ = {
-		  -0.5f,  0.5f, 0.0f // top left
-    , -0.5f, -0.5f, 0.0f // bottom left
-    ,  0.5f, -0.5f, 0.0f // bottom right
-    
-    ,  0.5f,  0.5f, 0.0f // top right
-    
-    ,  0.8f,  0.5f, 0.0f // off to side
+      -0.4f,  0.8f, 0.0f
+    , -0.8f, -0.8f, 0.0f
+    ,  0.0f, -0.8f, 0.0f
+    ,  0.4f,  0.8f, 0.0f
+    ,  0.8f, -0.8f, 0.0f
 	};
   
   glGenBuffers( 1, &vbo_ );
@@ -118,29 +116,17 @@ int Shader::init() {
   glBufferData( GL_ARRAY_BUFFER, vertices_.size() * sizeof( GLfloat ), &vertices_[0], GL_STATIC_DRAW );
   
   indices_ = {
-      0, 1, 2
-    , 2, 0, 3
-    , 2, 3, 4
+      0, 1, 2 // left triangle
+    , 2, 0, 3 // middle triangle
+    , 2, 3, 4 // right triangle
   };
     
   glGenBuffers( 1, &ibo_ );
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof( indices_[0] ), &indices_[0], GL_STATIC_DRAW );
   
-  positionLoc_    = glGetAttribLocation( programObject_, "position" );
-  mvpLoc_         = glGetUniformLocation( programObject_, "mvpMatrix" );
-  
-  projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 100.0f );
-  
-  view_ = glm::lookAt(
-      glm::vec3( 4, 3, 3 )
-    , glm::vec3( 0, 0, 0 )
-    , glm::vec3( 0, 1, 0 )
-  );
-  
-  model_ = glm::mat4( 1.0f );
-  
-  mvp_ = projection_ * view_ * model_;
+  positionID_ = glGetAttribLocation( programObject_, "position" );
+  //mvpID_      = glGetUniformLocation( programObject_, "mvpMatrix" );
   
   // set the viewport
   glViewport( 0, 0, windowWidth, windowHeight );
@@ -154,14 +140,10 @@ void Shader::update( float dt ) {
   
   // use the program object
   glUseProgram( programObject_ );
-  
-  // Send our transformation to the currently bound shader, 
-  // in the "MVP" uniform
-	glUniformMatrix4fv( mvpLoc_, 1, GL_FALSE, &mvp_[0][0] );
 	
 	// load the vertex data
-  glVertexAttribPointer( positionLoc_, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
-  glEnableVertexAttribArray( positionLoc_ );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
+  glEnableVertexAttribArray( positionID_ );
 }
 
 void Shader::render() {

@@ -19,8 +19,8 @@ class Shader {
     GLuint      vbo_;
     GLuint      ibo_;
     
-    GLint       positionLoc_;
-    GLint       mvpLoc_;
+    GLint       positionID_;
+    GLint       mvpID_;
     
     glm::mat4   projection_;
     glm::mat4   view_;
