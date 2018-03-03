@@ -104,11 +104,15 @@ int Shader::init() {
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   
   vertices_ = {
-      -0.4f,  0.8f, 0.0f
-    , -0.8f, -0.8f, 0.0f
-    ,  0.0f, -0.8f, 0.0f
-    ,  0.4f,  0.8f, 0.0f
-    ,  0.8f, -0.8f, 0.0f
+      -1.0f,  1.0f,  1.0f // front top left
+    , -1.0f, -1.0f,  1.0f // front bottom left
+    ,  1.0f,  1.0f,  1.0f // front top right
+    ,  1.0f, -1.0f,  1.0f // front bottom right
+    
+    ,  1.0f,  1.0f, -1.0f // back top right
+    ,  1.0f, -1.0f, -1.0f // back bottom right
+    , -1.0f,  1.0f, -1.0f // back top left
+    , -1.0f, -1.0f, -1.0f // back bottom left
 	};
   
   glGenBuffers( 1, &vbo_ );
@@ -116,9 +120,18 @@ int Shader::init() {
   glBufferData( GL_ARRAY_BUFFER, vertices_.size() * sizeof( GLfloat ), &vertices_[0], GL_STATIC_DRAW );
   
   indices_ = {
-      0, 1, 2 // left triangle
-    , 2, 0, 3 // middle triangle
-    , 2, 3, 4 // right triangle
+      0, 1, 2 // front A
+    , 2, 1, 3 // front B
+    , 4, 2, 3 // right A
+    , 4, 3, 5 // right B
+    , 4, 5, 6 // back A
+    , 6, 5, 7 // back B
+    , 7, 0, 6 // left A
+    , 0, 7, 1 // left B
+    , 5, 3, 7 // bottom A
+    , 7, 3, 0 // bottom B
+    , 2, 4, 0 // top A
+    , 0, 4, 6 // top B
   };
     
   glGenBuffers( 1, &ibo_ );
@@ -126,7 +139,19 @@ int Shader::init() {
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof( indices_[0] ), &indices_[0], GL_STATIC_DRAW );
   
   positionID_ = glGetAttribLocation( programObject_, "position" );
-  //mvpID_      = glGetUniformLocation( programObject_, "mvpMatrix" );
+  mvpID_      = glGetUniformLocation( programObject_, "mvpMatrix" );
+  
+  projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 100.0f );
+  
+  view_ = glm::lookAt(
+      glm::vec3( 4, 3, 3 )
+    , glm::vec3( 0, 0, 0 )
+    , glm::vec3( 0, 1, 0 )
+  );
+  
+  model_ = glm::mat4( 1.0f );
+  
+  mvp_ = projection_ * view_ * model_;
   
   // set the viewport
   glViewport( 0, 0, windowWidth, windowHeight );
@@ -140,6 +165,10 @@ void Shader::update( float dt ) {
   
   // use the program object
   glUseProgram( programObject_ );
+  
+  // Send our transformation to the currently bound shader, 
+  // in the "MVP" uniform
+  glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
 	
 	// load the vertex data
   glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
