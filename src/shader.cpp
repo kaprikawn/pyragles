@@ -104,19 +104,21 @@ int Shader::init() {
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   
   vertices_ = {
-      -1.0f,  1.0f,  1.0f // front top left
-    , -1.0f, -1.0f,  1.0f // front bottom left
-    ,  1.0f,  1.0f,  1.0f // front top right
-    ,  1.0f, -1.0f,  1.0f // front bottom right
+	//    x      y      z     r     g     b     a
+      -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f // front top left
+    , -1.0f, -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f // front bottom left
+    ,  1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f // front top right
+    ,  1.0f, -1.0f,  1.0f, 0.0f, 0.9f, 0.9f, 1.0f // front bottom right
     
-    ,  1.0f,  1.0f, -1.0f // back top right
-    ,  1.0f, -1.0f, -1.0f // back bottom right
-    , -1.0f,  1.0f, -1.0f // back top left
-    , -1.0f, -1.0f, -1.0f // back bottom left
+    ,  1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f // back top right
+    ,  1.0f, -1.0f, -1.0f, 0.9f, 0.9f, 0.0f, 1.0f // back bottom right
+    , -1.0f,  1.0f, -1.0f, 0.9f, 0.5f, 0.0f, 1.0f // back top left
+    , -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f // back bottom left
 	};
-  
-  glGenBuffers( 1, &vbo_ );
-  glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
+	
+	glGenBuffers( 2, vboIDs_ );
+	
+	glBindBuffer( GL_ARRAY_BUFFER, vboIDs_[0] );
   glBufferData( GL_ARRAY_BUFFER, vertices_.size() * sizeof( GLfloat ), &vertices_[0], GL_STATIC_DRAW );
   
   indices_ = {
@@ -134,12 +136,13 @@ int Shader::init() {
     , 0, 4, 6 // top B
   };
     
-  glGenBuffers( 1, &ibo_ );
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
+  //glGenBuffers( 1, &ibo_ );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIDs_[1] );
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof( indices_[0] ), &indices_[0], GL_STATIC_DRAW );
   
-  positionID_ = glGetAttribLocation( programObject_, "position" );
-  mvpID_      = glGetUniformLocation( programObject_, "mvpMatrix" );
+  positionID_ = glGetAttribLocation( programObject_, "a_position" );
+  colourID_   = glGetAttribLocation( programObject_, "a_colour" );
+  mvpID_      = glGetUniformLocation( programObject_, "u_mvpMatrix" );
   
   projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 100.0f );
   
@@ -156,12 +159,16 @@ int Shader::init() {
   // set the viewport
   glViewport( 0, 0, windowWidth, windowHeight );
   
+  glEnable( GL_DEPTH_TEST );
+  // Accept fragment if it closer to the camera than the former one
+  glDepthFunc( GL_LESS );
+  
   return 0;
 }
 
 void Shader::update( float dt ) {
   
-  glClear( GL_COLOR_BUFFER_BIT );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   
   // use the program object
   glUseProgram( programObject_ );
@@ -171,8 +178,12 @@ void Shader::update( float dt ) {
   glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
 	
 	// load the vertex data
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 7, (GLvoid*)0 );
   glEnableVertexAttribArray( positionID_ );
+  
+  // load the colour data
+  glVertexAttribPointer( colourID_, 4, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 7, ( char* )( sizeof( GLfloat ) * 3 ) );
+  glEnableVertexAttribArray( colourID_ );
 }
 
 void Shader::render() {
