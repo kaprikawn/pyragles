@@ -15,11 +15,12 @@ class Shader {
     GLuint                programObject_;
     std::vector<GLfloat>  vertices_;
     std::vector<GLuint>   indices_;
+    std::vector<GLfloat>  colours_;
     
-    GLuint      vbo_;
-    GLuint      ibo_;
+    GLuint      vboIDs_[2];
     
     GLint       positionID_;
+    GLint       colourID_;
     GLint       mvpID_;
     
     glm::mat4   projection_;
