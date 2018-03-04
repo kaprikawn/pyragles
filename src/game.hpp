@@ -1,9 +1,9 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include <SDL2/SDL.h>
-#include "inputHandler.hpp"
-#include "shader.hpp"
+#include <memory>
+#include "SDL.h"
+#include "gameStateMachine.hpp"
 
 #define windowWidth 1280.0f
 #define windowHeight 720.0f
@@ -13,10 +13,12 @@ class Game {
     SDL_Window*     window_;
     SDL_Renderer*   renderer_;
     
-    bool          running_;
-    static Game*  instance_;
+    int             newState_ = -1;
+    int             transitionType_;
+    bool            running_;
+    static Game*    instance_;
     
-    Shader*       shader;
+    std::unique_ptr<GameStateMachine> gameStateMachine_;
     
     Game(){}
     
@@ -29,6 +31,9 @@ class Game {
     void render();
     void clean();
     void quit();
+    
+    void setNewState( int newState, int transitionType );
+    void changeGameState( int newState, int transitionType );
     
     bool gameRunning() { return running_; }
     
