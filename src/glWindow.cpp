@@ -1,4 +1,4 @@
-#include "shader.hpp"
+#include "glWindow.hpp"
 #include <fstream>
 #include <iostream>
 #include "game.hpp"
@@ -44,7 +44,7 @@ void checkShaderError( GLuint shader, GLuint flag, bool isProgram, const std::st
   }
 }
 
-GLuint Shader::load( const char* shaderSrc, GLenum type ) {
+GLuint load( const char* shaderSrc, GLenum type ) {
   
   GLuint  shader;
   
@@ -68,7 +68,7 @@ GLuint Shader::load( const char* shaderSrc, GLenum type ) {
   return shader;
 }
 
-int Shader::init() {
+int GlWindow::init() {
   
   GLuint  vs;
   GLuint  fs;
@@ -89,8 +89,11 @@ int Shader::init() {
   programObject_ = glCreateProgram();
   
   if( programObject_ == 0 ) {
+    std::cout << "No projectObject found" << std::endl;
     return 0;
   }
+  
+  std::cout << "programObject is " << programObject_ << std::endl;
   
   glAttachShader( programObject_, vs );
   glAttachShader( programObject_, fs );
@@ -166,12 +169,12 @@ int Shader::init() {
   return 0;
 }
 
-void Shader::update( float dt ) {
-  
+void GlWindow::update( float dt ) {
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   
-  // use the program object
   glUseProgram( programObject_ );
+  
+  // compute the MVP matrix...goes here
   
   // Send our transformation to the currently bound shader, 
   // in the "MVP" uniform
@@ -186,7 +189,7 @@ void Shader::update( float dt ) {
   glEnableVertexAttribArray( colourID_ );
 }
 
-void Shader::render() {
+void GlWindow::render() {
   
   // clear the colour buffer
   glClear( GL_COLOR_BUFFER_BIT );
@@ -194,6 +197,5 @@ void Shader::render() {
   glDrawElements( GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0 );
   
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
-  
   
 }

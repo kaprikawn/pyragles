@@ -1,5 +1,5 @@
-#ifndef SHADER_HPP
-#define SHADER_HPP
+#ifndef GLWINDOW_HPP
+#define GLWINDOW_HPP
 
 #include "SDL.h"
 #include <GLES2/gl2.h>
@@ -10,7 +10,7 @@
 
 #define PI 3.1415926535897932384626433832795f
 
-class Shader {
+class GlWindow {
   private:
     GLuint                programObject_;
     std::vector<GLfloat>  vertices_;
@@ -29,11 +29,11 @@ class Shader {
     glm::mat4   mvp_;
     
   public:
-    GLuint  load( const char* shaderSrc, GLenum type );
+    
     int     init();
     void    update( float dt );
     void    render();
     
 };
 
-#endif //SHADER_HPP
+#endif //GLWINDOW_HPP

@@ -3,7 +3,7 @@
 ## declare an array variable
 declare -a arr=( animation CMakeLists.txt collision enemy game gameState gameStateMachine health hero hud inputHandler jsonLoader main playState position projectile scenary sprite structs target textures transitionState values vector dataLevel1.json dataMain.json )
 
-arr=( CMakeLists.txt game inputHandler main shader triangle.vs triangle.fs )
+arr=( CMakeLists.txt game glWindow inputHandler main playState shader triangle.vs triangle.fs )
 
 if [ $HOSTNAME == "arch" ]
 then
