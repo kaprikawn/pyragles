@@ -102,15 +102,17 @@ int GlWindow::init() {
   checkShaderError( programID_, GL_LINK_STATUS, true, "Error linking shader program");
   
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+  glEnable( GL_DEPTH_TEST );
   
   verts_ = {
-  //    x      y     r     g     b
-       0.0f,  0.0f, 1.0f, 0.0f, 0.0f
-    ,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f
-    , -1.0f,  1.0f, 1.0f, 0.0f, 0.0f
+  //    x      y      z     r     g     b
+      -1.0f, -1.0f,  0.5f, 1.0f, 0.0f, 0.0f
+    ,  0.0f,  1.0f,  0.5f, 1.0f, 0.0f, 0.0f
+    ,  1.0f, -1.0f,  0.5f, 1.0f, 0.0f, 0.0f
     
-    , -1.0f, -1.0f, 1.0f, 0.0f, 0.0f
-    ,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f
+    , -1.0f,  1.0f, -0.5f, 0.0f, 0.0f, 1.0f
+    ,  0.0f, -1.0f, -0.5f, 0.0f, 0.0f, 1.0f
+    ,  1.0f,  1.0f, -0.5f, 0.0f, 0.0f, 1.0f
 	};
   
   glGenBuffers( 1, &vbo_ );
@@ -119,7 +121,7 @@ int GlWindow::init() {
   
   indices_ = {
       0, 1, 2
-    , 0, 3, 4
+    , 3, 4, 5
   };
   
   glGenBuffers( 1, &ibo_ );
@@ -141,15 +143,15 @@ void GlWindow::update( float dt ) {
   glUseProgram( programID_ );
 	
 	// load the vertex data
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 5, (GLvoid*)0 );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 6, (GLvoid*)0 );
   glEnableVertexAttribArray( positionID_ );
   
   // load the colour data
-  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 5, ( char* )( sizeof( GLfloat ) * 2 ) );
+  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 6, ( char* )( sizeof( GLfloat ) * 3 ) );
   glEnableVertexAttribArray( colourID_ );
   
   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-  glClear( GL_COLOR_BUFFER_BIT );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   
   //glDrawArrays( GL_TRIANGLES, 0, 6 );
   glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
