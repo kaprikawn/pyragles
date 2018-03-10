@@ -14,8 +14,11 @@ class GlWindow {
   private:
     GLuint                programID_;
     std::vector<GLfloat>  verts_;
+    std::vector<GLushort> indices_;
     GLuint                vbo_;
+    GLuint                ibo_;
     GLint                 positionID_;
+    GLint                 colourID_;
     
   public:
     

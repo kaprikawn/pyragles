@@ -101,19 +101,33 @@ int GlWindow::init() {
   // check the link status
   checkShaderError( programID_, GL_LINK_STATUS, true, "Error linking shader program");
   
-  glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
+  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
   
   verts_ = {
-       0.0f,  1.0f, 0.0f
-    , -1.0f, -1.0f, 0.0f
-    ,  1.0f, -1.0f, 0.0f
+  //    x      y     r     g     b
+       0.0f,  0.0f, 1.0f, 0.0f, 0.0f
+    ,  1.0f,  1.0f, 1.0f, 0.0f, 0.0f
+    , -1.0f,  1.0f, 1.0f, 0.0f, 0.0f
+    
+    , -1.0f, -1.0f, 1.0f, 0.0f, 0.0f
+    ,  1.0f, -1.0f, 1.0f, 0.0f, 0.0f
 	};
   
   glGenBuffers( 1, &vbo_ );
   glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
   glBufferData( GL_ARRAY_BUFFER, verts_.size() * sizeof( GLfloat ), &verts_[0], GL_STATIC_DRAW );
   
+  indices_ = {
+      0, 1, 2
+    , 0, 3, 4
+  };
+  
+  glGenBuffers( 1, &ibo_ );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof( GLushort ), &indices_[0], GL_STATIC_DRAW );
+  
   positionID_ = glGetAttribLocation( programID_, "aPosition" );
+  colourID_   = glGetAttribLocation( programID_, "aColour" );
   
   // set the viewport
   glViewport( 0, 0, windowWidth, windowHeight );
@@ -127,12 +141,18 @@ void GlWindow::update( float dt ) {
   glUseProgram( programID_ );
 	
 	// load the vertex data
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 5, (GLvoid*)0 );
   glEnableVertexAttribArray( positionID_ );
-  glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
+  
+  // load the colour data
+  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 5, ( char* )( sizeof( GLfloat ) * 2 ) );
+  glEnableVertexAttribArray( colourID_ );
+  
+  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT );
   
-  glDrawArrays( GL_TRIANGLES, 0, 3 );
+  //glDrawArrays( GL_TRIANGLES, 0, 6 );
+  glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 }
 
 void GlWindow::render() {
