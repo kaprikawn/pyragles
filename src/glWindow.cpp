@@ -104,7 +104,10 @@ int GlWindow::init() {
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   
   verts_ = {
-       0.0f,  1.0f, 0.0f
+       0.0f,  0.0f, 0.0f
+    ,  1.0f,  1.0f, 0.0f
+    , -1.0f,  1.0f, 0.0f
+    
     , -1.0f, -1.0f, 0.0f
     ,  1.0f, -1.0f, 0.0f
 	};
@@ -112,6 +115,15 @@ int GlWindow::init() {
   glGenBuffers( 1, &vbo_ );
   glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
   glBufferData( GL_ARRAY_BUFFER, verts_.size() * sizeof( GLfloat ), &verts_[0], GL_STATIC_DRAW );
+  
+  indices_ = {
+      0, 1, 2
+    , 0, 3, 4
+  };
+  
+  glGenBuffers( 1, &ibo_ );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof( GLushort ), &indices_[0], GL_STATIC_DRAW );
   
   positionID_ = glGetAttribLocation( programID_, "aPosition" );
   
@@ -132,7 +144,8 @@ void GlWindow::update( float dt ) {
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT );
   
-  glDrawArrays( GL_TRIANGLES, 0, 3 );
+  //glDrawArrays( GL_TRIANGLES, 0, 6 );
+  glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 }
 
 void GlWindow::render() {
