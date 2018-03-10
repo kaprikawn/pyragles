@@ -20,5 +20,7 @@ fi
 
 cp ../../src/shaders/* shaders
 
+./exe
+
 exit 0
 
