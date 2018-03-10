@@ -104,12 +104,13 @@ int GlWindow::init() {
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   
   verts_ = {
-       0.0f,  0.0f, 0.0f
-    ,  1.0f,  1.0f, 0.0f
-    , -1.0f,  1.0f, 0.0f
+  //    x      y     z     r     g     b
+       0.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f
+    ,  1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f
+    , -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f
     
-    , -1.0f, -1.0f, 0.0f
-    ,  1.0f, -1.0f, 0.0f
+    , -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f
+    ,  1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f
 	};
   
   glGenBuffers( 1, &vbo_ );
@@ -126,6 +127,7 @@ int GlWindow::init() {
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof( GLushort ), &indices_[0], GL_STATIC_DRAW );
   
   positionID_ = glGetAttribLocation( programID_, "aPosition" );
+  colourID_   = glGetAttribLocation( programID_, "aColour" );
   
   // set the viewport
   glViewport( 0, 0, windowWidth, windowHeight );
@@ -139,8 +141,13 @@ void GlWindow::update( float dt ) {
   glUseProgram( programID_ );
 	
 	// load the vertex data
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 6, (GLvoid*)0 );
   glEnableVertexAttribArray( positionID_ );
+  
+  // load the colour data
+  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 6, ( char* )( sizeof( GLfloat ) * 3 ) );
+  glEnableVertexAttribArray( colourID_ );
+  
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   glClear( GL_COLOR_BUFFER_BIT );
   

@@ -18,6 +18,7 @@ class GlWindow {
     GLuint                vbo_;
     GLuint                ibo_;
     GLint                 positionID_;
+    GLint                 colourID_;
     
   public:
     
