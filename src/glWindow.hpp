@@ -12,21 +12,10 @@
 
 class GlWindow {
   private:
-    GLuint                programObject_;
-    std::vector<GLfloat>  vertices_;
-    std::vector<GLuint>   indices_;
-    std::vector<GLfloat>  colours_;
-    
-    GLuint      vboIDs_[2];
-    
-    GLint       positionID_;
-    GLint       colourID_;
-    GLint       mvpID_;
-    
-    glm::mat4   projection_;
-    glm::mat4   view_;
-    glm::mat4   model_;
-    glm::mat4   mvp_;
+    GLuint                programID_;
+    std::vector<GLfloat>  verts_;
+    GLuint                vbo_;
+    GLint                 positionID_;
     
   public:
     
