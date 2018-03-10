@@ -10,6 +10,8 @@
 
 #define PI 3.1415926535897932384626433832795f
 
+
+
 class GlWindow {
   private:
     GLuint                programID_;
@@ -20,11 +22,15 @@ class GlWindow {
     GLint                 positionID_;
     GLint                 colourID_;
     
+    uint                  numTris_ = 0;
+    
   public:
     
     int     init();
     void    update( float dt );
     void    render();
+    
+    void    sendAnotherTriToOpenGL();
     
 };
 
