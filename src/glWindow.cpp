@@ -1,6 +1,7 @@
 #include "glWindow.hpp"
 #include <fstream>
 #include <iostream>
+#include <cstring>
 #include "game.hpp"
 
 const GLfloat X_DELTA               = 0.1f;
@@ -105,62 +106,46 @@ int GlWindow::init() {
   glLinkProgram( programID_ );
   
   // check the link status
-  checkShaderError( programID_, GL_LINK_STATUS, true, "Error linking shader program");
+  checkShaderError( programID_, GL_LINK_STATUS, true, "Error linking shader program" );
   
-  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-  glEnable( GL_DEPTH_TEST );
+  glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
+  
+  Vertex myTri[] = {
+      glm::vec3( -0.5f,  1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f ) // vertex0
+    , glm::vec3( -1.0f, -1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
+    , glm::vec3(  0.0f, -1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
+    
+    , glm::vec3( -0.5f,  1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
+    , glm::vec3(  0.0f, -1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
+    , glm::vec3(  0.5f,  1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
+  };
+  
+  memcpy( myTri_, myTri, sizeof( myTri ) );
+  
+  // set the viewport
+  glViewport( 0, 0, windowWidth, windowHeight );
+  
+  // use the program object
+  glUseProgram( programID_ );
   
   positionID_ = glGetAttribLocation( programID_, "aPosition" );
-  colourID_   = glGetAttribLocation( programID_, "aColour" );
   
-  glGenBuffers( 1, &vbo_ );
-  glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
-  glBufferData( GL_ARRAY_BUFFER, MAX_TRIS * TRIANGLE_BYTE_SIZE, NULL, GL_STATIC_DRAW );
+  // load the vertex data
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), myTri_ );
   glEnableVertexAttribArray( positionID_ );
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 6, (GLvoid*)0 );
-  
-  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, sizeof( GLfloat ) * 6, ( char* )( sizeof( GLfloat ) * 3 ) );
-glEnableVertexAttribArray( colourID_ );
-  
-  glViewport( 0, 0, windowWidth, windowHeight ); // set the viewport
   
   return 0;
 }
 
-void GlWindow::sendAnotherTriToOpenGL() {
-  
-  if( numTris_ == MAX_TRIS ) {
-    return;
-  }
-  
-  const GLfloat THIS_TRI_X = -1.0f + numTris_ * X_DELTA;
-  
-  GLfloat thisTri[] = {
-      THIS_TRI_X          ,  1.0f,  0.0f, 1.0f, 0.0f, 0.0f
-    , THIS_TRI_X + X_DELTA,  1.0f,  0.0f, 1.0f, 0.0f, 0.0f
-    , THIS_TRI_X          ,  0.0f,  0.0f, 1.0f, 0.0f, 0.0f
-  };
-  
-  //std::cout << "this tri x is " << THIS_TRI_X << std::endl;
-  
-  glBufferSubData( GL_ARRAY_BUFFER, numTris_ * TRIANGLE_BYTE_SIZE, TRIANGLE_BYTE_SIZE, thisTri );
-  numTris_++;
-}
-
 void GlWindow::update( float dt ) {
   
-  // use the program object
-  glUseProgram( programID_ );
-	
-  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  
-  sendAnotherTriToOpenGL();
-  
-  glDrawArrays( GL_TRIANGLES, ( numTris_ - 1 ) * NUM_VERTICES_PER_TRI, NUM_VERTICES_PER_TRI );
-  //glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0 );
 }
 
 void GlWindow::render() {
+  
+  glClear( GL_COLOR_BUFFER_BIT );
+  
+  glDrawArrays( GL_TRIANGLES, 0, 6 );
+  
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
 }

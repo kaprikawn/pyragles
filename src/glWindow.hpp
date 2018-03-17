@@ -10,27 +10,24 @@
 
 #define PI 3.1415926535897932384626433832795f
 
-
+struct Vertex {
+  glm::vec3   position;
+  glm::vec3   colour;
+};
 
 class GlWindow {
   private:
-    GLuint                programID_;
-    std::vector<GLfloat>  verts_;
-    std::vector<GLushort> indices_;
-    GLuint                vbo_;
-    GLuint                ibo_;
-    GLint                 positionID_;
-    GLint                 colourID_;
-    
-    uint                  numTris_ = 0;
+    GLuint    programID_;
+    //GLfloat   vertices_[9];
+    Vertex    myTri_[1000];
+    GLint     positionID_;
+    GLint     colourID_;
     
   public:
     
     int     init();
     void    update( float dt );
     void    render();
-    
-    void    sendAnotherTriToOpenGL();
     
 };
 
