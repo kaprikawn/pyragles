@@ -110,6 +110,7 @@ int GlWindow::init() {
   
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   
+  /*
   Vertex myTri[] = {
       glm::vec3( -0.5f,  1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f ) // vertex0
     , glm::vec3( -1.0f, -1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
@@ -121,6 +122,8 @@ int GlWindow::init() {
   };
   
   memcpy( myTri_, myTri, sizeof( myTri ) );
+  */
+  newTri_ = std::make_unique<Shape>( TRIANGLE );
   
   // set the viewport
   glViewport( 0, 0, windowWidth, windowHeight );
@@ -130,8 +133,11 @@ int GlWindow::init() {
   
   positionID_ = glGetAttribLocation( programID_, "aPosition" );
   
+  std::cout << "stride is " << newTri_ -> getStride() << std::endl;
+  std::cout << "sizeof Vertex is " << sizeof( Vertex ) << std::endl;
+  
   // load the vertex data
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), myTri_ );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, newTri_ -> getStride(), newTri_ -> getVertexDataPointer() );
   glEnableVertexAttribArray( positionID_ );
   
   return 0;
@@ -145,7 +151,7 @@ void GlWindow::render() {
   
   glClear( GL_COLOR_BUFFER_BIT );
   
-  glDrawArrays( GL_TRIANGLES, 0, 6 );
+  glDrawArrays( GL_TRIANGLES, 0, 3 );
   
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
 }

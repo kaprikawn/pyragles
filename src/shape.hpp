@@ -1,0 +1,32 @@
+#ifndef SHAPE_HPP
+#define SHAPE_HPP
+
+#include "structs.hpp"
+#include <GLES2/gl2.h>
+#include <vector>
+
+class Shape {
+  private:
+  
+    std::vector<Vertex>  vertices_;
+    std::vector<GLuint>  indices_;
+    
+    GLuint  numVertices_  = 0;
+    GLuint  numIndices_   = 0;
+    
+  public:
+    Shape( int shapeType );
+    ~Shape(){}
+    
+  GLsizei getStride() {
+    return sizeof( Vertex );
+  }
+  
+  //Vertex* getVertexDataPointer() { return &vertices_[0]; }
+  
+  GLfloat* getVertexDataPointer() {
+    return &vertices_[0].position.x; // returns pointer to the first position
+  }
+};
+
+#endif //SHAPE_HPP

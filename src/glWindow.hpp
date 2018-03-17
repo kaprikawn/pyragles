@@ -7,13 +7,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <memory>
+#include "structs.hpp"
+#include "shape.hpp"
+
 
 #define PI 3.1415926535897932384626433832795f
 
-struct Vertex {
-  glm::vec3   position;
-  glm::vec3   colour;
-};
+
 
 class GlWindow {
   private:
@@ -22,6 +23,8 @@ class GlWindow {
     Vertex    myTri_[1000];
     GLint     positionID_;
     GLint     colourID_;
+    
+    std::unique_ptr<Shape>  newTri_;
     
   public:
     
