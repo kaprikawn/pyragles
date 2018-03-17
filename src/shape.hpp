@@ -27,6 +27,22 @@ class Shape {
   GLfloat* getVertexDataPointer() {
     return &vertices_[0].position.x; // returns pointer to the first position
   }
+  
+  GLuint* getIndexDataPointer() {
+    return &indices_[0];
+  }
+  
+  GLsizeiptr vertexBufferSize() {
+    return vertices_.size() * sizeof( vertices_[0] );
+  }
+  
+  GLsizeiptr indexBufferSize() {
+    return indices_.size() * sizeof( indices_[0] );
+  }
+  
+  GLuint numIndices() {
+    return numIndices_;
+  }
 };
 
 #endif //SHAPE_HPP

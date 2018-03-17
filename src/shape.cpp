@@ -23,5 +23,11 @@ Shape::Shape( int shapeType ) {
     
     numVertices_ = 3;
     
+    indices_.push_back( 0 );
+    indices_.push_back( 1 );
+    indices_.push_back( 2 );
+    
+    numIndices_ = 3;
+    
   }
 }

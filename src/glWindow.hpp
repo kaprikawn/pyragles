@@ -11,20 +11,20 @@
 #include "structs.hpp"
 #include "shape.hpp"
 
-
 #define PI 3.1415926535897932384626433832795f
-
-
 
 class GlWindow {
   private:
+    
     GLuint    programID_;
-    //GLfloat   vertices_[9];
-    Vertex    myTri_[1000];
+    
+    GLuint    vbo_;
+    GLuint    ibo_;
+    
     GLint     positionID_;
     GLint     colourID_;
     
-    std::unique_ptr<Shape>  newTri_;
+    std::unique_ptr<Shape>  shape_;
     
   public:
     

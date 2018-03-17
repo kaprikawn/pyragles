@@ -96,6 +96,7 @@ int GlWindow::init() {
   programID_ = glCreateProgram();
   
   if( programID_ == 0 ) {
+    std::cout << "No programID" << std::endl;
     return 0;
   }
   
@@ -109,49 +110,44 @@ int GlWindow::init() {
   checkShaderError( programID_, GL_LINK_STATUS, true, "Error linking shader program" );
   
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
-  
-  /*
-  Vertex myTri[] = {
-      glm::vec3( -0.5f,  1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f ) // vertex0
-    , glm::vec3( -1.0f, -1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
-    , glm::vec3(  0.0f, -1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
-    
-    , glm::vec3( -0.5f,  1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
-    , glm::vec3(  0.0f, -1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
-    , glm::vec3(  0.5f,  1.0f,  0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f )
-  };
-  
-  memcpy( myTri_, myTri, sizeof( myTri ) );
-  */
-  newTri_ = std::make_unique<Shape>( TRIANGLE );
-  
-  // set the viewport
+  glEnable( GL_DEPTH_TEST );
+  //glDepthFunc( GL_LESS );
   glViewport( 0, 0, windowWidth, windowHeight );
   
-  // use the program object
-  glUseProgram( programID_ );
+  glUseProgram( programID_ ); // use the program object
   
   positionID_ = glGetAttribLocation( programID_, "aPosition" );
   
-  std::cout << "stride is " << newTri_ -> getStride() << std::endl;
-  std::cout << "sizeof Vertex is " << sizeof( Vertex ) << std::endl;
+  shape_ = std::make_unique<Shape>( TRIANGLE );
   
-  // load the vertex data
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, newTri_ -> getStride(), newTri_ -> getVertexDataPointer() );
-  glEnableVertexAttribArray( positionID_ );
+  glGenBuffers( 1, &vbo_ );
+  glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
+  glBufferData( GL_ARRAY_BUFFER, shape_ -> vertexBufferSize(), shape_ -> getVertexDataPointer(), GL_STATIC_DRAW );
+  
+  glGenBuffers( 1, &ibo_ );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, shape_ -> indexBufferSize(), shape_ -> getIndexDataPointer(), GL_STATIC_DRAW );
   
   return 0;
 }
 
 void GlWindow::update( float dt ) {
   
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  
+  glUseProgram( programID_ );
+  
+  // load the vertex data
+  glEnableVertexAttribArray( positionID_ );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), ( GLvoid* ) 0 );
+  
+  
 }
 
 void GlWindow::render() {
   
-  glClear( GL_COLOR_BUFFER_BIT );
-  
-  glDrawArrays( GL_TRIANGLES, 0, 3 );
+  //glDrawArrays( GL_TRIANGLES, 0, 3 );
+  glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
   
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
 }
