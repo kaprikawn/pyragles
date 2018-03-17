@@ -1,7 +1,6 @@
 #include "shape.hpp"
 #include <iostream>
 
-
 Shape::Shape( int shapeType ) {
   
   if( shapeType == CUBE ) {
@@ -65,8 +64,6 @@ Shape::Shape( int shapeType ) {
       , 0, 4, 6 // top B
     };
     
-    numIndices_ = indices_.size();
-    
   } else if( shapeType == TRIANGLE ) {
     
     Vertex top;
@@ -84,13 +81,10 @@ Shape::Shape( int shapeType ) {
     bottomRight.colour    = {  0.0f,  0.0f,  1.0f };
     vertices_.push_back( bottomRight );
     
-    numVertices_ = 3;
-    
-    indices_.push_back( 0 );
-    indices_.push_back( 1 );
-    indices_.push_back( 2 );
-    
-    numIndices_ = 3;
+    indices_ = { 0, 1, 2 };
     
   }
+  
+  numVertices_  = vertices_.size();
+  numIndices_   = indices_.size();
 }

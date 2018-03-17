@@ -1,11 +1,9 @@
 #!/bin/bash
 
 ## declare an array variable
-declare -a arr=( animation CMakeLists.txt collision enemy game gameState gameStateMachine health hero hud inputHandler jsonLoader main playState position projectile scenary sprite structs target textures transitionState values vector dataLevel1.json dataMain.json )
+declare -a arr=( CMakeLists.txt game glWindow inputHandler main playState shape triangle.vs triangle.fs )
 
-arr=( CMakeLists.txt game glWindow inputHandler main playState shape triangle.vs triangle.fs )
-
-if [ $HOSTNAME == "arch" ]
+if [[ `which gedit` ]]
 then
   syscall="gedit "
 else

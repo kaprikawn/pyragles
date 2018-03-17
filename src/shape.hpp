@@ -22,8 +22,6 @@ class Shape {
     return sizeof( Vertex );
   }
   
-  //Vertex* getVertexDataPointer() { return &vertices_[0]; }
-  
   GLfloat* getVertexDataPointer() {
     return &vertices_[0].position.x; // returns pointer to the first position
   }
