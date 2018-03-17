@@ -3,77 +3,7 @@
 #include <iostream>
 #include <cstring>
 #include "game.hpp"
-
-const GLfloat X_DELTA               = 0.1f;
-const uint    NUM_VERTICES_PER_TRI  = 3;
-const uint    NUM_FLOATS_PER_VERTEX = 6;
-const uint    TRIANGLE_BYTE_SIZE = NUM_VERTICES_PER_TRI * NUM_FLOATS_PER_VERTEX * sizeof( GLfloat );
-const uint  MAX_TRIS = 20;
-
-std::string getFile( const std::string& filename ) {
-  
-  std::ifstream file;
-  file.open( ( filename ).c_str() );
-  
-  std::string output;
-  std::string line;
-  
-  if( file.is_open() ) {
-    while( file.good() ) {
-      getline( file, line );
-      output.append( line + "\n" );
-    }
-  } else {
-    std::cerr << "Unable to load shader: " << filename << std::endl;
-  }
-  
-  return output;
-}
-
-void checkShaderError( GLuint shader, GLuint flag, bool isProgram, const std::string& errorMessage ) {
-  GLint success = 0;
-  GLchar error[ 1024 ] = { 0 };
-  
-  if( isProgram ) {
-    glGetProgramiv( shader, flag, &success );
-  } else {
-    glGetShaderiv( shader, flag, &success );
-  }
-  
-  if( success == GL_FALSE ) {
-    if( isProgram ) {
-      glGetProgramInfoLog( shader, sizeof( error ), NULL, error );
-    } else {
-      glGetShaderInfoLog( shader, sizeof( error ), NULL, error );
-    }
-    
-    std::cerr << errorMessage << ": '" << error << "'" << std::endl;
-  }
-}
-
-GLuint load( const char* shaderSrc, GLenum type ) {
-  
-  GLuint  shader;
-  
-  // create the shader object
-  shader = glCreateShader( type );
-  
-  if( shader == 0 ) {
-    return 0;
-  }
-  
-  // load the shader source
-  glShaderSource( shader, 1, &shaderSrc, NULL );
-  
-  // compile the shader
-  glCompileShader( shader );
-  
-  // check the compile status
-  //glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
-  checkShaderError( shader, GL_COMPILE_STATUS, false, "Error compiling shader!");
-  
-  return shader;
-}
+#include "shader.hpp"
 
 int GlWindow::init() {
 
@@ -89,8 +19,8 @@ int GlWindow::init() {
   fsSrc = fsSrcStr.c_str();
   
   // load the vertex / fragment shaders
-  vs = load( vsSrc, GL_VERTEX_SHADER );
-  fs = load( fsSrc, GL_FRAGMENT_SHADER );
+  vs = loadShader( vsSrc, GL_VERTEX_SHADER );
+  fs = loadShader( fsSrc, GL_FRAGMENT_SHADER );
   
   // create the program object
   programID_ = glCreateProgram();
@@ -103,11 +33,9 @@ int GlWindow::init() {
   glAttachShader( programID_, vs );
   glAttachShader( programID_, fs );
   
-  // link the program
-  glLinkProgram( programID_ );
+  glLinkProgram( programID_ ); // link the program
   
-  // check the link status
-  checkShaderError( programID_, GL_LINK_STATUS, true, "Error linking shader program" );
+  checkShaderError( programID_, GL_LINK_STATUS, true, "Error linking shader program" ); // check the link status
   
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   glEnable( GL_DEPTH_TEST );
@@ -120,7 +48,7 @@ int GlWindow::init() {
   colourID_   = glGetAttribLocation( programID_,  "aColour" );
   mvpID_      = glGetUniformLocation( programID_, "uMVP" );
   
-  shape_ = std::make_unique<Shape>( CUBE );
+  shape_ = std::make_unique<Shape>( CUBE ); // get a cube (verts, indices etc.)
   
   glGenBuffers( 1, &vbo_ );
   glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
@@ -171,3 +99,4 @@ void GlWindow::render() {
   
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
 }
+
