@@ -75,7 +75,9 @@ void GlWindow::update( float dt ) {
   
   model_ = glm::mat4( 1.0f );
   
-  mvp_ = projection_ * view_ * model_;
+  rotation_ = glm::rotate( glm::mat4(), 54.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  
+  mvp_ = projection_ * view_ * model_ * rotation_;
   
   // Send our transformation to the currently bound shader, 
   // in the "MVP" uniform
