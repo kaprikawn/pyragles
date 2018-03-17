@@ -111,7 +111,7 @@ int GlWindow::init() {
   
   glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
   glEnable( GL_DEPTH_TEST );
-  //glDepthFunc( GL_LESS );
+  glDepthFunc( GL_LESS );
   glViewport( 0, 0, windowWidth, windowHeight );
   
   glUseProgram( programID_ ); // use the program object
@@ -120,7 +120,7 @@ int GlWindow::init() {
   colourID_   = glGetAttribLocation( programID_,  "aColour" );
   mvpID_      = glGetUniformLocation( programID_, "uMVP" );
   
-  shape_ = std::make_unique<Shape>( TRIANGLE );
+  shape_ = std::make_unique<Shape>( CUBE );
   
   glGenBuffers( 1, &vbo_ );
   glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
@@ -161,14 +161,12 @@ void GlWindow::update( float dt ) {
   glEnableVertexAttribArray( colourID_ );
   glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), shape_ -> colorOffset() );
   
-  
 }
 
 void GlWindow::render() {
 
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   
-  //glDrawArrays( GL_TRIANGLES, 0, 3 );
   glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
   
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
