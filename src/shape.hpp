@@ -43,6 +43,10 @@ class Shape {
   GLuint numIndices() {
     return numIndices_;
   }
+  
+  GLvoid* colorOffset() {
+    return ( char* )( sizeof( GLfloat ) * 3 );
+  }
 };
 
 #endif //SHAPE_HPP

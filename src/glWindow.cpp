@@ -116,7 +116,9 @@ int GlWindow::init() {
   
   glUseProgram( programID_ ); // use the program object
   
-  positionID_ = glGetAttribLocation( programID_, "aPosition" );
+  positionID_ = glGetAttribLocation( programID_,  "aPosition" );
+  colourID_   = glGetAttribLocation( programID_,  "aColour" );
+  mvpID_      = glGetUniformLocation( programID_, "uMVP" );
   
   shape_ = std::make_unique<Shape>( TRIANGLE );
   
@@ -133,18 +135,38 @@ int GlWindow::init() {
 
 void GlWindow::update( float dt ) {
   
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  
   glUseProgram( programID_ );
+  
+  projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 100.0f );
+  
+  view_ = glm::lookAt(
+      glm::vec3( 4, 3, 3 )
+    , glm::vec3( 0, 0, 0 )
+    , glm::vec3( 0, 1, 0 )
+  );
+  
+  model_ = glm::mat4( 1.0f );
+  
+  mvp_ = projection_ * view_ * model_;
+  
+  // Send our transformation to the currently bound shader, 
+  // in the "MVP" uniform
+  glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
   
   // load the vertex data
   glEnableVertexAttribArray( positionID_ );
   glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), ( GLvoid* ) 0 );
   
+  // load the colour data
+  glEnableVertexAttribArray( colourID_ );
+  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), shape_ -> colorOffset() );
+  
   
 }
 
 void GlWindow::render() {
+
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   
   //glDrawArrays( GL_TRIANGLES, 0, 3 );
   glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );

@@ -23,6 +23,12 @@ class GlWindow {
     
     GLint     positionID_;
     GLint     colourID_;
+    GLint     mvpID_;
+    
+    glm::mat4   projection_;
+    glm::mat4   view_;
+    glm::mat4   model_;
+    glm::mat4   mvp_;
     
     std::unique_ptr<Shape>  shape_;
     
