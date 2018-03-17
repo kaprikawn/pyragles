@@ -7,30 +7,36 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <memory>
+#include "structs.hpp"
+#include "shape.hpp"
 
 #define PI 3.1415926535897932384626433832795f
 
-
-
 class GlWindow {
   private:
-    GLuint                programID_;
-    std::vector<GLfloat>  verts_;
-    std::vector<GLushort> indices_;
-    GLuint                vbo_;
-    GLuint                ibo_;
-    GLint                 positionID_;
-    GLint                 colourID_;
     
-    uint                  numTris_ = 0;
+    GLuint    programID_;
+    
+    GLuint    vbo_;
+    GLuint    ibo_;
+    
+    GLint     positionID_;
+    GLint     colourID_;
+    GLint     mvpID_;
+    
+    glm::mat4   projection_;
+    glm::mat4   view_;
+    glm::mat4   model_;
+    glm::mat4   mvp_;
+    
+    std::unique_ptr<Shape>  shape_;
     
   public:
     
     int     init();
     void    update( float dt );
     void    render();
-    
-    void    sendAnotherTriToOpenGL();
     
 };
 
