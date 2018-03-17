@@ -67,17 +67,17 @@ void GlWindow::update( float dt ) {
   
   projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 100.0f );
   
-  view_ = glm::lookAt(
-      glm::vec3( 4, 3, 3 )
+  /*view_ = glm::lookAt(
+      glm::vec3( 0, 0, 3 )
     , glm::vec3( 0, 0, 0 )
     , glm::vec3( 0, 1, 0 )
-  );
+  );*/
   
-  model_ = glm::mat4( 1.0f );
+  model_ = glm::translate( projection_, glm::vec3( 0.0f, 0.0f, -10.0f ) );
   
-  rotation_ = glm::rotate( glm::mat4(), 54.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  mvp_ = glm::rotate( model_, glm::radians( 30.0f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   
-  mvp_ = projection_ * view_ * model_ * rotation_;
+  //mvp_ = projection_ * model_ * rotation_;
   
   // Send our transformation to the currently bound shader, 
   // in the "MVP" uniform
