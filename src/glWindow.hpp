@@ -31,6 +31,9 @@ class GlWindow {
     glm::mat4   rotation_;
     glm::mat4   mvp_;
     
+    GLfloat     yAngle_ = 0.0f;
+    GLfloat     xAngle_ = 0.0f;
+    
     std::unique_ptr<Shape>  shape_;
     
   public:

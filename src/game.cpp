@@ -27,9 +27,7 @@ bool Game::init( const char* title, int xpos, int ypos, int width, int height, i
     return false;
   }
   
-  //shader = new Shader();
-  
-  //shader -> init();
+  TheInputHandler::Instance() -> initialiseGamepads();
   
   std::unique_ptr<GameStateMachine> gameStateMachine ( new GameStateMachine );
   gameStateMachine_ = std::move( gameStateMachine );

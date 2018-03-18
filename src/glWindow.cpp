@@ -4,6 +4,7 @@
 #include <cstring>
 #include "game.hpp"
 #include "shader.hpp"
+#include "inputHandler.hpp"
 
 int GlWindow::init() {
 
@@ -67,17 +68,43 @@ void GlWindow::update( float dt ) {
   
   projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 100.0f );
   
-  view_ = glm::lookAt(
-      glm::vec3( 4, 3, 3 )
+  /*view_ = glm::lookAt(
+      glm::vec3( 0, 0, 3 )
     , glm::vec3( 0, 0, 0 )
     , glm::vec3( 0, 1, 0 )
-  );
+  );*/
   
-  model_ = glm::mat4( 1.0f );
+  model_ = glm::translate( projection_, glm::vec3( 0.0f, 0.0f, -10.0f ) );
   
-  rotation_ = glm::rotate( glm::mat4(), 54.0f, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  if( TheInputHandler::Instance() -> isPressed( RIGHT ) ) {
+    yAngle_ += 50.0f * dt;
+  } else if( TheInputHandler::Instance() -> isPressed( LEFT ) ) {
+    yAngle_ -= 50.0f * dt;
+  }
   
-  mvp_ = projection_ * view_ * model_ * rotation_;
+  if( yAngle_ >= 360.f ) {
+    yAngle_ -= 360.0f;
+  } else if( yAngle_ < 0 ) {
+    yAngle_ += 360.0f;
+  }
+  
+  mvp_ = glm::rotate( model_, glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+  
+  if( TheInputHandler::Instance() -> isPressed( UP ) ) {
+    xAngle_ += 50.0f * dt;
+  } else if( TheInputHandler::Instance() -> isPressed( DOWN ) ) {
+    xAngle_ -= 50.0f * dt;
+  }
+  
+  if( xAngle_ >= 360.f ) {
+    xAngle_ -= 360.0f;
+  } else if( xAngle_ < 0 ) {
+    xAngle_ += 360.0f;
+  }
+  
+  mvp_ = glm::rotate( mvp_, glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  
+  //mvp_ = projection_ * model_ * rotation_;
   
   // Send our transformation to the currently bound shader, 
   // in the "MVP" uniform
