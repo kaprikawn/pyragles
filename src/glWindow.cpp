@@ -59,22 +59,28 @@ int GlWindow::init() {
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, shape_ -> indexBufferSize(), shape_ -> getIndexDataPointer(), GL_STATIC_DRAW );
   
+  // load the vertex data
+  glEnableVertexAttribArray( positionID_ );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), ( GLvoid* ) 0 );
+  
+  // load the colour data
+  glEnableVertexAttribArray( colourID_ );
+  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), shape_ -> colorOffset() );
+  
   return 0;
 }
 
 void GlWindow::update( float dt ) {
   
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  
   glUseProgram( programID_ );
   
-  projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 100.0f );
+  projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 20.0f );
   
-  /*view_ = glm::lookAt(
-      glm::vec3( 0, 0, 3 )
-    , glm::vec3( 0, 0, 0 )
-    , glm::vec3( 0, 1, 0 )
-  );*/
+  view_ = glm::mat4();
   
-  model_ = glm::translate( projection_, glm::vec3( 0.0f, 0.0f, -10.0f ) );
+  model_ = glm::translate( glm::mat4(), glm::vec3( 0.0f, 0.0f, -10.0f ) );
   
   if( TheInputHandler::Instance() -> isPressed( RIGHT ) ) {
     yAngle_ += 50.0f * dt;
@@ -88,7 +94,7 @@ void GlWindow::update( float dt ) {
     yAngle_ += 360.0f;
   }
   
-  mvp_ = glm::rotate( model_, glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+  rotation_ = glm::rotate( glm::mat4(), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   
   if( TheInputHandler::Instance() -> isPressed( UP ) ) {
     xAngle_ += 50.0f * dt;
@@ -102,30 +108,26 @@ void GlWindow::update( float dt ) {
     xAngle_ += 360.0f;
   }
   
-  mvp_ = glm::rotate( mvp_, glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  rotation_ = glm::rotate( rotation_, glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   
-  //mvp_ = projection_ * model_ * rotation_;
+  mvp_ = projection_ * view_ * model_ * rotation_;
   
   // Send our transformation to the currently bound shader, 
   // in the "MVP" uniform
   glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
   
-  // load the vertex data
-  glEnableVertexAttribArray( positionID_ );
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), ( GLvoid* ) 0 );
+  glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
   
-  // load the colour data
-  glEnableVertexAttribArray( colourID_ );
-  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), shape_ -> colorOffset() );
+  // cube 2
+  model_ = glm::translate( glm::mat4(), glm::vec3( 2.0f, 2.0f, -12.0f ) );
+  rotation_ = glm::mat4();
+  mvp_ = projection_ * view_ * model_ * rotation_;
+  glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
   
+  glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
 }
 
 void GlWindow::render() {
-
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  
-  glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
-  
   SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
 }
 
