@@ -78,7 +78,11 @@ void GlWindow::update( float dt ) {
   
   projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 20.0f );
   
-  view_ = glm::mat4();
+  view_ = glm::lookAt(
+      glm::vec3( 0, 0, 1 )
+    , glm::vec3( 0, 0, 0 )
+    , glm::vec3( 0, 1, 0 )
+  );
   
   model_ = glm::translate( glm::mat4(), glm::vec3( 0.0f, 0.0f, -10.0f ) );
   
@@ -111,20 +115,17 @@ void GlWindow::update( float dt ) {
   rotation_ = glm::rotate( rotation_, glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   
   mvp_ = projection_ * view_ * model_ * rotation_;
-  
-  // Send our transformation to the currently bound shader, 
-  // in the "MVP" uniform
   glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
   
   glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
   
   // cube 2
-  model_ = glm::translate( glm::mat4(), glm::vec3( 2.0f, 2.0f, -12.0f ) );
+  model_    = glm::translate( glm::mat4(), glm::vec3( 2.0f, 2.0f, -12.0f ) );
   rotation_ = glm::mat4();
-  mvp_ = projection_ * view_ * model_ * rotation_;
+  mvp_      = projection_ * view_ * model_ * rotation_;
   glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
-  
   glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
+  
 }
 
 void GlWindow::render() {

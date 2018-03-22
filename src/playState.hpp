@@ -5,7 +5,7 @@
 #include "SDL.h"
 #include "gameState.hpp"
 #include "structs.hpp"
-#include "glWindow.hpp"
+#include "hero.hpp"
 
 class PlayState : public GameState {
   private:
@@ -14,7 +14,8 @@ class PlayState : public GameState {
     Uint32    levelStart_;
     Uint32    currentTime_;
     
-    std::unique_ptr<GlWindow> glWindow_;
+    //std::unique_ptr<GlWindow> glWindow_;
+    Hero*       hero_;
     
   public:
     
@@ -22,6 +23,8 @@ class PlayState : public GameState {
     virtual void update( float dt );
     virtual void render();
     virtual bool onExit();
+    
+    void  addGlObject( GlObject* glObject );
     
     virtual std::string getStateID() const { return s_playID; }
 

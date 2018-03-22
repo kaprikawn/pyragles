@@ -10,7 +10,7 @@ if ( CMAKE_COMPILER_IS_GNUCC )
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
 endif ( CMAKE_COMPILER_IS_GNUCC )
 
-add_executable( exe shape.cpp gameStateMachine.cpp playState.cpp inputHandler.cpp glWindow.cpp game.cpp main.cpp )
+add_executable( exe glObject.cpp hero.cpp shape.cpp gameStateMachine.cpp playState.cpp inputHandler.cpp glWindow.cpp game.cpp main.cpp )
 
 include( FindPkgConfig )
 

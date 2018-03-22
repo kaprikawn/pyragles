@@ -4,10 +4,13 @@
 #include <string>
 #include <memory>
 #include "SDL.h"
+#include "glObject.hpp"
 
 class GameState {
   protected:
     GameState() {}
+    
+    std::vector <GlObject*> glObjects_;
     
   public:
     virtual ~GameState() {}
