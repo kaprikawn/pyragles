@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
 #include "shape.hpp"
+#include "vector.hpp"
 
 class GlObject {
   protected:
@@ -24,8 +25,11 @@ class GlObject {
     glm::mat4   rotation_;
     glm::mat4   mvp_;
     
+    Vector      velocity_;
+    Vector      coordinates_;
     GLfloat     yAngle_ = 0.0f;
     GLfloat     xAngle_ = 0.0f;
+    GLfloat     zAngle_ = 0.0f;
     
     std::unique_ptr<Shape>  shape_;
     

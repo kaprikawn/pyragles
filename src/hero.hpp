@@ -5,19 +5,22 @@
 
 class Hero : public GlObject {
   private:
-  
+    
+    GLfloat xPos    = 0.0f;
+    GLfloat yPos    = 0.0f;
     
   public:
     Hero();
     virtual ~Hero(){}
     
+    void handleInput( float dt );
+    
+    void updatePosition( float dt );
+    
     virtual void update( float dt );
     virtual void render();
     virtual void clean();
     
-    void handleInput();
-    
-  
 };
 
 #endif //HERO_HPP

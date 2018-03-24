@@ -2,8 +2,9 @@
 #include "glObject.hpp"
 #include "shader.hpp"
 #include "inputHandler.hpp"
+#include "camera.hpp"
 
-GlObject::GlObject() {
+GlObject::GlObject() : velocity_( 0, 0, 0 ), coordinates_( 0, 0, 0 ) {
    GlObject::init();
 }
 
@@ -14,7 +15,6 @@ int GlObject::init() {
   
   std::string vsSrcStr = getFile( "./shaders/triangle.vs" );
   std::string fsSrcStr = getFile( "./shaders/triangle.fs" );
-  
   
   const GLchar* vsSrc;
   const GLchar* fsSrc;
@@ -39,11 +39,6 @@ int GlObject::init() {
   glLinkProgram( programID_ ); // link the program
   
   checkShaderError( programID_, GL_LINK_STATUS, true, "Error linking shader program" ); // check the link status
-  
-  glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
-  glEnable( GL_DEPTH_TEST );
-  glDepthFunc( GL_LESS );
-  glViewport( 0, 0, windowWidth, windowHeight );
   
   glUseProgram( programID_ ); // use the program object
   
@@ -74,56 +69,20 @@ int GlObject::init() {
 
 void GlObject::update( float dt ) {
   
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  
   glUseProgram( programID_ );
   
-  projection_ = glm::perspective( glm::radians( 45.0f ), windowWidth / windowHeight, 0.1f, 20.0f );
   
-  view_ = glm::lookAt(
-      glm::vec3( 0, 0, 1 )
-    , glm::vec3( 0, 0, 0 )
-    , glm::vec3( 0, 1, 0 )
-  );
-  
-  model_ = glm::translate( glm::mat4(), glm::vec3( 0.0f, 0.0f, -10.0f ) );
-  
-  if( TheInputHandler::Instance() -> isPressed( RIGHT ) ) {
-    yAngle_ += 50.0f * dt;
-  } else if( TheInputHandler::Instance() -> isPressed( LEFT ) ) {
-    yAngle_ -= 50.0f * dt;
-  }
-  
-  if( yAngle_ >= 360.f ) {
-    yAngle_ -= 360.0f;
-  } else if( yAngle_ < 0 ) {
-    yAngle_ += 360.0f;
-  }
-  
-  rotation_ = glm::rotate( glm::mat4(), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-  
-  if( TheInputHandler::Instance() -> isPressed( UP ) ) {
-    xAngle_ += 50.0f * dt;
-  } else if( TheInputHandler::Instance() -> isPressed( DOWN ) ) {
-    xAngle_ -= 50.0f * dt;
-  }
-  
-  if( xAngle_ >= 360.f ) {
-    xAngle_ -= 360.0f;
-  } else if( xAngle_ < 0 ) {
-    xAngle_ += 360.0f;
-  }
-  
-  rotation_ = glm::rotate( rotation_, glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
-  
-  mvp_ = projection_ * view_ * model_ * rotation_;
-  glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
-  
-  glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
   
 }
 
 void GlObject::render() {
+  
+  
+  
+  mvp_ = TheCamera::Instance() -> projectionMatrix() * TheCamera::Instance() -> viewMatrix() * model_ * rotation_;
+  glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
+  
+  glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
   
 }
 
