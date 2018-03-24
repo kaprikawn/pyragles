@@ -5,8 +5,6 @@
 #include "SDL.h"
 #include "gameStateMachine.hpp"
 
-#define windowWidth 1280.0f
-#define windowHeight 720.0f
 
 class Game {
   private:

@@ -1,13 +1,14 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include "game.hpp"
+#include "structs.hpp"
 
 int main( int argc, char* args[] ) {
 
   Uint32  currentTime_;
   Uint32  previousTime_;
-  Uint32  msFrameDiff_ = 0;
-  float   dt_ = 0.0f;
+  Uint32  msFrameDiff_      = 0;
+  float   dt_               = 0.0f;
   
   const int   FPS           = 60;
   const float DELAY_TIME    = 1000.0f / FPS;
