@@ -46,7 +46,7 @@ int GlObject::init() {
   colourID_   = glGetAttribLocation( programID_,  "aColour" );
   mvpID_      = glGetUniformLocation( programID_, "uMVP" );
   
-  shape_ = std::make_unique<Shape>( CUBE ); // get a cube (verts, indices etc.)
+  shape_ = std::make_unique<Shape>( SHIP );
   
   glGenBuffers( 1, &vbo_ );
   glBindBuffer( GL_ARRAY_BUFFER, vbo_ );

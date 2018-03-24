@@ -22,7 +22,7 @@ enum buttons {
 };
 
 enum ShapeTypes {
-  UNDEF_SHAPE, CUBE, TRIANGLE
+  UNDEF_SHAPE, CUBE, TRIANGLE, SHIP
 };
 
 struct Vertex {
