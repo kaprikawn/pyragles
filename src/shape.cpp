@@ -3,7 +3,60 @@
 
 Shape::Shape( int shapeType ) {
   
-  if( shapeType == CUBE ) {
+  if( shapeType == SHIP ) {
+    
+    // 0 front
+    Vertex front;
+    front.position  = {  0.0f,  0.0f, -1.0f };
+    front.colour    = {  1.0f,  1.0f,  1.0f };
+    vertices_.push_back( front );
+    
+    // 1 top
+    Vertex top;
+    top.position    = {  0.0f,  0.6f,  0.6f };
+    top.colour      = {  0.0f,  1.0f,  0.0f };
+    vertices_.push_back( top );
+    
+    // 2 right
+    Vertex right;
+    right.position  = {  1.0f,  0.0f,  0.6f };
+    right.colour    = {  0.0f,  1.0f,  0.0f };
+    vertices_.push_back( right );
+    
+    // 3 left
+    Vertex left;
+    left.position   = { -1.0f,  0.0f,  0.6f };
+    left.colour     = {  0.0f,  1.0f,  0.0f };
+    vertices_.push_back( left );
+    
+    // 4 bottom
+    Vertex bottom;
+    bottom.position = {  0.0f, -0.4f,  0.6f };
+    bottom.colour   = {  0.0f,  1.0f,  0.0f };
+    vertices_.push_back( bottom );
+    
+    // 5 back
+    Vertex back;
+    back.position   = {  0.0f,  0.0f,  1.0f };
+    back.colour     = {  1.0f,  0.0f,  0.0f };
+    vertices_.push_back( back );
+    
+    // f t r
+    // f t l
+    
+    
+    indices_ = {
+        0, 1, 2 // f t r
+      , 0, 1, 3 // f t l
+      , 0, 4, 2 // f b r
+      , 0, 4, 3 // f b l
+      , 5, 1, 2 // b t r
+      , 5, 1, 3 // b t l
+      , 5, 4, 2 // b b r
+      , 5, 4, 3 // b b l
+    };
+    
+  } else if( shapeType == CUBE ) {
     
     // front vertices
     Vertex topLeftF; // 0
@@ -46,8 +99,6 @@ Shape::Shape( int shapeType ) {
     bottomLeftB.position  = { -1.0f, -1.0f, -1.0f };
     bottomLeftB.colour    = {  0.0f,  1.0f,  0.0f };
     vertices_.push_back( bottomLeftB );
-    
-    numVertices_ = vertices_.size();
     
     indices_ = {
         0, 1, 2 // front A
