@@ -1,6 +1,9 @@
 #ifndef STRUCTS_HPP
 #define STRUCTS_HPP
 
+#define windowWidth   1280.0f
+#define windowHeight  720.0f
+
 #include <glm/glm.hpp>
 
 enum GameStates {

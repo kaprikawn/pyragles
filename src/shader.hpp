@@ -1,6 +1,10 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
+#include <fstream>
+#include <string>
+#include <GLES2/gl2.h>
+
 std::string getFile( const std::string& filename ) {
   
   std::ifstream file;

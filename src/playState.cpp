@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "playState.hpp"
+#include "game.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -14,12 +15,6 @@ void PlayState::addGlObject( GlObject* glObject ) {
 
 bool PlayState::onEnter() {
   
-  //std::unique_ptr<GlWindow> glWindow_ ( new GlWindow );
-  
-  //glWindow_ = std::make_unique<GlWindow>();
-  
-  //glWindow_ -> init();
-  
   hero_ = new Hero();
   PlayState::addGlObject( hero_ );
   
@@ -29,16 +24,18 @@ bool PlayState::onEnter() {
 }
 
 void PlayState::gameLogic( float dt ) {
-
+  for( unsigned int i = 0; i < glObjects_.size(); i++ ) {
+    glObjects_[i] -> update( dt );
+  }
 }
 
 void PlayState::update( float dt ) {
    
-   //glWindow_ -> update( dt );
+   PlayState::gameLogic( dt );
 }
 
 void PlayState::render() {
-  //glWindow_ -> render();
+  SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
 }
 
 bool PlayState::onExit() {

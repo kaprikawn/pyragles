@@ -11,12 +11,10 @@ void Hero::handleInput() {
 }
 
 void Hero::update( float dt ) {
-
   GlObject::update( dt );
 }
 
 void Hero::render() {
-
   GlObject::render();
 }
 
