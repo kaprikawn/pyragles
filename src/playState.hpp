@@ -11,10 +11,9 @@ class PlayState : public GameState {
   private:
     static const std::string  s_playID;
     
-    Uint32    levelStart_;
-    Uint32    currentTime_;
+    Uint32      levelStart_;
+    Uint32      currentTime_;
     
-    //std::unique_ptr<GlWindow> glWindow_;
     Hero*       hero_;
     
   public:
