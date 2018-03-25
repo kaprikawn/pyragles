@@ -5,6 +5,9 @@
 
 class Hero : public GlObject {
   private:
+  
+    GLfloat   xVelocity_ = 0.0f;
+    GLfloat   yVelocity_ = 0.0f;
     
   public:
     Hero();
