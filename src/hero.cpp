@@ -7,37 +7,106 @@ Hero::Hero() : GlObject() {
 }
 
 void Hero::handleInput( float dt ) {
+  
   if( TheInputHandler::Instance() -> isPressed( RIGHT ) ) {
-    velocity_.setX( 5.0f );
-    zAngle_ = -10.0f;
+    
+    velocity_.setX( 9.0f );
+    
+    // tilt
+    if( zAngle_ > -10.0f ) {
+      if( zAngle_ > 0.0f ) {
+        zAngle_ -= 40.0f * dt;
+      } else {
+        zAngle_ -= 20.0f * dt;
+      }
+    }
+    
+    if( yAngle_ > -20.0f ) {
+      if( yAngle_ > 0.0f ) {
+        yAngle_ -= 100.0f * dt;
+      } else {
+        yAngle_ -= 80.0f * dt;
+      }
+    }
+    
   } else if( TheInputHandler::Instance() -> isPressed( LEFT ) ) {
-    velocity_.setX( -5.0f );
-    zAngle_ = 10.0f;
+    
+    velocity_.setX( -9.0f );
+    
+    if( zAngle_ < 10.0f ) {
+      if( zAngle_ < 0.0f ) {
+        zAngle_ += 40.0f * dt;
+      } else {
+        zAngle_ += 20.0f * dt;
+      }
+    }
+    
+    if( yAngle_ < 20.0f ) {
+      if( yAngle_ < 0.0f ) {
+        yAngle_ += 100.0f * dt;
+      } else {
+        yAngle_ += 80.0f * dt;
+      }
+    }
+    
   } else {
     velocity_.setX( 0.0f );
-    zAngle_ = 0.0f;
+    if( zAngle_ > 0.0f ) {
+      zAngle_ -= 80.0f * dt;
+    } else if( zAngle_ < 0.0f ) {
+      zAngle_ += 80.0f * dt;
+    }
+    
+    if( yAngle_ > 0.0f ) {
+      yAngle_ -= 80.0f * dt;
+    } else if( yAngle_ < 0.0f ) {
+      yAngle_ += 80.0f * dt;
+    }
   }
   
   if( TheInputHandler::Instance() -> isPressed( UP ) ) {
-    velocity_.setY( -5.0f );
+    velocity_.setY( -9.0f );
     xAngle_ = -20.0f;
+    
   } else if( TheInputHandler::Instance() -> isPressed( DOWN ) ) {
-    velocity_.setY( 5.0f );
-    xAngle_ = 20.0f;
+    velocity_.setY( 9.0f );
+    //xAngle_ = 20.0f;
+    
+    if( xAngle_ < 100.f ) {
+      xAngle_ += 30.f * dt;
+    }
+    
+    
+    
   } else {
     velocity_.setY( 0.0f );
     xAngle_ = 0.0f;
   }
+  
+  if( zAngle_ < 0.05f && zAngle_ > -0.05f )
+    zAngle_ = 0.0f;
+  if( xAngle_ < 0.05f && xAngle_ > -0.05f )
+    xAngle_ = 0.0f;
+  if( yAngle_ < 0.5f && yAngle_ > -0.05f )
+    yAngle_ = 0.0f;
+}
+
+void calculateRotation( float dt ) {
+
 }
 
 void Hero::updatePosition( float dt ) {
-  coordinates_ = coordinates_ + velocity_ * dt;
+  position_.updatePosition( velocity_, dt );
+  coordinates_ = position_.coordinateValues();
+  
 }
 
 void Hero::update( float dt ) {
   GlObject::update( dt );
   
   Hero::handleInput( dt );
+  
+  Hero::calculatRotation( dt );
   
   Hero::updatePosition( dt );
   

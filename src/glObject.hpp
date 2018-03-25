@@ -7,6 +7,7 @@
 #include <memory>
 #include "shape.hpp"
 #include "vector.hpp"
+#include "position.hpp"
 
 class GlObject {
   protected:
@@ -27,6 +28,7 @@ class GlObject {
     
     Vector      velocity_;
     Vector      coordinates_;
+    Position    position_;
     GLfloat     yAngle_ = 0.0f;
     GLfloat     xAngle_ = 0.0f;
     GLfloat     zAngle_ = 0.0f;
