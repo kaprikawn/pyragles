@@ -4,7 +4,7 @@
 #include "inputHandler.hpp"
 #include "camera.hpp"
 
-GlObject::GlObject() : velocity_( 0, 0, 0 ), coordinates_( 0, 0, 0 ) {
+GlObject::GlObject() : velocity_( 0, 0, 0 ), coordinates_( 0, 0, 0 ), position_( 0, 0, 0 ) {
    GlObject::init();
 }
 

@@ -5,9 +5,9 @@
 
 class Hero : public GlObject {
   private:
-    
-    GLfloat xPos    = 0.0f;
-    GLfloat yPos    = 0.0f;
+  
+    GLfloat   xVelocity_ = 0.0f;
+    GLfloat   yVelocity_ = 0.0f;
     
   public:
     Hero();
@@ -15,6 +15,7 @@ class Hero : public GlObject {
     
     void handleInput( float dt );
     
+    void calculateRotation( float dt );
     void updatePosition( float dt );
     
     virtual void update( float dt );
