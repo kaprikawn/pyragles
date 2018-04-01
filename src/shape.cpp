@@ -3,7 +3,84 @@
 
 Shape::Shape( int shapeType ) {
   
-  if( shapeType == SHIP ) {
+  if( shapeType == TARGET ) {
+    
+    glm::vec3 colour = { 0.8f, 0.8f, 0.8f };
+    Vertex vertex;
+    
+    // 6 top left outer
+    vertex.position    = { -0.9f,  0.9f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 7 top left lower
+    vertex.position    = { -0.9f,  0.8f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 8 top right upper
+    vertex.position    = {  0.9f,  0.9f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 9 top right lower
+    vertex.position    = {  0.9f,  0.8f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 10 top left inner
+    vertex.position    = { -0.8f,  0.8f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 11 bottom left upper
+    vertex.position    = { -0.9f, -0.8f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 12 bottom left inner
+    vertex.position    = { -0.8f, -0.8f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 13 bottom left lower
+    vertex.position    = { -0.9f, -0.9f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 14 bottom right upper
+    vertex.position    = {  0.9f, -0.8f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 15 bottom right lower
+    vertex.position    = {  0.9f, -0.9f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 16 top right inner
+    vertex.position    = {  0.8f,  0.8f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    // 17 bottom right inner
+    vertex.position    = {  0.8f, -0.8f, 0.0f };
+    vertex.colour      = colour;
+    vertices_.push_back( vertex );
+    
+    indices_ = {
+        0,  1,  2 // 0
+      , 2,  1,  3 // 1
+      , 1,  4,  5 // 2
+      , 4,  5,  6 // 3
+      , 5,  8,  7 // 4
+      , 7,  8,  9 // 5
+      , 10, 11, 8
+      , 10, 8,  3
+      
+    };
+    
+  } else if( shapeType == SHIP ) {
     
     glm::vec3 targetColour = { 0.8f, 0.8f, 0.8f };
     Vertex vertex;
@@ -38,133 +115,6 @@ Shape::Shape( int shapeType ) {
     vertex.colour     = {  1.0f,  0.0f,  0.0f };
     vertices_.push_back( vertex );
     
-    // near target
-    
-    GLfloat targetDist = -8.0f;
-    
-    // 6 top left outer
-    vertex.position    = { -0.9f,  0.9f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 7 top left lower
-    vertex.position    = { -0.9f,  0.8f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 8 top right upper
-    vertex.position    = {  0.9f,  0.9f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 9 top right lower
-    vertex.position    = {  0.9f,  0.8f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 10 top left inner
-    vertex.position    = { -0.8f,  0.8f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 11 bottom left upper
-    vertex.position    = { -0.9f, -0.8f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 12 bottom left inner
-    vertex.position    = { -0.8f, -0.8f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 13 bottom left lower
-    vertex.position    = { -0.9f, -0.9f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 14 bottom right upper
-    vertex.position    = {  0.9f, -0.8f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 15 bottom right lower
-    vertex.position    = {  0.9f, -0.9f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 16 top right inner
-    vertex.position    = {  0.8f,  0.8f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 17 bottom right inner
-    vertex.position    = {  0.8f, -0.8f, targetDist };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // far target
-    targetColour = { 0.6f, 0.6f, 0.6f };
-    
-    // 18 top left outer
-    vertex.position    = { -0.7f,  0.7f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 19 top left lower
-    vertex.position    = { -0.7f,  0.6f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 20 top right upper
-    vertex.position    = {  0.7f,  0.7f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 21 top right lower
-    vertex.position    = {  0.7f,  0.6f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 22 top left inner
-    vertex.position    = { -0.6f,  0.6f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 23 bottom left upper
-    vertex.position    = { -0.7f, -0.6f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 24 bottom left inner
-    vertex.position    = { -0.6f, -0.6f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 25 bottom left lower
-    vertex.position    = { -0.7f, -0.7f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 26 bottom right upper
-    vertex.position    = {  0.7f, -0.6f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 27 bottom right lower
-    vertex.position    = {  0.7f, -0.7f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 28 top right inner
-    vertex.position    = {  0.6f,  0.6f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
-    // 29 bottom right inner
-    vertex.position    = {  0.6f, -0.6f, -20.0f };
-    vertex.colour      = targetColour;
-    vertices_.push_back( vertex );
-    
     indices_ = {
         0,  1,  2 // f t r
       , 0,  1,  3 // f t l
@@ -174,24 +124,6 @@ Shape::Shape( int shapeType ) {
       , 5,  1,  3 // b t l
       , 5,  4,  2 // b b r
       , 5,  4,  3 // b b l
-      
-      , 6,  7,  8
-      , 8,  7,  9
-      , 7,  10, 11
-      , 10, 11, 12
-      , 11, 14, 13
-      , 13, 14, 15
-      , 16, 17, 14
-      , 16, 14, 9
-      
-      , 18, 19, 20
-      , 20, 19, 21
-      , 19, 23, 22
-      , 22, 23, 24
-      , 23, 25, 26
-      , 26, 25, 27
-      , 26, 28, 29
-      , 28, 26, 21
     };
     
   } else if( shapeType == CUBE ) {

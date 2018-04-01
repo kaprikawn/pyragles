@@ -5,6 +5,7 @@
 #include "SDL.h"
 #include "gameState.hpp"
 #include "structs.hpp"
+#include "target.hpp"
 #include "hero.hpp"
 
 class PlayState : public GameState {
@@ -15,6 +16,7 @@ class PlayState : public GameState {
     Uint32      currentTime_;
     
     Hero*       hero_;
+    Target*     target_;
     
   public:
     

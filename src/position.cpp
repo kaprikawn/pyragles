@@ -8,3 +8,9 @@ Position::Position( GLfloat x, GLfloat y, GLfloat z ) : coordinates_( x, y, z ) 
 void Position::updatePosition( Vector &velocity, float &dt ) {
   coordinates_ = coordinates_ + velocity * dt;
 }
+
+glm::vec3 Position::coordinates() {
+  
+  return glm::vec3( coordinates_.getX(), coordinates_.getY(), coordinates_.getZ() );
+
+}

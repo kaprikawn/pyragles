@@ -10,7 +10,7 @@ int main( int argc, char* args[] ) {
   Uint32  msFrameDiff_      = 0;
   float   dt_               = 0.0f;
   
-  const int   FPS           = 60;
+  const int   FPS           = 20;
   const float DELAY_TIME    = 1000.0f / FPS;
   
   if( !TheGame::Instance() -> init( "GLES2 Test", 20, 20, windowWidth, windowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN ) ) {

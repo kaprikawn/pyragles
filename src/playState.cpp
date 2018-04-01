@@ -1,7 +1,8 @@
+#include "playState.hpp"
 #include <iostream>
 #include <vector>
-#include "playState.hpp"
 #include "game.hpp"
+
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -13,7 +14,10 @@ void PlayState::addGlObject( GlObject* glObject ) {
 
 bool PlayState::onEnter() {
   
-  hero_ = new Hero();
+  target_ = new Target( TARGET );
+  PlayState::addGlObject( target_ );
+  
+  hero_ = new Hero( SHIP, target_ );
   PlayState::addGlObject( hero_ );
   
   levelStart_ = SDL_GetTicks();
@@ -53,5 +57,6 @@ void PlayState::render() {
 
 bool PlayState::onExit() {
   delete hero_;
+  delete target_;
   return true;
 }

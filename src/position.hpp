@@ -2,6 +2,7 @@
 #define POSITION_HPP
 
 #include <GLES2/gl2.h>
+#include <glm/glm.hpp>
 #include "vector.hpp"
 
 class Position {
@@ -16,7 +17,9 @@ class Position {
     
     void updatePosition( Vector &velocity, float &dt );
     
-    Vector  coordinateValues() { return coordinates_; }
+    //Vector  coordinates() { return coordinates_; }
+    
+    glm::vec3 coordinates();
   
 };
 
