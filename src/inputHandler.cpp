@@ -17,7 +17,6 @@ void InputHandler::initialiseGamepads() {
         std::cout << SDL_GetError() << std::endl;
       } else {
         gamepads_.push_back( joy );
-        //m_gamepadValues.push_back( std::make_pair( new Vector2D( 0, 0 ), new Vector2D( 0, 0 ) ) );
         for( int b = 0; b < SDL_JoystickNumButtons( joy ); b++ ) {
           buttonStates_.push_back( false );
         }
@@ -79,27 +78,57 @@ bool InputHandler::isPressed( int button ) {
 
 void InputHandler::onHatMotion( SDL_Event &event ) {
   
-  if( !gamepadsInitialised_ ) {
-    return;
-  }
-  
-  for( unsigned int i = 0; i < gamepads_.size(); i++ ) {
+  for( unsigned int i = 0; i < gamepads_.size(); i++ )
     currentHat_ = SDL_JoystickGetHat( gamepads_[i], 0 );
+    
+}
+
+GLfloat InputHandler::joyAxisX() {
+  
+  if( joyAxisX_ > 0 ) { // right on the stick
+    return ( float ) joyAxisX_ / 32767.0f;
+  } else if( joyAxisX_ < 0 ) { // left on the stick
+    return ( float ) joyAxisX_ / 32768.0f;
   }
+  return 0.0f;
+}
+
+GLfloat InputHandler::joyAxisY() {
+  
+  if( joyAxisY_ > 0 ) { // down on the stick
+    return -( joyAxisY_ / 32767.0f );
+  } else if( joyAxisY_ < 0 ) { // up on the stick
+    return -joyAxisY_ / 32768.0f;
+  }
+  return 0.0f;
+}
+
+void InputHandler::onJoystickAxisMove( SDL_Event &event ) {
+  
+  if( event.jaxis.axis == 0 ) {
+    if( event.jaxis.value > joystickDeadZone_ || event.jaxis.value < -joystickDeadZone_ ) {
+      joyAxisX_ = event.jaxis.value;
+    } else {
+      joyAxisX_ = 0;
+    }
+  } else if( event.jaxis.axis == 1 ) {
+    if( event.jaxis.value > joystickDeadZone_ || event.jaxis.value < -joystickDeadZone_ ) {
+      joyAxisY_ = event.jaxis.value; // swap = position up, negative down
+    } else {
+      joyAxisY_ = 0;
+    }
+  }
+    
 }
 
 void InputHandler::update() {
   SDL_Event event;
   while( SDL_PollEvent( &event ) ) {
     switch( event.type ) {
-      case SDL_QUIT:
-        TheGame::Instance() -> quit(); break;
-      case SDL_KEYDOWN:
-        onKeyDown(); break;
-      case SDL_KEYUP:
-        onKeyUp(); break;
-      case SDL_JOYHATMOTION:
-        onHatMotion( event ); break;
+      
+      // gamepad
+      case SDL_JOYAXISMOTION:
+        onJoystickAxisMove( event );    break;
       case SDL_JOYBUTTONDOWN:
         whichOne_ = event.jaxis.which;
         buttonStates_[ event.jbutton.button ] = true;
@@ -108,6 +137,19 @@ void InputHandler::update() {
         whichOne_ = event.jaxis.which;
         buttonStates_[ event.jbutton.button ] = false;
         break;
+      case SDL_JOYHATMOTION:
+        onHatMotion( event );           break;
+      
+      // keyboard
+      case SDL_KEYDOWN:
+        onKeyDown();                    break;
+      case SDL_KEYUP:
+        onKeyUp();                      break;
+      
+      // others
+      case SDL_QUIT:
+        TheGame::Instance() -> quit();  break;
+      
       default:
         break;
     }

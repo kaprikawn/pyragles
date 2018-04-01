@@ -9,6 +9,11 @@ class Hero : public GlObject {
     GLfloat   xVelocity_ = 0.0f;
     GLfloat   yVelocity_ = 0.0f;
     
+    GLfloat   joyAxisX_;
+    GLfloat   joyAxisY_;
+    
+    bool      directionPressed_ = false;
+    
   public:
     Hero();
     virtual ~Hero(){}

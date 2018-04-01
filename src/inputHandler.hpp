@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <SDL2/SDL.h>
+#include "vector.hpp"
 
 class InputHandler {
   private:
@@ -16,7 +17,10 @@ class InputHandler {
     bool    gamepadsInitialised_ = false;
     int     whichOne_;
     Uint8   currentHat_ = 0;
-    
+    void    onJoystickAxisMove( SDL_Event &event );
+    static const int joystickDeadZone_ = 3000;
+    Sint16  joyAxisX_   = 0;
+    Sint16  joyAxisY_   = 0;
     
     std::vector<SDL_Joystick*>  gamepads_;
     std::vector<bool>           buttonStates_;
@@ -32,6 +36,8 @@ class InputHandler {
     bool  gamepadsInitialised() { return gamepadsInitialised_; }
     bool  getButtonState( int buttonNumber ) { return buttonStates_[buttonNumber]; }
     void  onHatMotion( SDL_Event &event );
+    GLfloat joyAxisX();
+    GLfloat joyAxisY();
     
     // keyboard
     bool  isKeyDown( SDL_Scancode key );
