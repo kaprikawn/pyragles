@@ -4,11 +4,11 @@
 #include "inputHandler.hpp"
 #include "camera.hpp"
 
-GlObject::GlObject() : velocity_( 0, 0, 0 ), coordinates_( 0, 0, 0 ), position_( 0, 0, 0 ) {
-   GlObject::init();
+GlObject::GlObject( int shapeType, GLfloat x, GLfloat y, GLfloat z ) : velocity_( 0, 0, 0 ), position_( x, y, z ) {
+   GlObject::init( shapeType );
 }
 
-int GlObject::init() {
+int GlObject::init( int shapeType ) {
   
   GLuint  vs;
   GLuint  fs;
@@ -46,7 +46,7 @@ int GlObject::init() {
   colourID_   = glGetAttribLocation( programID_,  "aColour" );
   mvpID_      = glGetUniformLocation( programID_, "uMVP" );
   
-  shape_ = std::make_unique<Shape>( SHIP );
+  shape_ = std::make_unique<Shape>( shapeType );
   
   glGenBuffers( 1, &vbo_ );
   glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
@@ -58,28 +58,30 @@ int GlObject::init() {
   
   // load the vertex data
   glEnableVertexAttribArray( positionID_ );
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), ( GLvoid* ) 0 );
+  
   
   // load the colour data
   glEnableVertexAttribArray( colourID_ );
-  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), shape_ -> colorOffset() );
+  
   
   return 0;
 }
 
 void GlObject::update( float dt ) {
   
-  glUseProgram( programID_ );
-  
-  
-  
 }
 
 void GlObject::render() {
+
+  glUseProgram( programID_ );
   
+  glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
   
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), ( GLvoid* ) 0 );
+  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, shape_ -> getStride(), shape_ -> colorOffset() );
   
-  mvp_ = TheCamera::Instance() -> projectionMatrix() * TheCamera::Instance() -> viewMatrix() * model_ * rotation_;
+  mvp_ = TheCamera::Instance() -> projectionMatrix() * TheCamera::Instance() -> viewMatrix() * model_;
   glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
   
   glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );

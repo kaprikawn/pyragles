@@ -27,19 +27,19 @@ class GlObject {
     glm::mat4   mvp_;
     
     Vector      velocity_;
-    Vector      coordinates_;
+    //Vector      coordinates_;
     Position    position_;
-    GLfloat     yAngle_ = 0.0f;
-    GLfloat     xAngle_ = 0.0f;
-    GLfloat     zAngle_ = 0.0f;
+    GLfloat     yAngle_;
+    GLfloat     xAngle_;
+    GLfloat     zAngle_;
     
     std::unique_ptr<Shape>  shape_;
     
   public:
-    GlObject();
+    GlObject( int shapeType, GLfloat x, GLfloat y, GLfloat z );
     virtual ~GlObject(){}
     
-    virtual int   init();
+    virtual int   init( int shapeType );
     virtual void  update( float dt );
     virtual void  render();
     virtual void  clean();

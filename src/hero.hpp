@@ -2,31 +2,25 @@
 #define HERO_HPP
 
 #include "glObject.hpp"
+#include "target.hpp"
 
 class Hero : public GlObject {
+  
   private:
   
-    GLfloat   xVelocity_ = 0.0f;
-    GLfloat   yVelocity_ = 0.0f;
-    
-    GLfloat   joyAxisX_;
-    GLfloat   joyAxisY_;
-    
-    bool      directionPressed_ = false;
+    Target*   target_;
+    //Vector    targetCoordinates_;
     
   public:
-    Hero();
+    Hero( int shapeType, Target* target );
     virtual ~Hero(){}
     
-    void handleInput( float dt );
-    
-    void calculateRotation( float dt );
-    void updatePosition( float dt );
+    void calculateRotation();
     
     virtual void update( float dt );
     virtual void render();
     virtual void clean();
-    
+  
 };
 
 #endif //HERO_HPP
