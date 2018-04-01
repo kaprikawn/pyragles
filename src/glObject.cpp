@@ -56,13 +56,8 @@ int GlObject::init( int shapeType ) {
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, shape_ -> indexBufferSize(), shape_ -> getIndexDataPointer(), GL_STATIC_DRAW );
   
-  // load the vertex data
   glEnableVertexAttribArray( positionID_ );
-  
-  
-  // load the colour data
   glEnableVertexAttribArray( colourID_ );
-  
   
   return 0;
 }
@@ -85,7 +80,6 @@ void GlObject::render() {
   glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );
   
   glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
-  
 }
 
 void GlObject::clean() {
