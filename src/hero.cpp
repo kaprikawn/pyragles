@@ -67,8 +67,6 @@ void Hero::updatePosition( float dt ) {
 
 void Hero::update( float dt ) {
   
-  glm::vec3 vector = target_ -> position().coordinates() - position_.coordinates();
-  
   Hero::updatePosition( dt );
   
   Hero::calculateRotation( dt );
