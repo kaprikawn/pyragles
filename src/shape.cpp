@@ -82,7 +82,6 @@ Shape::Shape( int shapeType ) {
     
   } else if( shapeType == SHIP ) {
     
-    glm::vec3 targetColour = { 0.8f, 0.8f, 0.8f };
     Vertex vertex;
     
     // 0 front
