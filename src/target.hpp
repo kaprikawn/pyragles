@@ -14,7 +14,7 @@ class Target : public GlObject {
     GLfloat maxValY_;
   
   public:
-    Target( int shapeType );
+    Target( int shapeType, GLuint programID );
     virtual ~Target(){}
     
     void handleInput( float dt );

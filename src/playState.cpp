@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include "game.hpp"
-
+#include "shader.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -14,10 +14,18 @@ void PlayState::addGlObject( GlObject* glObject ) {
 
 bool PlayState::onEnter() {
   
-  target_ = new Target( TARGET );
+  std::unique_ptr<Shader> shader = std::make_unique<Shader>();
+  GLuint programID = shader -> init();
+  
+  if( programID == 0 )
+    return false;
+    
+  glUseProgram( programID );
+  
+  target_ = new Target( TARGET, programID );
   PlayState::addGlObject( target_ );
   
-  hero_ = new Hero( SHIP, target_ );
+  hero_ = new Hero( SHIP, programID, target_ );
   PlayState::addGlObject( hero_ );
   
   levelStart_ = SDL_GetTicks();

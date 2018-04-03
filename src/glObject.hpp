@@ -11,7 +11,6 @@
 
 class GlObject {
   protected:
-    GLuint      programID_;
     
     GLuint      vbo_;
     GLuint      ibo_;
@@ -35,10 +34,10 @@ class GlObject {
     std::unique_ptr<Shape>  shape_;
     
   public:
-    GlObject( int shapeType, GLfloat x, GLfloat y, GLfloat z );
+    GlObject( int shapeType, GLfloat x, GLfloat y, GLfloat z, GLuint programID );
     virtual ~GlObject(){}
     
-    virtual int   init( int shapeType );
+    virtual int   init( int shapeType, GLuint programID );
     virtual void  update( float dt );
     virtual void  render();
     virtual void  clean();

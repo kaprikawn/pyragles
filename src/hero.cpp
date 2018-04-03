@@ -5,7 +5,7 @@
 
 #define PI 3.141592653589793238462643383279
 
-Hero::Hero( int shapeType, Target* target ) : GlObject( shapeType, 0.0f, 0.0f, -7.0f ) {
+Hero::Hero( int shapeType, GLuint programID, Target* target ) : GlObject( shapeType, 0.0f, 0.0f, -7.0f, programID ) {
   target_ = target;
 }
 
