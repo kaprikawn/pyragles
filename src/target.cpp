@@ -3,7 +3,7 @@
 #include "target.hpp"
 #include "inputHandler.hpp"
 
-Target::Target( int shapeType ) : GlObject( shapeType, 0.0f, 0.0f, -15.0f ) {
+Target::Target( int shapeType, GLuint programID ) : GlObject( shapeType, 0.0f, 0.0f, -15.0f, programID ) {
   maxValX_ = 7.0f;
   maxValY_ = 4.0f;
 }

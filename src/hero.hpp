@@ -20,7 +20,7 @@ class Hero : public GlObject {
     GLfloat   catchup = 90.0f;
     
   public:
-    Hero( int shapeType, Target* target );
+    Hero( int shapeType, GLuint programID, Target* target );
     virtual ~Hero(){}
     
     void calculateRotation( float dt );

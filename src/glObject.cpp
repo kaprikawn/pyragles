@@ -1,50 +1,17 @@
 #include <iostream>
 #include "glObject.hpp"
-#include "shader.hpp"
 #include "inputHandler.hpp"
 #include "camera.hpp"
 
-GlObject::GlObject( int shapeType, GLfloat x, GLfloat y, GLfloat z ) : velocity_( 0, 0, 0 ), position_( x, y, z ) {
-   GlObject::init( shapeType );
+GlObject::GlObject( int shapeType, GLfloat x, GLfloat y, GLfloat z, GLuint programID ) : velocity_( 0, 0, 0 ), position_( x, y, z ) {
+   GlObject::init( shapeType, programID );
 }
 
-int GlObject::init( int shapeType ) {
+int GlObject::init( int shapeType, GLuint programID ) {
   
-  GLuint  vs;
-  GLuint  fs;
-  
-  std::string vsSrcStr = getFile( "./shaders/triangle.vs" );
-  std::string fsSrcStr = getFile( "./shaders/triangle.fs" );
-  
-  const GLchar* vsSrc;
-  const GLchar* fsSrc;
-  vsSrc = vsSrcStr.c_str();
-  fsSrc = fsSrcStr.c_str();
-  
-  // load the vertex / fragment shaders
-  vs = loadShader( vsSrc, GL_VERTEX_SHADER );
-  fs = loadShader( fsSrc, GL_FRAGMENT_SHADER );
-  
-  // create the program object
-  programID_ = glCreateProgram();
-  
-  if( programID_ == 0 ) {
-    std::cout << "No programID" << std::endl;
-    return 0;
-  }
-  
-  glAttachShader( programID_, vs );
-  glAttachShader( programID_, fs );
-  
-  glLinkProgram( programID_ ); // link the program
-  
-  checkShaderError( programID_, GL_LINK_STATUS, true, "Error linking shader program" ); // check the link status
-  
-  glUseProgram( programID_ ); // use the program object
-  
-  positionID_ = glGetAttribLocation( programID_,  "aPosition" );
-  colourID_   = glGetAttribLocation( programID_,  "aColour" );
-  mvpID_      = glGetUniformLocation( programID_, "uMVP" );
+  positionID_ = glGetAttribLocation( programID,  "aPosition" );
+  colourID_   = glGetAttribLocation( programID,  "aColour" );
+  mvpID_      = glGetUniformLocation( programID, "uMVP" );
   
   shape_ = std::make_unique<Shape>( shapeType );
   
@@ -67,8 +34,6 @@ void GlObject::update( float dt ) {
 }
 
 void GlObject::render() {
-
-  glUseProgram( programID_ );
   
   glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
