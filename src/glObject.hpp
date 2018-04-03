@@ -27,11 +27,10 @@ class GlObject {
     glm::mat4   mvp_;
     
     Vector      velocity_;
-    //Vector      coordinates_;
     Position    position_;
-    GLfloat     yAngle_;
-    GLfloat     xAngle_;
-    GLfloat     zAngle_;
+    GLfloat     yAngle_ = 0.0f;
+    GLfloat     xAngle_ = 0.0f;
+    GLfloat     zAngle_ = 0.0f;
     
     std::unique_ptr<Shape>  shape_;
     
