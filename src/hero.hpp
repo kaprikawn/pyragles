@@ -8,7 +8,7 @@ class Hero : public GlObject {
   
   private:
   
-    Target*   target_;
+    std::shared_ptr<Target> target_;
     GLfloat   maxRotationZ_ = 10.0f;
     
     GLfloat   heroX_;
@@ -20,7 +20,7 @@ class Hero : public GlObject {
     GLfloat   catchup = 90.0f;
     
   public:
-    Hero( int shapeType, GLuint programID, Target* target );
+    Hero( int shapeType, GLuint programID, std::shared_ptr<Target> target );
     virtual ~Hero(){}
     
     void calculateRotation( float dt );

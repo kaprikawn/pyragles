@@ -6,7 +6,7 @@
 
 const std::string PlayState::s_playID = "PLAY";
 
-void PlayState::addGlObject( GlObject* glObject ) {
+void PlayState::addGlObject( std::shared_ptr<GlObject> glObject ) {
   
   glObjects_.push_back( glObject );
   
@@ -22,10 +22,12 @@ bool PlayState::onEnter() {
     
   glUseProgram( programID );
   
-  target_ = new Target( TARGET, programID );
-  PlayState::addGlObject( target_ );
+  //PlayState::addGlObject( std::make_unique<Target>( TARGET, programID ) );
   
-  hero_ = new Hero( SHIP, programID, target_ );
+  target_ = std::make_shared<Target>( TARGET, programID );
+  hero_   = std::make_shared<Hero>( SHIP, programID, target_ );
+  
+  PlayState::addGlObject( target_ );
   PlayState::addGlObject( hero_ );
   
   levelStart_ = SDL_GetTicks();
@@ -64,7 +66,7 @@ void PlayState::render() {
 }
 
 bool PlayState::onExit() {
-  delete hero_;
-  delete target_;
+  //delete hero_;
+  //delete target_;
   return true;
 }

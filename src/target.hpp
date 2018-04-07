@@ -18,7 +18,6 @@ class Target : public GlObject {
     virtual ~Target(){}
     
     void handleInput( float dt );
-    //void updatePosition( float dt );
     
     virtual void update( float dt );
     virtual void render();
