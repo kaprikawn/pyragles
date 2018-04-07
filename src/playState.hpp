@@ -15,8 +15,8 @@ class PlayState : public GameState {
     Uint32      levelStart_;
     Uint32      currentTime_;
     
-    Hero*       hero_;
-    Target*     target_;
+    std::shared_ptr<Hero>   hero_;
+    std::shared_ptr<Target> target_;
     
   public:
     
@@ -25,7 +25,7 @@ class PlayState : public GameState {
     virtual void render();
     virtual bool onExit();
     
-    void  addGlObject( GlObject* glObject );
+    void  addGlObject( std::shared_ptr<GlObject> glObject );
     
     virtual std::string getStateID() const { return s_playID; }
 

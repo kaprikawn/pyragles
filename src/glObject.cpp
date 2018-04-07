@@ -13,6 +13,9 @@ int GlObject::init( int shapeType, GLuint programID ) {
   colourID_   = glGetAttribLocation( programID,  "aColour" );
   mvpID_      = glGetUniformLocation( programID, "uMVP" );
   
+  glEnableVertexAttribArray( positionID_ );
+  glEnableVertexAttribArray( colourID_ );
+  
   shape_ = std::make_unique<Shape>( shapeType );
   
   glGenBuffers( 1, &vbo_ );
@@ -22,9 +25,6 @@ int GlObject::init( int shapeType, GLuint programID ) {
   glGenBuffers( 1, &ibo_ );
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, shape_ -> indexBufferSize(), shape_ -> getIndexDataPointer(), GL_STATIC_DRAW );
-  
-  glEnableVertexAttribArray( positionID_ );
-  glEnableVertexAttribArray( colourID_ );
   
   return 0;
 }

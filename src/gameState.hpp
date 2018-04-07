@@ -10,7 +10,7 @@ class GameState {
   protected:
     GameState() {}
     
-    std::vector <GlObject*> glObjects_;
+    std::vector<std::shared_ptr<GlObject>> glObjects_;
     
   public:
     virtual ~GameState() {}
