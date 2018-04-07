@@ -22,8 +22,6 @@ bool PlayState::onEnter() {
     
   glUseProgram( programID );
   
-  //PlayState::addGlObject( std::make_unique<Target>( TARGET, programID ) );
-  
   target_ = std::make_shared<Target>( TARGET, programID );
   hero_   = std::make_shared<Hero>( SHIP, programID, target_ );
   
