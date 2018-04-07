@@ -38,12 +38,16 @@ class Shape {
     return indices_.size() * sizeof( indices_[0] );
   }
   
+  GLsizeiptr bufferSize() {
+    return ( vertices_.size() * sizeof( vertices_[0] ) ) + ( indices_.size() * sizeof( indices_[0] ) );
+  }
+  
   GLuint numIndices() {
     return numIndices_;
   }
   
-  GLvoid* colorOffset() {
-    return ( char* )( sizeof( GLfloat ) * 3 );
+  GLsizeiptr colorOffset() {
+    return ( sizeof( GLfloat ) * 3 );
   }
 };
 

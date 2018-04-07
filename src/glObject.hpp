@@ -9,6 +9,9 @@
 #include "vector.hpp"
 #include "position.hpp"
 
+#include <iostream>
+
+
 class GlObject {
   protected:
     
@@ -18,6 +21,11 @@ class GlObject {
     GLint       positionID_;
     GLint       colourID_;
     GLint       mvpID_;
+    
+    GLsizeiptr  vertexOffset_; // location of beginning of data in vertex buffer
+    GLsizeiptr  indexOffset_;  // location of beginning of data in index buffer
+    
+    GLvoid*     colourOffset_;
     
     glm::mat4   projection_;
     glm::mat4   view_;
@@ -41,6 +49,19 @@ class GlObject {
     virtual void  update( float dt );
     virtual void  render();
     virtual void  clean();
+    
+    GLsizeiptr  vertexBufferSize()  { return shape_ -> vertexBufferSize(); }
+    GLsizeiptr  indexBufferSize()   { return shape_ -> indexBufferSize(); }
+    GLfloat*    vertexDataPointer() { return shape_ -> getVertexDataPointer(); }
+    GLuint*     indexDataPointer()  { return shape_ -> getIndexDataPointer(); }
+    
+    void setOffsetLocations( GLsizeiptr vertexOffset, GLsizeiptr indexOffset ) {
+      vertexOffset_ = vertexOffset;
+      indexOffset_  = indexOffset;
+      
+      GLsizeiptr colourOffset = vertexOffset_ + shape_ -> colorOffset();      
+      colourOffset_ = (GLvoid*)colourOffset;
+    }
     
 };
 

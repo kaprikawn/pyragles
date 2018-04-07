@@ -7,6 +7,7 @@
 #include "structs.hpp"
 #include "target.hpp"
 #include "hero.hpp"
+#include "glBuffer.hpp"
 
 class PlayState : public GameState {
   private:
@@ -17,6 +18,11 @@ class PlayState : public GameState {
     
     std::shared_ptr<Hero>   hero_;
     std::shared_ptr<Target> target_;
+    
+    std::unique_ptr<GlBuffer> glBuffer_;
+    
+    GLsizeiptr  vertexBufferSize_     = 0;
+    GLsizeiptr  indexBufferSize_      = 0;
     
   public:
     

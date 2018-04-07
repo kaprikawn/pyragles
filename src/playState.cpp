@@ -8,6 +8,9 @@ const std::string PlayState::s_playID = "PLAY";
 
 void PlayState::addGlObject( std::shared_ptr<GlObject> glObject ) {
   
+  vertexBufferSize_ += glObject -> vertexBufferSize();
+  indexBufferSize_  += glObject -> indexBufferSize();
+  
   glObjects_.push_back( glObject );
   
 }
@@ -27,6 +30,24 @@ bool PlayState::onEnter() {
   
   PlayState::addGlObject( target_ );
   PlayState::addGlObject( hero_ );
+  
+  glBuffer_ = std::make_unique<GlBuffer>( vertexBufferSize_, indexBufferSize_ );
+  
+  for( unsigned int i = 0; i < glObjects_.size(); i++ ) {
+    
+    GLsizeiptr vertexOffset = glBuffer_ -> addVertexBufferData ( 
+        glObjects_[i] -> vertexBufferSize()
+      , glObjects_[i] -> vertexDataPointer()
+    ); // add the vertex data to the buffer
+    
+    GLsizeiptr indexOffset = glBuffer_ -> addIndexBufferData (
+        glObjects_[i] -> indexBufferSize()
+      , glObjects_[i] -> indexDataPointer()
+    );
+    
+    glObjects_[i] -> setOffsetLocations( vertexOffset, indexOffset );
+    
+  }
   
   levelStart_ = SDL_GetTicks();
   
