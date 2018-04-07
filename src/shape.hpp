@@ -46,8 +46,8 @@ class Shape {
     return numIndices_;
   }
   
-  GLvoid* colorOffset() {
-    return ( char* )( sizeof( GLfloat ) * 3 );
+  GLsizeiptr colorOffset() {
+    return ( sizeof( GLfloat ) * 3 );
   }
 };
 
