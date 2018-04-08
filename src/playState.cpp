@@ -25,11 +25,12 @@ bool PlayState::onEnter() {
     
   glUseProgram( programID );
   
-  target_ = std::make_shared<Target>( TARGET, programID );
-  hero_   = std::make_shared<Hero>( SHIP, programID, target_ );
+  heroPosition_ = std::make_shared<glm::vec3>();
+  target_ = std::make_shared<Target>( TARGET, programID, heroPosition_ );
+  hero_   = std::make_shared<Hero>( SHIP, programID, target_, heroPosition_ );
   
-  PlayState::addGlObject( target_ );
   PlayState::addGlObject( hero_ );
+  PlayState::addGlObject( target_ );
   
   glBuffer_ = std::make_unique<GlBuffer>( vertexBufferSize_, indexBufferSize_ );
   
@@ -66,6 +67,8 @@ void PlayState::gameLogic( float dt ) {
   for( unsigned int i = 0; i < glObjects_.size(); i++ ) {
     glObjects_[i] -> update( dt );
   }
+  
+  glObjects_[0] -> calculateRotation( dt ); // calculate rotation of hero
   
 }
 

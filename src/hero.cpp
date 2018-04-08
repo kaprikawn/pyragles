@@ -5,8 +5,9 @@
 
 #define PI 3.141592653589793238462643383279
 
-Hero::Hero( int shapeType, GLuint programID, std::shared_ptr<Target> target ) : GlObject( shapeType, 0.0f, 0.0f, -7.0f, programID ) {
+Hero::Hero( int shapeType, GLuint programID, std::shared_ptr<Target> target, std::shared_ptr<glm::vec3> heroPosition ) : GlObject( shapeType, 0.0f, 0.0f, -7.0f, programID ) {
   target_ = target;
+  heroPosition_ = heroPosition;
 }
 
 GLfloat differenceBetween( float target, float current ) {
@@ -41,54 +42,109 @@ void Hero::handleInput( float dt ) {
     }
   }
   
-  GLfloat velocityMultiplier_ = 13.0f;
+  if( invertY_ ) {
+    joyAxisY_ = -joyAxisY_;
+  }
+  
+  GLfloat velocityMultiplier_ = 20.0f;
   GLfloat xCurrentVelocity_ = velocity_.getX();
-  GLfloat setVelocityX_ = 0.0f;
+  GLfloat xSetVelocity_ = 0.0f;
   GLfloat xMaxVelocity_ = 8.0f;
   
-  if( joyAxisX_ > 0.0f ) {
+  if( joyAxisX_ > 0.0f ) { // pressing right
     if( xCurrentVelocity_  < 0.0f ) // if going left but pressing right
       xCurrentVelocity_ = 0.0f; // calculate velocity from 0 to turn quicker
   
-    setVelocityX_ = xCurrentVelocity_ + dt * velocityMultiplier_ * joyAxisX_;
+    xSetVelocity_ = xCurrentVelocity_ + dt * velocityMultiplier_ * joyAxisX_;
     
-  } else if( joyAxisX_ < 0.0f ) {
+  } else if( joyAxisX_ < 0.0f ) { // pressing left
     
     if( xCurrentVelocity_  > 0.0f )
       xCurrentVelocity_ = 0.0f;
   
-    setVelocityX_ = xCurrentVelocity_ + dt * velocityMultiplier_ * joyAxisX_;
+    xSetVelocity_ = xCurrentVelocity_ + dt * velocityMultiplier_ * joyAxisX_;
   
-  } else {
-    if( velocity_.getX() > 0.0f ) {
-      setVelocityX_ = xCurrentVelocity_ - differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.2f;
+  } else { // not pressing left nor right
+    
+    if( xCurrentVelocity_ > 0.0f ) {
       
-      if( velocity_.getX() < 0.0f )
-        setVelocityX_ = 0.0f;
+      xSetVelocity_ = xCurrentVelocity_ - differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.2f;
+      
+      if( xCurrentVelocity_ < 0.0f )
+        xSetVelocity_ = 0.0f;
+        
     } else if( xCurrentVelocity_ < 0.0f ) {
-      setVelocityX_ = xCurrentVelocity_ + differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.2f;
+      
+      xSetVelocity_ = xCurrentVelocity_ + differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.2f;
       
       if( xCurrentVelocity_ > 0.0f )
-        setVelocityX_ = 0.0f;
+        xSetVelocity_ = 0.0f;
+        
     }
   }
   
-  if( setVelocityX_ > xMaxVelocity_ )
-    setVelocityX_ = xMaxVelocity_;
+  if( xSetVelocity_ > xMaxVelocity_ )
+    xSetVelocity_ = xMaxVelocity_;
   
-  if( setVelocityX_ < -xMaxVelocity_ )
-    setVelocityX_ = -xMaxVelocity_;
+  if( xSetVelocity_ < -xMaxVelocity_ )
+    xSetVelocity_ = -xMaxVelocity_;
     
-  velocity_.setX( setVelocityX_ );
+  velocity_.setX( xSetVelocity_ );
+  
+  //////////////////
+  
+  GLfloat yCurrentVelocity_ = velocity_.getY();
+  GLfloat ySetVelocity_ = 0.0f;
+  GLfloat yMaxVelocity_ = 8.0f;
+  
+  if( joyAxisY_ > 0.0f ) { // rising
+    if( yCurrentVelocity_  < 0.0f )
+      yCurrentVelocity_ = 0.0f;
+  
+    ySetVelocity_ = yCurrentVelocity_ + dt * velocityMultiplier_ * joyAxisY_;
+    
+  } else if( joyAxisY_ < 0.0f ) { // falling
+    
+    if( yCurrentVelocity_  > 0.0f )
+      yCurrentVelocity_ = 0.0f;
+  
+    ySetVelocity_ = yCurrentVelocity_ + dt * velocityMultiplier_ * joyAxisY_;
+  
+  } else { // not pressing up nor down
+    
+    if( yCurrentVelocity_ > 0.0f ) {
+      
+      ySetVelocity_ = yCurrentVelocity_ - differenceBetween( 0.0f, yCurrentVelocity_ ) * 0.2f;
+      
+      if( yCurrentVelocity_ < 0.0f )
+        ySetVelocity_ = 0.0f;
+        
+    } else if( yCurrentVelocity_ < 0.0f ) {
+      
+      ySetVelocity_ = yCurrentVelocity_ + differenceBetween( 0.0f, yCurrentVelocity_ ) * 0.2f;
+      
+      if( yCurrentVelocity_ > 0.0f )
+        ySetVelocity_ = 0.0f;
+        
+    }
+  }
+  
+  if( ySetVelocity_ > yMaxVelocity_ )
+    ySetVelocity_ = yMaxVelocity_;
+  
+  if( ySetVelocity_ < -yMaxVelocity_ )
+    ySetVelocity_ = -yMaxVelocity_;
+    
+  velocity_.setY( ySetVelocity_ );
   
 }
 
 void Hero::calculateRotation( float dt ) {
   
-  heroX_ = position_.coordinates().x;
-  heroY_ = position_.coordinates().y;
-  targetX_ = target_ -> position().coordinates().x;
-  targetY_ = target_ -> position().coordinates().y;
+  heroX_    = position_.coordinates().x;
+  heroY_    = position_.coordinates().y;
+  targetX_  = target_ -> position().coordinates().x;
+  targetY_  = target_ -> position().coordinates().y;
   
   yAngle_ = -( atan( ( target_ -> position().coordinates().x - position_.coordinates().x ) / ( position_.coordinates().z - target_ -> position().coordinates().z ) ) * 180 / PI ); // face left and right
   
@@ -111,6 +167,10 @@ void Hero::calculateRotation( float dt ) {
 
 void Hero::updatePosition( float dt ) {
   position_.updatePosition( velocity_, dt );
+  
+  heroPosition_ -> x = position_.coordinates().x;
+  heroPosition_ -> y = position_.coordinates().y;
+  heroPosition_ -> z = position_.coordinates().z;
 }
 
 void Hero::update( float dt ) {
@@ -118,8 +178,6 @@ void Hero::update( float dt ) {
   Hero::handleInput( dt );
   
   Hero::updatePosition( dt );
-  
-  Hero::calculateRotation( dt );
   
   model_ = glm::translate( glm::mat4(), position_.coordinates() );
   model_ *= rotation_;

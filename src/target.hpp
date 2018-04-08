@@ -7,6 +7,8 @@ class Target : public GlObject {
   
   private:
     
+    std::shared_ptr<glm::vec3> heroPosition_;
+    
     GLfloat   joyAxisX_;
     GLfloat   joyAxisY_;
     
@@ -14,7 +16,7 @@ class Target : public GlObject {
     GLfloat maxValY_;
   
   public:
-    Target( int shapeType, GLuint programID );
+    Target( int shapeType, GLuint programID, std::shared_ptr<glm::vec3> heroPosition );
     virtual ~Target(){}
     
     void handleInput( float dt );

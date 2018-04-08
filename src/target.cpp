@@ -3,16 +3,14 @@
 #include "target.hpp"
 #include "inputHandler.hpp"
 
-Target::Target( int shapeType, GLuint programID ) : GlObject( shapeType, 0.0f, 0.0f, -15.0f, programID ) {
-  maxValX_ = 7.0f;
-  maxValY_ = 4.0f;
+Target::Target( int shapeType, GLuint programID, std::shared_ptr<glm::vec3> heroPosition ) : GlObject( shapeType, 0.0f, 0.0f, -15.0f, programID ) {
+  
+  heroPosition_ = heroPosition;
+  
+  rotation_ = glm::mat4();
 }
 
 void Target::handleInput( float dt ) {
-  
-  return;
-  
-  GLfloat velMultiplier_ = 13.0f;
   
   joyAxisX_ = TheInputHandler::Instance() -> joyAxisX();
   joyAxisY_ = TheInputHandler::Instance() -> joyAxisY();
@@ -33,39 +31,77 @@ void Target::handleInput( float dt ) {
     }
   }
   
-  // horizontal movement
-  if( joyAxisX_ > 0.0f ) {
-    if( position_.coordinates().x < maxValX_ ) {
-      velocity_.setX( joyAxisX_ * velMultiplier_ );
-    } else {
-      velocity_.setX( 0.0f );
-    }
-  } else if( joyAxisX_ < 0.0f ) {
-    if( position_.coordinates().x > -maxValX_ ) {
-      velocity_.setX( joyAxisX_ * velMultiplier_ );
-    } else {
-      velocity_.setX( 0.0f );
-    }
-  } else {
-    velocity_.setX( 0.0f );
+  if( invertY_ ) {
+    joyAxisY_ = -joyAxisY_;
   }
   
-  // vertical movement
-  if( joyAxisY_ < 0.0f ) { // rise
-    if( position_.coordinates().y < maxValY_ ) {
-      velocity_.setY( -joyAxisY_ * velMultiplier_ );
-    } else {
-      velocity_.setY( 0.0f );
-    }
-  } else if( joyAxisY_ > 0.0f ) { // fall
-    if( position_.coordinates().y > -maxValY_ ) {
-      velocity_.setY( -joyAxisY_ * velMultiplier_ );
-    } else {
-      velocity_.setY( 0.0f );
-    }
+  GLfloat speedFactor = 30.0f;
+  
+  GLfloat maxDistFromShipX_ = 10.0f;
+  GLfloat maxDistFromShipY_ = 5.0f;
+  GLfloat currentX          = position_.coordinates().x;
+  GLfloat shipX             = heroPosition_ -> x;
+  GLfloat destinationX_     = shipX + joyAxisX_ * maxDistFromShipX_;
+  GLfloat currentY          = position_.coordinates().y;
+  GLfloat shipY             = heroPosition_ -> y;
+  GLfloat destinationY_     = shipY + joyAxisY_ * maxDistFromShipY_;
+  
+  GLfloat x = currentX;
+  GLfloat y = currentY;
+  
+  if( joyAxisX_ > 0.0f ) {
+    if( x < destinationX_ )
+      x += speedFactor * dt;
+    
+    if( x > shipX + joyAxisX_ * maxDistFromShipX_ * 0.9f )
+      x = shipX + joyAxisX_ * maxDistFromShipX_ * 0.9f;
+    
+  } else if( joyAxisX_ < 0.0f ) {
+    if( x > destinationX_ )
+      x -= speedFactor * dt;
+    
+    if( x < shipX + joyAxisX_ * maxDistFromShipX_ * 0.9f )
+      x = shipX + joyAxisX_ * maxDistFromShipX_ * 0.9f;
+      
   } else {
-    velocity_.setY( 0.0f );
+    if( destinationX_ > currentX ) {
+      x += speedFactor * dt;
+      if( x > shipX )
+        x = shipX;
+    } else if( destinationX_ < currentX ) {
+      x -= speedFactor * dt;
+      if( x < shipX )
+        x = shipX;
+    }
   }
+  
+  if( joyAxisY_ > 0.0f ) { // rising
+    if( y < destinationY_ )
+      y += speedFactor * dt;
+    
+    if( y > shipY + joyAxisY_ * maxDistFromShipY_ * 0.9f )
+      y = shipY + joyAxisY_ * maxDistFromShipY_ * 0.9f;
+    
+  } else if( joyAxisY_ < 0.0f ) { // falling
+    if( y > destinationY_ )
+      y -= speedFactor * dt;
+    
+    if( y < shipY - -joyAxisY_ * maxDistFromShipY_ * 0.9f )
+      y = shipY - -joyAxisY_ * maxDistFromShipY_ * 0.9f;
+      
+  } else {
+    if( destinationY_ > currentY ) {
+      y += speedFactor * dt;
+      if( y > shipY )
+        y = shipY;
+    } else if( destinationY_ < currentY ) {
+      y -= speedFactor * dt;
+      if( y < shipY )
+        y = shipY;
+    }
+  }
+  
+  position_.setCoordinates( x, y, heroPosition_ -> z - 15.0f );
   
 }
 
@@ -73,11 +109,13 @@ void Target::update( float dt ) {
   
   Target::handleInput( dt );
   
-  position_.updatePosition( velocity_, dt );
+  //position_.updatePosition( velocity_, dt );
+  
+  //position_.setCoordinates( heroPosition_ -> x, heroPosition_ -> y, heroPosition_ -> z - 15.0f );
   
   model_ = glm::translate( glm::mat4(), position_.coordinates() );
   
-  rotation_ = glm::mat4();
+  
 }
 
 void Target::render() {
