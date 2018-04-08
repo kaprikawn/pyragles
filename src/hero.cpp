@@ -41,7 +41,7 @@ void Hero::handleInput( float dt ) {
     }
   }
   
-  GLfloat velocityMultiplier_ = 40.0f;
+  GLfloat velocityMultiplier_ = 13.0f;
   GLfloat xCurrentVelocity_ = velocity_.getX();
   GLfloat setVelocityX_ = 0.0f;
   GLfloat xMaxVelocity_ = 8.0f;
