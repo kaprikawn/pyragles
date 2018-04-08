@@ -14,6 +14,8 @@ class Shape {
     GLuint  numVertices_  = 0;
     GLuint  numIndices_   = 0;
     
+    int     shapeType_;
+    
   public:
     Shape( int shapeType );
     ~Shape(){}
@@ -49,6 +51,8 @@ class Shape {
   GLsizeiptr colorOffset() {
     return ( sizeof( GLfloat ) * 3 );
   }
+  
+  int shapeType() { return shapeType_; }
 };
 
 #endif //SHAPE_HPP

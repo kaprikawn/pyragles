@@ -8,9 +8,11 @@
 class InputHandler {
   private:
   
+    bool justPressed_[5];
+  
     // keyboard
     const Uint8*  keystates_ = SDL_GetKeyboardState( NULL );
-    void          onKeyDown();
+    void          onKeyDown( SDL_Event &event );
     void          onKeyUp();
     
     // gamepad
@@ -24,6 +26,7 @@ class InputHandler {
     
     std::vector<SDL_Joystick*>  gamepads_;
     std::vector<bool>           buttonStates_;
+    std::vector<bool>           padJustPressed_;
     
     InputHandler  (){}
     ~InputHandler (){}
@@ -36,6 +39,7 @@ class InputHandler {
     bool  gamepadsInitialised() { return gamepadsInitialised_; }
     bool  getButtonState( int buttonNumber ) { return buttonStates_[buttonNumber]; }
     void  onHatMotion( SDL_Event &event );
+    void  onGamepadButtonDown( SDL_Event &event );
     GLfloat joyAxisX();
     GLfloat joyAxisY();
     
@@ -43,6 +47,7 @@ class InputHandler {
     bool  isKeyDown( SDL_Scancode key );
     
     bool  isPressed( int button );
+    bool  justPressed( int button );
     
     void update();
     void clean();

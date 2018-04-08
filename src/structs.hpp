@@ -23,7 +23,9 @@ enum buttons {
 };
 
 enum ShapeTypes {
-  UNDEF_SHAPE, CUBE, TRIANGLE, SHIP, TARGET
+    UNDEF_SHAPE, SHIP, TARGET, BULLET
+  , MAX_SHAPE_NUM
+  , MAX_SHAPE = MAX_SHAPE_NUM
 };
 
 struct Vertex {

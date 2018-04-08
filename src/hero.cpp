@@ -21,8 +21,6 @@ GLfloat differenceBetween( float target, float current ) {
 
 void Hero::handleInput( float dt ) {
   
-  
-  
   GLfloat joyAxisX_ = TheInputHandler::Instance() -> joyAxisX();
   GLfloat joyAxisY_ = TheInputHandler::Instance() -> joyAxisY();
   
@@ -137,6 +135,8 @@ void Hero::handleInput( float dt ) {
     
   velocity_.setY( ySetVelocity_ );
   
+  if( TheInputHandler::Instance() -> justPressed( FIRE ) )
+    fire_ = true;
 }
 
 void Hero::calculateRotation( float dt ) {
