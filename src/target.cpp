@@ -10,6 +10,8 @@ Target::Target( int shapeType, GLuint programID ) : GlObject( shapeType, 0.0f, 0
 
 void Target::handleInput( float dt ) {
   
+  return;
+  
   GLfloat velMultiplier_ = 13.0f;
   
   joyAxisX_ = TheInputHandler::Instance() -> joyAxisX();

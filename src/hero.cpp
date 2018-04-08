@@ -9,20 +9,86 @@ Hero::Hero( int shapeType, GLuint programID, std::shared_ptr<Target> target ) : 
   target_ = target;
 }
 
-void Hero::handleInput( float dt ) {
-  
-}
-
 GLfloat differenceBetween( float target, float current ) {
   float squared = sqrt( pow( target - current, 2.0f ) );
   
-  if( squared < 0.2 )
+  if( squared < 0.2f )
     squared = 0.0f;
     
   return squared;
 }
 
+void Hero::handleInput( float dt ) {
+  
+  
+  
+  GLfloat joyAxisX_ = TheInputHandler::Instance() -> joyAxisX();
+  GLfloat joyAxisY_ = TheInputHandler::Instance() -> joyAxisY();
+  
+  if( joyAxisX_ == 0.0f ) {
+    if( TheInputHandler::Instance() -> isPressed( RIGHT ) ) {
+      joyAxisX_ = 1.0f;
+    } else if( TheInputHandler::Instance() -> isPressed( LEFT ) ) {
+      joyAxisX_ = -1.0f;
+    }
+  }
+  
+  if( joyAxisY_ == 0.0f ) {
+    if( TheInputHandler::Instance() -> isPressed( RISE ) ) {
+      joyAxisY_ = 1.0f;
+    } else if( TheInputHandler::Instance() -> isPressed( FALL ) ) {
+      joyAxisY_ = -1.0f;
+    }
+  }
+  
+  GLfloat velocityMultiplier_ = 40.0f;
+  GLfloat xCurrentVelocity_ = velocity_.getX();
+  GLfloat setVelocityX_ = 0.0f;
+  GLfloat xMaxVelocity_ = 8.0f;
+  
+  if( joyAxisX_ > 0.0f ) {
+    if( xCurrentVelocity_  < 0.0f ) // if going left but pressing right
+      xCurrentVelocity_ = 0.0f; // calculate velocity from 0 to turn quicker
+  
+    setVelocityX_ = xCurrentVelocity_ + dt * velocityMultiplier_ * joyAxisX_;
+    
+  } else if( joyAxisX_ < 0.0f ) {
+    
+    if( xCurrentVelocity_  > 0.0f )
+      xCurrentVelocity_ = 0.0f;
+  
+    setVelocityX_ = xCurrentVelocity_ + dt * velocityMultiplier_ * joyAxisX_;
+  
+  } else {
+    if( velocity_.getX() > 0.0f ) {
+      setVelocityX_ = xCurrentVelocity_ - differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.2f;
+      
+      if( velocity_.getX() < 0.0f )
+        setVelocityX_ = 0.0f;
+    } else if( xCurrentVelocity_ < 0.0f ) {
+      setVelocityX_ = xCurrentVelocity_ + differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.2f;
+      
+      if( xCurrentVelocity_ > 0.0f )
+        setVelocityX_ = 0.0f;
+    }
+  }
+  
+  if( setVelocityX_ > xMaxVelocity_ )
+    setVelocityX_ = xMaxVelocity_;
+  
+  if( setVelocityX_ < -xMaxVelocity_ )
+    setVelocityX_ = -xMaxVelocity_;
+    
+  velocity_.setX( setVelocityX_ );
+  
+}
+
 void Hero::calculateRotation( float dt ) {
+  
+  heroX_ = position_.coordinates().x;
+  heroY_ = position_.coordinates().y;
+  targetX_ = target_ -> position().coordinates().x;
+  targetY_ = target_ -> position().coordinates().y;
   
   yAngle_ = -( atan( ( target_ -> position().coordinates().x - position_.coordinates().x ) / ( position_.coordinates().z - target_ -> position().coordinates().z ) ) * 180 / PI ); // face left and right
   
@@ -44,28 +110,12 @@ void Hero::calculateRotation( float dt ) {
 }
 
 void Hero::updatePosition( float dt ) {
-  
-  heroX_ = position_.coordinates().x;
-  heroY_ = position_.coordinates().y;
-  targetX_ = target_ -> position().coordinates().x;
-  targetY_ = target_ -> position().coordinates().y;
-  
-  if( targetX_ > heroX_ + buffer || targetX_ < heroX_ - buffer ) {
-    velocity_.setX( ( targetX_ - heroX_ ) * catchup * dt );
-  } else {
-    velocity_.setX( 0.0f );
-  }
-  
-  if( targetY_ > heroY_ + buffer || targetY_ < heroY_ - buffer ) {
-    velocity_.setY( ( targetY_ - heroY_ ) * catchup * dt );
-  } else {
-    velocity_.setY( 0.0f );
-  }
-  
   position_.updatePosition( velocity_, dt );
 }
 
 void Hero::update( float dt ) {
+  
+  Hero::handleInput( dt );
   
   Hero::updatePosition( dt );
   
