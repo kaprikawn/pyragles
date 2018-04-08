@@ -5,12 +5,17 @@
 #include <memory>
 #include "SDL.h"
 #include "glObject.hpp"
+#include "structs.hpp"
 
 class GameState {
   protected:
     GameState() {}
     
-    std::vector<std::shared_ptr<GlObject>> glObjects_;
+    std::vector<std::shared_ptr<GlObject>> liveObjects_;
+    std::vector<std::shared_ptr<GlObject>> levelObjects_;
+    
+    GLsizeiptr vertexOffsets_[ MAX_SHAPE ];
+    GLsizeiptr indexOffsets_[ MAX_SHAPE ];
     
   public:
     virtual ~GameState() {}

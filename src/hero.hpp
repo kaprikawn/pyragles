@@ -17,9 +17,6 @@ class Hero : public GlObject {
     GLfloat   heroY_;
     GLfloat   targetX_;
     GLfloat   targetY_;
-  
-    GLfloat   buffer  =  0.3f;
-    GLfloat   catchup = 90.0f;
     
   public:
     Hero( int shapeType, GLuint programID, std::shared_ptr<Target> target, std::shared_ptr<glm::vec3> heroPosition );
@@ -32,7 +29,7 @@ class Hero : public GlObject {
     virtual void update   ( float dt );
     virtual void render();
     virtual void clean();
-  
+    
 };
 
 #endif //HERO_HPP

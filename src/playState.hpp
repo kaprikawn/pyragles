@@ -14,6 +14,8 @@ class PlayState : public GameState {
   private:
     static const std::string  s_playID;
     
+    GLuint      programID_;
+    
     Uint32      levelStart_;
     Uint32      currentTime_;
     
@@ -21,7 +23,7 @@ class PlayState : public GameState {
     std::shared_ptr<Target>     target_;
     std::shared_ptr<glm::vec3>  heroPosition_;
     
-    std::unique_ptr<GlBuffer> glBuffer_;
+    std::unique_ptr<GlBuffer>   glBuffer_;
     
     GLsizeiptr  vertexBufferSize_     = 0;
     GLsizeiptr  indexBufferSize_      = 0;
@@ -33,7 +35,7 @@ class PlayState : public GameState {
     virtual void render();
     virtual bool onExit();
     
-    void  addGlObject( std::shared_ptr<GlObject> glObject );
+    void  addGlObject( std::shared_ptr<GlObject> glObject, bool init, bool isLoading );
     
     virtual std::string getStateID() const { return s_playID; }
 

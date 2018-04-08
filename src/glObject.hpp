@@ -41,6 +41,10 @@ class GlObject {
     GLfloat     xAngle_ = 0.0f;
     GLfloat     zAngle_ = 0.0f;
     
+    bool        fire_   = false;
+    
+    bool        delete_ = false;
+    
     std::unique_ptr<Shape>  shape_;
     
   public:
@@ -53,10 +57,19 @@ class GlObject {
     virtual void  clean();
     virtual void  calculateRotation( float dt ){}
     
+    bool fire() {
+      if( fire_ ) {
+        fire_ = false;
+        return true;
+      }
+      return false;
+    }
+    
     GLsizeiptr  vertexBufferSize()  { return shape_ -> vertexBufferSize(); }
     GLsizeiptr  indexBufferSize()   { return shape_ -> indexBufferSize(); }
     GLfloat*    vertexDataPointer() { return shape_ -> getVertexDataPointer(); }
     GLuint*     indexDataPointer()  { return shape_ -> getIndexDataPointer(); }
+    int         shapeType()         { return shape_ -> shapeType(); }
     
     void setOffsetLocations( GLsizeiptr vertexOffset, GLsizeiptr indexOffset ) {
       vertexOffset_ = vertexOffset;
@@ -65,6 +78,9 @@ class GlObject {
       GLsizeiptr colourOffset = vertexOffset_ + shape_ -> colorOffset();      
       colourOffset_ = (GLvoid*)colourOffset;
     }
+    
+    glm::vec3 coordinates() { return position_.coordinates(); } 
+    bool deleteObject() { return delete_; }
     
 };
 
