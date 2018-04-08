@@ -35,83 +35,75 @@ void Target::handleInput( float dt ) {
     joyAxisY_ = -joyAxisY_;
   }
   
-  GLfloat speedFactor = 30.0f;
+  currentX_         = position_.coordinates().x;
+  shipX_            = heroPosition_ -> x;
+  destinationX_     = shipX_ + joyAxisX_ * maxDistFromShipX_;
+  currentY_         = position_.coordinates().y;
+  shipY_            = heroPosition_ -> y;
+  destinationY_     = shipY_ + joyAxisY_ * maxDistFromShipY_;
   
-  GLfloat maxDistFromShipX_ = 10.0f;
-  GLfloat maxDistFromShipY_ = 5.0f;
-  GLfloat currentX_         = position_.coordinates().x;
-  GLfloat shipX_            = heroPosition_ -> x;
-  GLfloat destinationX_     = shipX_ + joyAxisX_ * maxDistFromShipX_;
-  GLfloat currentY_         = position_.coordinates().y;
-  GLfloat shipY_            = heroPosition_ -> y;
-  GLfloat destinationY_     = shipY_ + joyAxisY_ * maxDistFromShipY_;
-  
-  GLfloat targetX_ = currentX_;
-  GLfloat y = currentY_;
+  targetX_          = currentX_;
+  targetY_          = currentY_;
   
   if( joyAxisX_ > 0.0f ) {
     if( targetX_ < destinationX_ )
-      targetX_ += speedFactor * dt;
+      targetX_ += speedFactor_ * dt;
     
     if( targetX_ > shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f )
       targetX_ = shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f;
     
   } else if( joyAxisX_ < 0.0f ) {
     if( targetX_ > destinationX_ )
-      targetX_ -= speedFactor * dt;
+      targetX_ -= speedFactor_ * dt;
     
     if( targetX_ < shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f )
       targetX_ = shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f;
       
   } else {
     if( destinationX_ > currentX_ ) {
-      targetX_ += speedFactor * dt;
+      targetX_ += speedFactor_ * dt;
       if( targetX_ > shipX_ )
         targetX_ = shipX_;
     } else if( destinationX_ < currentX_ ) {
-      targetX_ -= speedFactor * dt;
+      targetX_ -= speedFactor_ * dt;
       if( targetX_ < shipX_ )
         targetX_ = shipX_;
     }
   }
   
   if( joyAxisY_ > 0.0f ) { // rising
-    if( y < destinationY_ )
-      y += speedFactor * dt;
+    if( targetY_ < destinationY_ )
+      targetY_ += speedFactor_ * dt;
     
-    if( y > shipY_ + joyAxisY_ * maxDistFromShipY_ * 0.9f )
-      y = shipY_ + joyAxisY_ * maxDistFromShipY_ * 0.9f;
+    if( targetY_ > shipY_ + joyAxisY_ * maxDistFromShipY_ * 0.9f )
+      targetY_ = shipY_ + joyAxisY_ * maxDistFromShipY_ * 0.9f;
     
   } else if( joyAxisY_ < 0.0f ) { // falling
-    if( y > destinationY_ )
-      y -= speedFactor * dt;
+    if( targetY_ > destinationY_ )
+      targetY_ -= speedFactor_ * dt;
     
-    if( y < shipY_ - -joyAxisY_ * maxDistFromShipY_ * 0.9f )
-      y = shipY_ - -joyAxisY_ * maxDistFromShipY_ * 0.9f;
+    if( targetY_ < shipY_ - -joyAxisY_ * maxDistFromShipY_ * 0.9f )
+      targetY_ = shipY_ - -joyAxisY_ * maxDistFromShipY_ * 0.9f;
       
   } else {
     if( destinationY_ > currentY_ ) {
-      y += speedFactor * dt;
-      if( y > shipY_ )
-        y = shipY_;
+      targetY_ += speedFactor_ * dt;
+      if( targetY_ > shipY_ )
+        targetY_ = shipY_;
     } else if( destinationY_ < currentY_ ) {
-      y -= speedFactor * dt;
-      if( y < shipY_ )
-        y = shipY_;
+      targetY_ -= speedFactor_ * dt;
+      if( targetY_ < shipY_ )
+        targetY_ = shipY_;
     }
   }
   
-  position_.setCoordinates( x, y, heroPosition_ -> z - 15.0f );
+  position_.setCoordinates( targetX_, targetY_, heroPosition_ -> z - 15.0f );
   
 }
 
 void Target::update( float dt ) {
   
   Target::handleInput( dt );
-  
-  //position_.updatePosition( velocity_, dt );
-  
-  //position_.setCoordinates( heroPosition_ -> x, heroPosition_ -> y, heroPosition_ -> z - 15.0f );
   
   model_ = glm::translate( glm::mat4(), position_.coordinates() );
   

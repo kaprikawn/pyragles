@@ -12,8 +12,18 @@ class Target : public GlObject {
     GLfloat   joyAxisX_;
     GLfloat   joyAxisY_;
     
-    GLfloat maxValX_;
-    GLfloat maxValY_;
+    GLfloat speedFactor_      = 30.0f;
+  
+    GLfloat maxDistFromShipX_ = 10.0f;
+    GLfloat maxDistFromShipY_ = 5.0f;
+    GLfloat currentX_         = 0.0f;
+    GLfloat shipX_;
+    GLfloat destinationX_;
+    GLfloat currentY_         = 0.0f;
+    GLfloat shipY_;
+    GLfloat destinationY_;
+    GLfloat targetX_;
+    GLfloat targetY_;
   
   public:
     Target( int shapeType, GLuint programID, std::shared_ptr<glm::vec3> heroPosition );
