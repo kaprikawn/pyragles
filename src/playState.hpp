@@ -2,6 +2,7 @@
 #define PLAYSTATE_HPP
 
 #include <memory>
+#include <glm/glm.hpp>
 #include "SDL.h"
 #include "gameState.hpp"
 #include "structs.hpp"
@@ -16,8 +17,9 @@ class PlayState : public GameState {
     Uint32      levelStart_;
     Uint32      currentTime_;
     
-    std::shared_ptr<Hero>   hero_;
-    std::shared_ptr<Target> target_;
+    std::shared_ptr<Hero>       hero_;
+    std::shared_ptr<Target>     target_;
+    std::shared_ptr<glm::vec3>  heroPosition_;
     
     std::unique_ptr<GlBuffer> glBuffer_;
     

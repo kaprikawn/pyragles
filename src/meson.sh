@@ -2,12 +2,10 @@
 
 cd ..
 
-if [[ -d builddir ]]
+if [[ ! -d buillder ]]
 then
-  rm -rf builddir
+  meson builddir
 fi
-
-meson builddir
 
 cd builddir
 

@@ -44,8 +44,8 @@ void Game::handleInputs() {
 }
 
 void Game::update( float dt ) {
-  if( dt > 0.1f ) {
-    dt = 0.0f;
+  if( dt > 0.15f ) {
+    dt = 0.15f;
   }
 
   gameStateMachine_ -> update( dt );

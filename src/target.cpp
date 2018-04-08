@@ -3,14 +3,14 @@
 #include "target.hpp"
 #include "inputHandler.hpp"
 
-Target::Target( int shapeType, GLuint programID ) : GlObject( shapeType, 0.0f, 0.0f, -15.0f, programID ) {
-  maxValX_ = 7.0f;
-  maxValY_ = 4.0f;
+Target::Target( int shapeType, GLuint programID, std::shared_ptr<glm::vec3> heroPosition ) : GlObject( shapeType, 0.0f, 0.0f, -15.0f, programID ) {
+  
+  heroPosition_ = heroPosition;
+  
+  rotation_ = glm::mat4();
 }
 
 void Target::handleInput( float dt ) {
-  
-  GLfloat velMultiplier_ = 13.0f;
   
   joyAxisX_ = TheInputHandler::Instance() -> joyAxisX();
   joyAxisY_ = TheInputHandler::Instance() -> joyAxisY();
@@ -31,39 +31,73 @@ void Target::handleInput( float dt ) {
     }
   }
   
-  // horizontal movement
-  if( joyAxisX_ > 0.0f ) {
-    if( position_.coordinates().x < maxValX_ ) {
-      velocity_.setX( joyAxisX_ * velMultiplier_ );
-    } else {
-      velocity_.setX( 0.0f );
-    }
-  } else if( joyAxisX_ < 0.0f ) {
-    if( position_.coordinates().x > -maxValX_ ) {
-      velocity_.setX( joyAxisX_ * velMultiplier_ );
-    } else {
-      velocity_.setX( 0.0f );
-    }
-  } else {
-    velocity_.setX( 0.0f );
+  if( invertY_ ) {
+    joyAxisY_ = -joyAxisY_;
   }
   
-  // vertical movement
-  if( joyAxisY_ < 0.0f ) { // rise
-    if( position_.coordinates().y < maxValY_ ) {
-      velocity_.setY( -joyAxisY_ * velMultiplier_ );
-    } else {
-      velocity_.setY( 0.0f );
-    }
-  } else if( joyAxisY_ > 0.0f ) { // fall
-    if( position_.coordinates().y > -maxValY_ ) {
-      velocity_.setY( -joyAxisY_ * velMultiplier_ );
-    } else {
-      velocity_.setY( 0.0f );
-    }
+  currentX_         = position_.coordinates().x;
+  shipX_            = heroPosition_ -> x;
+  destinationX_     = shipX_ + joyAxisX_ * maxDistFromShipX_;
+  currentY_         = position_.coordinates().y;
+  shipY_            = heroPosition_ -> y;
+  destinationY_     = shipY_ + joyAxisY_ * maxDistFromShipY_;
+  
+  targetX_          = currentX_;
+  targetY_          = currentY_;
+  
+  if( joyAxisX_ > 0.0f ) {
+    if( targetX_ < destinationX_ )
+      targetX_ += speedFactor_ * dt;
+    
+    if( targetX_ > shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f )
+      targetX_ = shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f;
+    
+  } else if( joyAxisX_ < 0.0f ) {
+    if( targetX_ > destinationX_ )
+      targetX_ -= speedFactor_ * dt;
+    
+    if( targetX_ < shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f )
+      targetX_ = shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f;
+      
   } else {
-    velocity_.setY( 0.0f );
+    if( destinationX_ > currentX_ ) {
+      targetX_ += speedFactor_ * dt;
+      if( targetX_ > shipX_ )
+        targetX_ = shipX_;
+    } else if( destinationX_ < currentX_ ) {
+      targetX_ -= speedFactor_ * dt;
+      if( targetX_ < shipX_ )
+        targetX_ = shipX_;
+    }
   }
+  
+  if( joyAxisY_ > 0.0f ) { // rising
+    if( targetY_ < destinationY_ )
+      targetY_ += speedFactor_ * dt;
+    
+    if( targetY_ > shipY_ + joyAxisY_ * maxDistFromShipY_ * 0.9f )
+      targetY_ = shipY_ + joyAxisY_ * maxDistFromShipY_ * 0.9f;
+    
+  } else if( joyAxisY_ < 0.0f ) { // falling
+    if( targetY_ > destinationY_ )
+      targetY_ -= speedFactor_ * dt;
+    
+    if( targetY_ < shipY_ - -joyAxisY_ * maxDistFromShipY_ * 0.9f )
+      targetY_ = shipY_ - -joyAxisY_ * maxDistFromShipY_ * 0.9f;
+      
+  } else {
+    if( destinationY_ > currentY_ ) {
+      targetY_ += speedFactor_ * dt;
+      if( targetY_ > shipY_ )
+        targetY_ = shipY_;
+    } else if( destinationY_ < currentY_ ) {
+      targetY_ -= speedFactor_ * dt;
+      if( targetY_ < shipY_ )
+        targetY_ = shipY_;
+    }
+  }
+  
+  position_.setCoordinates( targetX_, targetY_, heroPosition_ -> z - 15.0f );
   
 }
 
@@ -71,11 +105,9 @@ void Target::update( float dt ) {
   
   Target::handleInput( dt );
   
-  position_.updatePosition( velocity_, dt );
-  
   model_ = glm::translate( glm::mat4(), position_.coordinates() );
   
-  rotation_ = glm::mat4();
+  
 }
 
 void Target::render() {

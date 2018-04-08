@@ -15,6 +15,8 @@
 class GlObject {
   protected:
     
+    bool        invertY_ = true;
+    
     GLuint      vbo_;
     GLuint      ibo_;
     
@@ -49,6 +51,7 @@ class GlObject {
     virtual void  update( float dt );
     virtual void  render();
     virtual void  clean();
+    virtual void  calculateRotation( float dt ){}
     
     GLsizeiptr  vertexBufferSize()  { return shape_ -> vertexBufferSize(); }
     GLsizeiptr  indexBufferSize()   { return shape_ -> indexBufferSize(); }
