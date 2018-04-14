@@ -7,6 +7,9 @@ Projectile::Projectile( int shapeType, GLuint programID, glm::vec3 origin, glm::
   velocity_.setY( destination.y - origin.y );
   velocity_.setZ( destination.z - origin.z );
   
+  velocity_.normalize();
+  
+  velocity_*= 15.0f;
 }
 
 void Projectile::updatePosition( float dt ) {
