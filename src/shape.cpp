@@ -171,6 +171,31 @@ Shape::Shape( int shapeType ) {
       , 5,  4,  3 // b b l
     };
     
+  } else if( shapeType == FLOOR1 ) {
+    
+    glm::vec3 colour = { 1.0f, 0.0f, 0.0f };
+
+    vertex.position = { -1.0f,  0.0f, -1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    vertex.position = { -1.0f,  0.0f,  1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    vertex.position = {  1.0f,  0.0f,  1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    vertex.position = {  1.0f,  0.0f, -1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    indices_ = {
+        0, 1, 2
+      , 0, 2, 3
+    };
+    
   }
   
   numVertices_  = vertices_.size();

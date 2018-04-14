@@ -23,7 +23,7 @@ enum buttons {
 };
 
 enum ShapeTypes {
-    UNDEF_SHAPE, SHIP, TARGET, BULLET
+    UNDEF_SHAPE, SHIP, TARGET, BULLET, FLOOR1, FLOOR2
   , MAX_SHAPE_NUM
   , MAX_SHAPE = MAX_SHAPE_NUM
 };

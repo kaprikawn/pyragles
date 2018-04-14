@@ -1,16 +1,23 @@
-#ifndef VECTOR_HPP
-#define VECTOR_HPP
+#ifndef FLOOR_HPP
+#define FLOOR_HPP
 
-#include <math.h>
-#include <GLES2/gl2.h>
+#include "glObject.hpp"
+#include "target.hpp"
 
-class Vector {
+class Floor : public GlObject {
   
   private:
     
   
   public:
     
+    Floor( int shapeType, GLuint programID );
+    virtual ~Floor(){}
+
+    virtual void update   ( float dt );
+    virtual void render();
+    virtual void clean();
+    
 };
 
-#endif //VECTOR_HPP
+#endif //FLOOR_HPP
