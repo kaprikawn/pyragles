@@ -20,6 +20,8 @@ class Position {
     //Vector  coordinates() { return coordinates_; }
     
     glm::vec3 coordinates();
+
+    
     
     void setCoordinates( GLfloat x, GLfloat y, GLfloat z ) {
       coordinates_.setX( x );

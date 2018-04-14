@@ -2,16 +2,15 @@
 #define FLOOR_HPP
 
 #include "glObject.hpp"
-#include "target.hpp"
 
 class Floor : public GlObject {
   
   private:
-    
+    int shapeType_;
   
   public:
     
-    Floor( int shapeType, GLuint programID );
+    Floor( int shapeType, GLuint programID, GLfloat y );
     virtual ~Floor(){}
 
     virtual void update   ( float dt );

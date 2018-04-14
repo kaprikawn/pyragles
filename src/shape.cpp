@@ -1,6 +1,8 @@
 #include "shape.hpp"
 #include <iostream>
 
+// http://doc.instantreality.org/tools/color_calculator/
+
 Shape::Shape( int shapeType ) {
   
   shapeType_ = shapeType;
@@ -9,7 +11,7 @@ Shape::Shape( int shapeType ) {
   
   if( shapeType == TARGET ) {
     
-    glm::vec3 colour = { 0.8f, 0.8f, 0.8f };
+    glm::vec3 colour = { 0.729f, 0.129f, 0.176f };
     
     // 6 top left outer
     vertex.position    = { -0.9f,  0.9f, 0.0f };
@@ -80,7 +82,6 @@ Shape::Shape( int shapeType ) {
       , 7,  8,  9 // 5
       , 10, 11, 8
       , 10, 8,  3
-      
     };
     
   } else if( shapeType == SHIP ) {
@@ -90,24 +91,26 @@ Shape::Shape( int shapeType ) {
     vertex.colour    = {  1.0f,  1.0f,  1.0f };
     vertices_.push_back( vertex );
     
+    glm::vec3 middle = { 0.0f, 0.4f, 0.0f };
+
     // 1 top
     vertex.position    = {  0.0f,  0.6f,  0.6f };
-    vertex.colour      = {  0.0f,  1.0f,  0.0f };
+    vertex.colour      = middle;
     vertices_.push_back( vertex );
     
     // 2 right
     vertex.position  = {  1.0f,  0.0f,  0.6f };
-    vertex.colour    = {  0.0f,  1.0f,  0.0f };
+    vertex.colour    = middle;
     vertices_.push_back( vertex );
     
     // 3 left
     vertex.position   = { -1.0f,  0.0f,  0.6f };
-    vertex.colour     = {  0.0f,  1.0f,  0.0f };
+    vertex.colour     = middle;
     vertices_.push_back( vertex );
     
     // 4 bottom
     vertex.position = {  0.0f, -0.4f,  0.6f };
-    vertex.colour   = {  0.0f,  1.0f,  0.0f };
+    vertex.colour   = middle;
     vertices_.push_back( vertex );
     
     // 5 back
@@ -128,7 +131,7 @@ Shape::Shape( int shapeType ) {
     
   } else if( shapeType == BULLET ) {
   
-    glm::vec3 colour = { 0.8f, 0.8f, 0.0f };
+    glm::vec3 colour = { 0.031f, 0.070f, 0.749f };
     
     // 0 front
     vertex.position  = {  0.0f,  0.0f, -1.0f };
@@ -157,7 +160,7 @@ Shape::Shape( int shapeType ) {
     
     // 5 back
     vertex.position   = {  0.0f,  0.0f,  1.0f };
-    vertex.colour     = colour;
+    vertex.colour     = { 0.031f, 0.537f, 0.749f };
     vertices_.push_back( vertex );
     
     indices_ = {
@@ -173,7 +176,7 @@ Shape::Shape( int shapeType ) {
     
   } else if( shapeType == FLOOR1 ) {
     
-    glm::vec3 colour = { 1.0f, 0.0f, 0.0f };
+    glm::vec3 colour = { 0.87f, 0.733f, 0.129f };
 
     vertex.position = { -1.0f,  0.0f, -1.0f };
     vertex.colour   = colour;
@@ -188,6 +191,31 @@ Shape::Shape( int shapeType ) {
     vertices_.push_back( vertex );
 
     vertex.position = {  1.0f,  0.0f, -1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    indices_ = {
+        0, 1, 2
+      , 0, 2, 3
+    };
+    
+  } else if( shapeType == FLOOR2 ) {
+    
+    glm::vec3 colour = { 0.87f, 0.623f, 0.129f };
+
+    vertex.position = { -100.0f,  0.0f, -100.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    vertex.position = { -100.0f,  0.0f, 10.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    vertex.position = {  100.0f,  0.0f, 10.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    vertex.position = {  100.0f,  0.0f, -100.0f };
     vertex.colour   = colour;
     vertices_.push_back( vertex );
 

@@ -18,12 +18,12 @@ class Vector {
     GLfloat x() { return x_; }
     GLfloat y() { return y_; }
     GLfloat z() { return z_; }
+
+    float length() { return sqrt( x_ * x_ + y_ * y_ + z_ * z_ ); }
     
     void setX( GLfloat x ) { x_ = x; }
     void setY( GLfloat y ) { y_ = y; }
     void setZ( GLfloat z ) { z_ = z; }
-    
-    float length() { return sqrt( x_ * x_ + y_ * y_ + z_ * z_ ); }
     
     Vector operator+( const Vector& v2 ) const {
       return Vector( x_ + v2.x_, y_ + v2.y_, z_ + v2.z_ );
@@ -46,7 +46,7 @@ class Vector {
       z_ *= scaler;
       return *this;
     }
-    
+
     void normalize() {
       float l = length();
       if( l > 0 ) {

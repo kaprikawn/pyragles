@@ -193,4 +193,3 @@ void InputHandler::clean() {
     }
   }
 }
-
