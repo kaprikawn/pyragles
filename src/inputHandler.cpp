@@ -73,19 +73,19 @@ bool InputHandler::isKeyDown( SDL_Scancode key ) {
 
 bool InputHandler::isPressed( int button ) {
   if( button == 0 ) {
-    if( keystates_[ SDL_SCANCODE_RIGHT ] == 1 || keystates_[ SDL_SCANCODE_L ] == 1 || currentHat_ == SDL_HAT_RIGHT || currentHat_ == SDL_HAT_RIGHTUP || currentHat_ == SDL_HAT_RIGHTDOWN ) {
+    if( keystates_[ SDL_SCANCODE_RIGHT ] == 1 || keystates_[ SDL_SCANCODE_D ] == 1 || currentHat_ == SDL_HAT_RIGHT || currentHat_ == SDL_HAT_RIGHTUP || currentHat_ == SDL_HAT_RIGHTDOWN ) {
       return true;
     }
   } else if( button == 1 ) {
-    if( keystates_[ SDL_SCANCODE_LEFT ] == 1 || keystates_[ SDL_SCANCODE_H ] == 1 || currentHat_ == SDL_HAT_LEFT || currentHat_ == SDL_HAT_LEFTUP || currentHat_ == SDL_HAT_LEFTDOWN ) {
+    if( keystates_[ SDL_SCANCODE_LEFT ] == 1 || keystates_[ SDL_SCANCODE_A ] == 1 || currentHat_ == SDL_HAT_LEFT || currentHat_ == SDL_HAT_LEFTUP || currentHat_ == SDL_HAT_LEFTDOWN ) {
       return true;
     }
   } else if( button == 2 ) {
-    if( keystates_[ SDL_SCANCODE_UP ] == 1 || keystates_[ SDL_SCANCODE_K ] == 1 || currentHat_ == SDL_HAT_UP || currentHat_ == SDL_HAT_LEFTUP || currentHat_ == SDL_HAT_RIGHTUP ) {
+    if( keystates_[ SDL_SCANCODE_UP ] == 1 || keystates_[ SDL_SCANCODE_W ] == 1 || currentHat_ == SDL_HAT_UP || currentHat_ == SDL_HAT_LEFTUP || currentHat_ == SDL_HAT_RIGHTUP ) {
       return true;
     }
   } else if( button == 3 ) {
-    if( keystates_[ SDL_SCANCODE_DOWN ] == 1 || keystates_[ SDL_SCANCODE_J ] == 1 || currentHat_ == SDL_HAT_DOWN || currentHat_ == SDL_HAT_LEFTDOWN || currentHat_ == SDL_HAT_RIGHTDOWN ) {
+    if( keystates_[ SDL_SCANCODE_DOWN ] == 1 || keystates_[ SDL_SCANCODE_S ] == 1 || currentHat_ == SDL_HAT_DOWN || currentHat_ == SDL_HAT_LEFTDOWN || currentHat_ == SDL_HAT_RIGHTDOWN ) {
       return true;
     }
   }
