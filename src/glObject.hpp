@@ -44,8 +44,6 @@ class GlObject {
     bool        fire_   = false;
     
     bool        delete_ = false;
-
-    bool        attribsSet_ = false;
     
     std::unique_ptr<Shape>  shape_;
     
@@ -73,7 +71,13 @@ class GlObject {
     GLuint*     indexDataPointer()  { return shape_ -> getIndexDataPointer(); }
     int         shapeType()         { return shape_ -> shapeType(); }
     
-    void setOffsetLocations( GLsizeiptr vertexOffset, GLsizeiptr indexOffset );
+    void setOffsetLocations( GLsizeiptr vertexOffset, GLsizeiptr indexOffset ) {
+      vertexOffset_ = vertexOffset;
+      indexOffset_  = indexOffset;
+      
+      GLsizeiptr colourOffset = vertexOffset_ + shape_ -> colorOffset();      
+      colourOffset_ = (GLvoid*)colourOffset;
+    }
     
     glm::vec3 coordinates() { return position_.coordinates(); } 
     bool deleteObject() { return delete_; }
