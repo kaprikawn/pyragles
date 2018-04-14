@@ -4,6 +4,7 @@
 #include "game.hpp"
 #include "shader.hpp"
 #include "projectile.hpp"
+#include "floor.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -40,6 +41,9 @@ bool PlayState::onEnter() {
   
   PlayState::addGlObject( std::make_shared<Projectile>( BULLET, programID_, glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) ), false, true );
   
+  PlayState::addGlObject( std::make_shared<Floor>( FLOOR1, programID_, -7.0f ), true, true );
+  PlayState::addGlObject( std::make_shared<Floor>( FLOOR2, programID_, -7.1f ), true, true );
+  
   glBuffer_ = std::make_unique<GlBuffer>( vertexBufferSize_, indexBufferSize_ );
   
   for( unsigned int i = 0; i < levelObjects_.size(); i++ ) {
@@ -64,7 +68,7 @@ bool PlayState::onEnter() {
   
   levelStart_ = SDL_GetTicks();
   
-  glClearColor( 0.0f, 0.0f, 0.4f, 1.0f );
+  glClearColor( 0.0f, 0.65f, 1.0f, 1.0f );
   glEnable( GL_DEPTH_TEST );
   glDepthFunc( GL_LESS );
   glViewport( 0, 0, windowWidth, windowHeight );
