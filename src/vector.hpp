@@ -15,13 +15,15 @@ class Vector {
     Vector( GLfloat x, GLfloat y, GLfloat z ) : x_( x ), y_( y ), z_( z ) {}
     ~Vector(){}
     
-    GLfloat getX() { return x_; }
-    GLfloat getY() { return y_; }
-    GLfloat getZ() { return z_; }
+    GLfloat x() { return x_; }
+    GLfloat y() { return y_; }
+    GLfloat z() { return z_; }
     
     void setX( GLfloat x ) { x_ = x; }
     void setY( GLfloat y ) { y_ = y; }
     void setZ( GLfloat z ) { z_ = z; }
+    
+    float length() { return sqrt( x_ * x_ + y_ * y_ + z_ * z_ ); }
     
     Vector operator+( const Vector& v2 ) const {
       return Vector( x_ + v2.x_, y_ + v2.y_, z_ + v2.z_ );
@@ -43,6 +45,13 @@ class Vector {
       y_ *= scaler;
       z_ *= scaler;
       return *this;
+    }
+    
+    void normalize() {
+      float l = length();
+      if( l > 0 ) {
+        ( *this ) *= 1 / l;
+      }
     }
   
 };

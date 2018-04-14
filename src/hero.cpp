@@ -45,7 +45,7 @@ void Hero::handleInput( float dt ) {
   }
   
   GLfloat velocityMultiplier_ = 20.0f;
-  GLfloat xCurrentVelocity_ = velocity_.getX();
+  GLfloat xCurrentVelocity_ = velocity_.x();
   GLfloat xSetVelocity_ = 0.0f;
   GLfloat xMaxVelocity_ = 8.0f;
   
@@ -91,7 +91,7 @@ void Hero::handleInput( float dt ) {
   
   //////////////////
   
-  GLfloat yCurrentVelocity_ = velocity_.getY();
+  GLfloat yCurrentVelocity_ = velocity_.y();
   GLfloat ySetVelocity_ = 0.0f;
   GLfloat yMaxVelocity_ = 8.0f;
   
@@ -150,11 +150,11 @@ void Hero::calculateRotation( float dt ) {
   
   xAngle_ = ( atan( ( target_ -> position().coordinates().y - position_.coordinates().y ) / ( position_.coordinates().z - target_ -> position().coordinates().z ) ) * 180 / PI ); // pitch up and down
   
-  if( velocity_.getX() == 0.0f && zAngle_ == 0.0f ) {
+  if( velocity_.x() == 0.0f && zAngle_ == 0.0f ) {
     zAngle_ = 0.0f;
-  } else if( velocity_.getX() > 0.3f && zAngle_ > -maxRotationZ_ ) {
+  } else if( velocity_.x() > 0.3f && zAngle_ > -maxRotationZ_ ) {
     zAngle_ -= differenceBetween( -maxRotationZ_, zAngle_ ) * 5.0f * dt;
-  } else if( velocity_.getX() < -0.3f && zAngle_ < maxRotationZ_ ) {
+  } else if( velocity_.x() < -0.3f && zAngle_ < maxRotationZ_ ) {
     zAngle_ += differenceBetween( maxRotationZ_, zAngle_ ) * 5.0f * dt;
   } else {
     zAngle_ += -zAngle_ * dt;
