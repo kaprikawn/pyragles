@@ -2,6 +2,8 @@
 
 let cores=`grep -c ^processor /proc/cpuinfo`
 
+useHUD=1
+
 clear
 
 cmake . || exit 1
@@ -13,7 +15,12 @@ else
   make || exit 1
 fi
 
-./exe
+if [[ $useHUD -eq 1 ]]
+then
+  GALLIUM_HUD=".dfps;cpu0+cpu1+cpu2+cpu3;GPU-load;VRAM-usage" ./exe
+else
+  ./exe
+fi
 
 exit 0
 
