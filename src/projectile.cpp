@@ -11,6 +11,9 @@ Projectile::Projectile( int shapeType, GLuint programID, glm::vec3 origin, glm::
   
   velocity_*= 15.0f;
   
+  velocity_.normalize();
+  
+  velocity_*= 15.0f;
 }
 
 void Projectile::updatePosition( float dt ) {
