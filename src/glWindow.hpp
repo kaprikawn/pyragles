@@ -1,7 +1,7 @@
 #ifndef GLWINDOW_HPP
 #define GLWINDOW_HPP
 
-#include "SDL.h"
+#include <SDL2/SDL.h>
 #include <GLES2/gl2.h>
 #include <string>
 #include <glm/glm.hpp>

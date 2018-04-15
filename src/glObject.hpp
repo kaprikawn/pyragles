@@ -5,12 +5,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
+#include <iostream>
 #include "shape.hpp"
 #include "vector.hpp"
 #include "position.hpp"
-
-#include <iostream>
-
 
 class GlObject {
   protected:

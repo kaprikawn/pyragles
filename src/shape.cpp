@@ -223,6 +223,99 @@ Shape::Shape( int shapeType ) {
         0, 1, 2
       , 0, 2, 3
     };
+  
+  } else if( shapeType == ARCH ) {
+    
+    glm::vec3 colour = { 1.0f, 0.0f, 0.0f };
+    
+    float z = 0.0f;
+    
+    // 0
+    vertex.position = { -3.0f,  0.0f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 1
+    vertex.position = { -2.6f,  0.0f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 2
+    vertex.position = { -3.0f,  3.4f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 3
+    vertex.position = { -2.6f,  2.6f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 4
+    vertex.position = { -2.6f,  4.0f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 5
+    vertex.position = { -2.3f,  3.4f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 6
+    vertex.position = {  2.6f,  4.0f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 7
+    vertex.position = {  2.3f,  3.4f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 8
+    vertex.position = {  3.0f,  3.4f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 9
+    vertex.position = {  2.6f,  2.6f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 10
+    vertex.position = {  3.0f,  0.0f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // 11
+    vertex.position = {  2.6f,  0.0f, z };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    indices_ = {
+         0,  1,  2
+      ,  2,  1,  3
+      ,  4,  2,  3
+      ,  4,  3,  5
+      ,  4,  5,  6
+      ,  6,  5,  7
+      ,  6,  7,  8
+      ,  8,  7,  9
+      ,  8,  9, 10
+      ,  9, 11, 10
+    };
+    
+    vertex.position = {  0.0f,  1.0f,  0.0f };
+    vertex.colour   = colour;
+    //vertices_.push_back( vertex );
+    
+    vertex.position = { -1.0f, -1.0f,  0.0f };
+    vertex.colour   = colour;
+    //vertices_.push_back( vertex );
+    
+    vertex.position = {  1.0f, -1.0f,  0.0f };
+    vertex.colour   = colour;
+    //vertices_.push_back( vertex );
+    
+    //indices_ = { 0, 1, 2 };
     
   }
   

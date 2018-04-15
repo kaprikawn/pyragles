@@ -1,5 +1,6 @@
 #include "floor.hpp"
 #include <iostream>
+#include "structs.hpp"
 
 Floor::Floor( int shapeType, GLuint programID, GLfloat y ) : GlObject( shapeType, 0.0f, y, -20.0f, programID ) {
   
@@ -8,7 +9,7 @@ Floor::Floor( int shapeType, GLuint programID, GLfloat y ) : GlObject( shapeType
   shapeType_ = shapeType;
 
   if( shapeType == FLOOR1 )
-    velocity_.setZ( 20.0f );
+    velocity_.setZ( SCROLL_SPEED );
 
 }
 

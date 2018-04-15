@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <glm/glm.hpp>
-#include "SDL.h"
+#include <SDL2/SDL.h>
 #include "gameState.hpp"
 #include "structs.hpp"
 #include "target.hpp"

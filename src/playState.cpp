@@ -5,6 +5,7 @@
 #include "shader.hpp"
 #include "projectile.hpp"
 #include "floor.hpp"
+#include "scenary.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -41,8 +42,10 @@ bool PlayState::onEnter() {
   
   PlayState::addGlObject( std::make_shared<Projectile>( BULLET, programID_, glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) ), false, true );
   
-  PlayState::addGlObject( std::make_shared<Floor>( FLOOR1, programID_, -7.0f ), true, true );
-  PlayState::addGlObject( std::make_shared<Floor>( FLOOR2, programID_, -7.1f ), true, true );
+  PlayState::addGlObject( std::make_shared<Floor>( FLOOR1, programID_, FLOOR_Y ), true, true );
+  PlayState::addGlObject( std::make_shared<Floor>( FLOOR2, programID_, FLOOR_Y - 0.1f ), true, true );
+  
+  PlayState::addGlObject( std::make_shared<Scenary>( ARCH, programID_, glm::vec3( 0.0f, FLOOR_Y, -70.0f ) ), true, true );
   
   glBuffer_ = std::make_unique<GlBuffer>( vertexBufferSize_, indexBufferSize_ );
   
