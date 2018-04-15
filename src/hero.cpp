@@ -66,16 +66,16 @@ void Hero::handleInput( float dt ) {
     
     if( xCurrentVelocity_ > 0.0f ) {
       
-      xSetVelocity_ = xCurrentVelocity_ - differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.2f;
+      xSetVelocity_ = xCurrentVelocity_ - differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.4f;
       
-      if( xCurrentVelocity_ < 0.0f )
+      if( xCurrentVelocity_ < 0.05f )
         xSetVelocity_ = 0.0f;
         
     } else if( xCurrentVelocity_ < 0.0f ) {
       
-      xSetVelocity_ = xCurrentVelocity_ + differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.2f;
+      xSetVelocity_ = xCurrentVelocity_ + differenceBetween( 0.0f, xCurrentVelocity_ ) * 0.4f;
       
-      if( xCurrentVelocity_ > 0.0f )
+      if( xCurrentVelocity_ > 0.05f )
         xSetVelocity_ = 0.0f;
         
     }
@@ -112,16 +112,16 @@ void Hero::handleInput( float dt ) {
     
     if( yCurrentVelocity_ > 0.0f ) {
       
-      ySetVelocity_ = yCurrentVelocity_ - differenceBetween( 0.0f, yCurrentVelocity_ ) * 0.2f;
+      ySetVelocity_ = yCurrentVelocity_ - differenceBetween( 0.0f, yCurrentVelocity_ ) * 0.4f;
       
-      if( yCurrentVelocity_ < 0.0f )
+      if( yCurrentVelocity_ < 0.02f )
         ySetVelocity_ = 0.0f;
         
     } else if( yCurrentVelocity_ < 0.0f ) {
       
-      ySetVelocity_ = yCurrentVelocity_ + differenceBetween( 0.0f, yCurrentVelocity_ ) * 0.2f;
+      ySetVelocity_ = yCurrentVelocity_ + differenceBetween( 0.0f, yCurrentVelocity_ ) * 0.4f;
       
-      if( yCurrentVelocity_ > 0.0f )
+      if( yCurrentVelocity_ > 0.02f )
         ySetVelocity_ = 0.0f;
         
     }
