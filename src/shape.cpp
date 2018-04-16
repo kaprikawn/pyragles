@@ -223,7 +223,236 @@ Shape::Shape( int shapeType ) {
         0, 1, 2
       , 0, 2, 3
     };
+  
+  } else if( shapeType == ARCH ) {
     
+    glm::vec3 colour = { 1.0f, 0.0f, 0.0f };
+    
+    // front face
+    
+    // 0
+    vertex.position = { -3.0f, 0.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 1
+    vertex.position = { -2.0f, 0.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 2
+    vertex.position = { -3.0f, 3.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 3
+    vertex.position = { -2.0f, 2.7f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 4
+    vertex.position = { -2.0f, 4.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 5
+    vertex.position = { -1.6f, 3.1f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 6
+    vertex.position = { 2.0f, 4.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 7
+    vertex.position = { 1.6f, 3.1f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 8
+    vertex.position = { 3.0f, 2.7f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 9
+    vertex.position = { 2.0f, 2.7f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 10
+    vertex.position = { 3.0f, 0.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 11
+    vertex.position = { 2.0f, 0.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // second back
+    colour = { 0.0f, 1.0f, 0.0f };
+    
+    // 12
+    vertex.position = { -3.4f, 0.0f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 13
+    vertex.position = { -3.0f, 0.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 14
+    vertex.position = { -3.4f, 3.4f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 15
+    vertex.position = { -3.0f, 3.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 16
+    vertex.position = { -2.4f, 4.4f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 17
+    vertex.position = { -2.0f, 4.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 18
+    vertex.position = { 2.4f, 4.4f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 19
+    vertex.position = { 2.0f, 4.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 20
+    vertex.position = { 3.4f, 3.4f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 21
+    vertex.position = { 3.0f, 2.7f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 22
+    vertex.position = { 3.4f, 0.0f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 23
+    vertex.position = { 3.0f, 0.0f, 1.0f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    // top
+    
+    colour = { 0.0f, 0.0f, 1.0f };
+    
+    // 24
+    vertex.position = { -3.4f, 0.0f, -0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 25
+    vertex.position = { -3.4f, 0.0f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 26
+    vertex.position = { -3.4f, 3.4f, -0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 27
+    vertex.position = { -3.4f, 3.4f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 28
+    vertex.position = { -2.4f, 4.4f, -0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 29
+    vertex.position = { -2.4f, 4.4f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 30
+    vertex.position = { 2.4f, 4.4f, -0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 31
+    vertex.position = { 2.4f, 4.4f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 32
+    vertex.position = { 3.4f, 3.4f, -0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 33
+    vertex.position = { 3.4f, 3.4f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 34
+    vertex.position = { 3.4f, 0.0f, -0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+
+    // 35
+    vertex.position = { 3.4f, 0.0f, 0.3f };
+    vertex.colour   = colour;
+    vertices_.push_back( vertex );
+    
+    indices_ = {
+         0,  1,  2
+      ,  2,  1,  3
+      ,  4,  2,  3
+      ,  4,  3,  5
+      ,  4,  5,  6
+      ,  6,  5,  7
+      ,  6,  7,  8
+      ,  8,  7,  9
+      ,  8,  9, 10
+      ,  9, 11, 10
+      
+      , 12, 13, 14
+      , 14, 13, 15
+      , 14, 15, 16
+      , 15, 17, 16
+      , 16, 17, 18
+      , 17, 19, 18
+      , 18, 19, 20
+      , 19, 21, 20
+      , 20, 21, 22
+      , 21, 23, 22
+      
+      , 24, 25, 26
+      , 25, 27, 26
+      , 26, 27, 28
+      , 27, 28, 29
+      , 28, 29, 30
+      , 29, 31, 30
+      , 30, 31, 32
+      , 31, 33, 32
+      , 32, 33, 34
+      , 33, 35, 34
+      
+      
+    };
   }
   
   numVertices_  = vertices_.size();
