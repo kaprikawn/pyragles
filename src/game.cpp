@@ -9,9 +9,14 @@ Game::Game( bool fullscreen ) {
   int windowHeight  = 720;
   
   Uint32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-  if( fullscreen )
+  if( fullscreen ) {
     sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN;
-  
+    SDL_DisplayMode dm;
+    SDL_GetCurrentDisplayMode( 0, &dm );
+    //windowWidth   = dm.w;
+    //windowHeight  = dm.h;
+    
+  }
   
   bool init = Game::init( "GLES2 Test", 20, 20, windowWidth, windowHeight, sdlFlags );
   

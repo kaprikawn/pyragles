@@ -3,7 +3,6 @@
 #include "shader.hpp"
 #include "camera.hpp"
 #include "global.hpp"
-#include "collisionData.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -48,9 +47,6 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   shapeType = FLOOR2;
   addPhysicsObject( std::make_shared<Floor>( glm::vec3( 0, FLOOR_Y - 0.02, 0 ), meshLoader_ -> bufferData( shapeType ), meshLoader_ -> mesh( shapeType ), renderer_, shapeType ), true, true );
   
-  
-  
-  
   return true;
 }
 
@@ -62,12 +58,6 @@ void PlayState::update( GLfloat dt ) {
   
   ship_ -> calculateRotation( dt );
   
-  /* CollisionData collisionData = collision_ -> collisionData( ship_, arch_ );
-  
-  if( collisionData.isColliding() ) {
-    ship_ -> registerCollision( collisionData );
-    //arch_ -> registerCollision( collisionData );
-  } */
 }
 
 void PlayState::render() {

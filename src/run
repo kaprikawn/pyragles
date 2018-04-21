@@ -3,7 +3,7 @@
 let cores=`grep -c ^processor /proc/cpuinfo`
 
 useHUD=1
-fullscreen=1
+fullscreen=0
 
 clear
 

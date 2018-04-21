@@ -61,8 +61,6 @@ void MeshLoader::generateMeshes() {
   indices_[ currentShape ] = indices;
   indices.clear();
   
-  
-  
   // arch
   currentShape  = ARCH;
   colour        = { 1, 0, 0 };
@@ -73,7 +71,7 @@ void MeshLoader::generateMeshes() {
   position  = { -2, 0, 1 };
   addVertex( position, colour, currentShape );
 
-  position  = { -3, 2.7, 1 };
+  position  = { -3, 3, 1 };
   addVertex( position, colour, currentShape );
 
   position  = { -2, 2.7, 1 };
@@ -114,7 +112,7 @@ void MeshLoader::generateMeshes() {
   position  = { -3.4, 3.4, 0.3 };
   addVertex( position, colour, currentShape );
 
-  position  = { -3, 3, 1 };
+  position  = { -2.7, 3, 1 };
   addVertex( position, colour, currentShape );
 
   position  = { -2.4, 4.4, 0.3 };
