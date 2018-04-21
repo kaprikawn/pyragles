@@ -18,6 +18,16 @@ void Scenary::render( glm::mat4 viewProjectionMatrix ) {
   PhysicsObject::render( viewProjectionMatrix );
 }
 
+CollisionProperties Scenary::collisionProperties() {
+  CollisionProperties collisionProperties;
+  
+  collisionProperties.objectID = objectID_;
+  
+  collisionProperties.damageToShip = 10;
+  
+  return collisionProperties;
+}
+
 void Scenary::clean() {
   PhysicsObject::clean();
 }

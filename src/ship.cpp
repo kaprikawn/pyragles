@@ -136,6 +136,18 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   PhysicsObject::render( viewProjectionMatrix );
 }
 
+void Ship::registerCollision( CollisionData collisionData, CollisionProperties collisionProperties ) {
+  
+}
+
+CollisionProperties Ship::collisionProperties() {
+  CollisionProperties collisionProperties;
+  
+  collisionProperties.objectID = objectID_;
+  
+  return collisionProperties;
+}
+
 void Ship::clean() {
   PhysicsObject::clean();
 }

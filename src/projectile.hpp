@@ -22,6 +22,8 @@ class Projectile : public PhysicsObject {
     void  clean();
     void  calculateRotation( GLfloat dt );
     
+    CollisionProperties collisionProperties();
+    
 };
 
 #endif // PROJECTILE_HPP

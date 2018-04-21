@@ -16,8 +16,12 @@ class Scenary : public PhysicsObject {
     void update( GLfloat dt, bool skipMove = false );
     void render( glm::mat4 viewProjectionMatrix );
     void clean();
+    CollisionProperties collisionProperties();
     
-    //void calculateRotation( GLfloat dt );
+    unsigned int stuff() {
+      return objectID_;
+    }
+    
 };
 
 #endif // SCENARY_HPP

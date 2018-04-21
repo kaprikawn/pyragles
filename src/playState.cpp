@@ -26,6 +26,9 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   renderer_   -> generateBuffer( meshLoader_ -> totalVertexBufferSize(), meshLoader_ -> totalIndexBufferSize() );
   renderer_   -> addBufferData( meshLoader_ );
   
+  Collision collision;
+  collision_ = collision;
+  
   shipPosition_           = std::make_shared<glm::vec3>();
   GLfloat shipStartZ      = -3.0f;
   GLfloat targetDistance  = 15.0f;
@@ -76,6 +79,19 @@ void PlayState::update( GLfloat dt ) {
   
   ship_ -> calculateRotation( dt );
   
+  for( unsigned int i = 1; i < liveObjects_.size(); i++ ) { // starting at 1 because target collision is irrelevent
+    for( unsigned int j = i + 1; j < liveObjects_.size(); j++ ) {
+      CollisionData collisionData = collision_.collisionData( liveObjects_[ i ], liveObjects_[ j ] );
+      
+      if( collisionData.isColliding() ) {
+        //CollisionProperties collisionProperties = liveObjects_[ i ] -> collisionProperties();
+        
+        //liveObjects_[ i ] -> registerCollision( collisionData );
+      }
+        
+    }
+  }
+  
 }
 
 void PlayState::render() {
@@ -87,11 +103,14 @@ void PlayState::render() {
 
 void PlayState::addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, bool init, bool isLoading ) {
   
+  physicsObject -> setObjectID( nextObjectID_++ );
+  
   if( isLoading )
     levelObjects_.push_back( physicsObject );
   
   if( init )
     liveObjects_.push_back( physicsObject );
+  
   
 }
 

@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "global.hpp"
 
-Target::Target( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<glm::vec3> shipPosition ) : PhysicsObject( initPosition, bufferData, mesh, renderer ) {
+Target::Target( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<glm::vec3> shipPosition ) : PhysicsObject( initPosition, bufferData, mesh, renderer, true ) {
   
   inputHandler_ = inputHandler;
   shipPosition_ = shipPosition;
@@ -100,12 +100,19 @@ void Target::update( GLfloat dt, bool skipMove ) {
   if( mesh_ -> y() < FLOOR_Y + 1.3f ) {
     mesh_ -> setY ( FLOOR_Y + 1.3f );
   }
-  
   PhysicsObject::update( dt, skipMove );
 }
 
 void Target::render( glm::mat4 viewProjectionMatrix ) {
   PhysicsObject::render( viewProjectionMatrix );
+}
+
+CollisionProperties Target::collisionProperties() {
+  CollisionProperties collisionProperties;
+  
+  collisionProperties.objectID = objectID_;
+  
+  return collisionProperties;
 }
 
 void Target::clean() {

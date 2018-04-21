@@ -27,7 +27,7 @@ class Mesh {
     
   public:
     
-    Mesh( glm::vec3 initPosition, std::vector<glm::vec3> mesh );
+    Mesh( glm::vec3 initPosition, std::vector<glm::vec3> mesh, bool print = false );
     ~Mesh(){}
     
     void updatePosition( glm::vec3 velocity, GLfloat dt, bool skip = false );
@@ -36,6 +36,8 @@ class Mesh {
     void setX( GLfloat x );
     void setY( GLfloat y );
     void setPosition( glm::vec3 coordinates );
+    
+    bool print_ = false;
     
     glm::vec3 position() {
       return position_;

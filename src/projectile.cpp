@@ -45,6 +45,14 @@ void  Projectile::calculateRotation( GLfloat dt ) {
   rotationMatrix_ = glm::rotate( rotationMatrix_, glm::radians( yAngle ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
 }
 
+CollisionProperties Projectile::collisionProperties() {
+  CollisionProperties collisionProperties;
+  
+  collisionProperties.objectID = objectID_;
+  
+  return collisionProperties;
+}
+
 void Projectile::clean() {
   PhysicsObject::clean();
 }

@@ -23,6 +23,8 @@ class Ship : public PhysicsObject {
     void  render( glm::mat4 viewProjectionMatrix );
     void  clean();
     void  calculateRotation( GLfloat dt );
+    void registerCollision( CollisionData collisionData, CollisionProperties collisionProperties );
+    CollisionProperties collisionProperties();
     
     void handleInput( GLfloat dt );
 };

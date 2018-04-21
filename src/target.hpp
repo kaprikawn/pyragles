@@ -24,6 +24,8 @@ class Target : public PhysicsObject {
     
     void handleInput( GLfloat dt );
     
+    CollisionProperties collisionProperties();
+    
     glm::vec3 position() {
       return mesh_ -> position();
     }

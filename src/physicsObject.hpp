@@ -8,6 +8,7 @@
 #include <memory>
 #include "shader.hpp"
 #include "mesh.hpp"
+#include "collisionData.hpp"
 
 class Renderer;
 
@@ -56,13 +57,16 @@ class PhysicsObject {
     glm::mat4                 rotationMatrix_;
     
   public:
-    PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> );
+    PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer>, bool print = false );
     virtual ~PhysicsObject(){}
     
     virtual void  update( GLfloat dt, bool skipMove = false );
     virtual void  render( glm::mat4 viewProjectionMatrix );
     virtual void  clean();
     virtual void  calculateRotation( GLfloat dt );
+    virtual void  registerCollision( CollisionData collisionData, CollisionProperties collisionProperties );
+    
+    virtual CollisionProperties collisionProperties();
     
     bool fire() {
       if( fire_ ) {
@@ -72,9 +76,14 @@ class PhysicsObject {
       return false;
     }
     
-    AABB aabb() { return mesh_ -> aabb(); }
+    AABB aabb()             { return mesh_ -> aabb(); }
     
-    bool deleteObject() { return delete_; }
+    bool deleteObject()     { return delete_; }
+    unsigned int objectID() { return objectID_; }
+    
+    void setObjectID( unsigned int objectID ) {
+      objectID_ = objectID;
+    }
     
 };
 

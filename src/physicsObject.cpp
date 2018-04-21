@@ -5,12 +5,14 @@
 #include "renderer.hpp"
 #include "camera.hpp"
 
-PhysicsObject::PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer ) {
+PhysicsObject::PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, bool print ) {
   
-  mesh_       = std::make_shared<Mesh>( initPosition, mesh );
-  bufferData_ = bufferData;
-  renderer_   = renderer;
+  bufferData_   = bufferData;
+  renderer_     = renderer;
+  mesh_         = std::make_shared<Mesh>( initPosition, mesh, print );
+  modelMatrix_  = glm::translate( glm::mat4(), mesh_ -> position() );
   
+  mesh_ -> updatePosition( glm::vec3( 0, 0, 0 ), 0.0f, true );
 }
 
 void PhysicsObject::update( GLfloat dt, bool skipMove ) {
@@ -28,10 +30,19 @@ void PhysicsObject::render( glm::mat4 viewProjectionMatrix ) {
   renderer_ -> renderObject( bufferData_.vertexOffset, bufferData_.indexOffset, bufferData_.numIndices, mvp );
 }
 
-void PhysicsObject::clean() {
+void PhysicsObject::registerCollision( CollisionData collisionData, CollisionProperties collisionProperties ) {
   
 }
 
 void PhysicsObject::calculateRotation( GLfloat dt ) {
+  
+}
+
+CollisionProperties PhysicsObject::collisionProperties() {
+  CollisionProperties collisionProperties;
+  return collisionProperties;
+}
+
+void PhysicsObject::clean() {
   
 }
