@@ -13,10 +13,6 @@ PhysicsObject::PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std
   
 }
 
-void PhysicsObject::registerCollision( CollisionData collisionData ) {
-  
-}
-
 void PhysicsObject::update( GLfloat dt, bool skipMove ) {
   mesh_ -> updatePosition( velocity_, dt, skipMove );
   mesh_ -> updateMesh( modelMatrix_ );
