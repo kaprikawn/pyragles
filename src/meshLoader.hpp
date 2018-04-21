@@ -20,6 +20,8 @@ class MeshLoader {
     
     BufferData bufferData_[ MAX_SHAPE ];
     
+    std::vector<std::array<glm::vec3, 3>> mesh_[ MAX_SHAPE ];
+    
     bool loadMesh_[ MAX_SHAPE ] = { false };
         
   public:
