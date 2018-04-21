@@ -5,9 +5,17 @@
 
 class Shader {
   private:
-  
+    
+    GLuint      programID_;
+    
+    GLint       positionID_;
+    GLint       colourID_;
+    GLint       mvpID_;
+    
   public:
     GLuint init();
+    
+    
 };
 
 #endif //SHADER_HPP

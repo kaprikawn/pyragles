@@ -2,38 +2,20 @@
 #define CAMERA_HPP
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 class Camera {
   private:
     
-    glm::mat4       projection_;
-    glm::mat4       view_;
-    
-    static Camera*  instance_;
-    
-    Camera();
+    glm::mat4   projection_;
+    glm::mat4   view_;
     
   public:
+    Camera();
     ~Camera(){}
-    
-    void init();
-    
-    glm::mat4 viewMatrix() {
-      return view_;
-    }
-    
-    glm::mat4 projectionMatrix() {
-      return projection_;
-    }
-    
-    
-    static Camera* Instance() {
-      if( instance_ == 0 ) {
-        instance_ = new Camera();
-      }
-      return instance_;
-    }
+  
+  glm::mat4 viewProjectionMatrix() {
+    return projection_ * view_;
+  }
 };
 
 typedef Camera TheCamera;

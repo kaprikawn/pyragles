@@ -13,12 +13,12 @@ ninja
 
 cd src
 
-if [[ ! -d shaders ]]
+if [[ ! -d assets ]]
 then
-  mkdir shaders
+  mkdir assets
 fi
 
-cp ../../src/shaders/* shaders
+cp ../../src/assets/* assets
 
 ./exe
 
