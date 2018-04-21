@@ -22,7 +22,7 @@ class Mesh {
     std::vector<glm::vec3> originalVertices_;
     std::vector<glm::vec3> vertices_;
     
-    //std::vector<std::array<glm::vec3, 3>> mesh_;
+    std::vector<std::array<glm::vec3, 3>> mesh_;
     
     AABB aabb_;
     
