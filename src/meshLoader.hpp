@@ -10,7 +10,7 @@ class MeshLoader {
   
   private:
     
-    std::vector<glm::vec3> shapeMeshes_[ MAX_SHAPE ];
+    std::vector<glm::vec3> shapeVertices_[ MAX_SHAPE ];
     
     std::vector<Vertex> vertices_[ MAX_SHAPE ];
     std::vector<GLuint> indices_[ MAX_SHAPE ];
@@ -59,10 +59,9 @@ class MeshLoader {
       return bufferData_[ shapeType ];
     }
     
-    std::vector<glm::vec3> mesh( int shapeType ) {
-      return shapeMeshes_[ shapeType ];
+    std::vector<glm::vec3> vertices( int shapeType ) {
+      return shapeVertices_[ shapeType ];
     }
-    
     
 };
 

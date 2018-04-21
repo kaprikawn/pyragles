@@ -5,11 +5,13 @@
 #include "renderer.hpp"
 #include "camera.hpp"
 
-PhysicsObject::PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, bool print ) {
+PhysicsObject::PhysicsObject( PhysicsObjectParams physicsObjectParams, bool print ) {
   
-  bufferData_   = bufferData;
-  renderer_     = renderer;
-  mesh_         = std::make_shared<Mesh>( initPosition, mesh, print );
+  bufferData_   = physicsObjectParams.bufferData;
+  renderer_     = physicsObjectParams.renderer;
+  mesh_         = physicsObjectParams.mesh;
+  renderer_     = physicsObjectParams.renderer;
+  
   modelMatrix_  = glm::translate( glm::mat4(), mesh_ -> position() );
   
   mesh_ -> updatePosition( glm::vec3( 0, 0, 0 ), 0.0f, true );

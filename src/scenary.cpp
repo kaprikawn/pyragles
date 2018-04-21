@@ -3,8 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "global.hpp"
 
-Scenary::Scenary( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer )
-  : PhysicsObject( initPosition, bufferData, mesh, renderer ) {
+Scenary::Scenary( PhysicsObjectParams physicsObjectParams ) : PhysicsObject( physicsObjectParams ) {
   
   velocity_.z = SCROLL_SPEED;
 }
@@ -35,7 +34,7 @@ void Scenary::registerCollision( CollisionData collisionData, CollisionPropertie
   
   lastCollisionID_ = collisionProperties.objectID;
   
-  printf( "Scenary\n");
+  
   
 }
 

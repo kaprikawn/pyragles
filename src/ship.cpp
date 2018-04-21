@@ -4,13 +4,11 @@
 
 #define PI 3.141592653589793238462643383279
 
-Ship::Ship( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<glm::vec3>    shipPosition, std::shared_ptr<Target> target )
-  : PhysicsObject( initPosition, bufferData, mesh, renderer ) {
+Ship::Ship( PhysicsObjectParams physicsObjectParams, std::shared_ptr<Target> target ) : PhysicsObject( physicsObjectParams ) {
   
-  inputHandler_ = inputHandler;
-  shipPosition_ = shipPosition;
+  inputHandler_ = physicsObjectParams.inputHandler;
+  shipPosition_ = physicsObjectParams.shipPosition;
   target_       = target;
-  
 }
 
 void Ship::calculateRotation( GLfloat dt ) {

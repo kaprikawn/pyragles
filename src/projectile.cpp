@@ -5,17 +5,16 @@
 
 #define PI 3.141592653589793238462643383279
 
-Projectile::Projectile( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<glm::vec3> shipPosition, std::shared_ptr<Target> target )
-  : PhysicsObject( initPosition, bufferData, mesh, renderer ) {
+Projectile::Projectile( PhysicsObjectParams physicsObjectParams, std::shared_ptr<Target> target ) : PhysicsObject( physicsObjectParams ) {
   
-  shipPosition_ = shipPosition;
+  shipPosition_ = physicsObjectParams.shipPosition;
   target_       = target;
   
   calculateRotation( 1.0f );
   
   mesh_ -> updatePosition( velocity_, 0.01f );
   
-  velocity_ = glm::normalize( target -> position() - initPosition ) * 100.0f;
+  velocity_ = glm::normalize( target -> position() - physicsObjectParams.initPosition ) * 100.0f;
 }
 
 void Projectile::update( GLfloat dt, bool skipMove ) {

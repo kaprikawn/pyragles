@@ -3,8 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "global.hpp"
 
-Floor::Floor( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, int shapeType )
-  : PhysicsObject( initPosition, bufferData, mesh, renderer ) {
+Floor::Floor( PhysicsObjectParams physicsObjectParams, int shapeType ) : PhysicsObject( physicsObjectParams ) {
   
   if( shapeType == FLOOR1 )
     velocity_.z = SCROLL_SPEED;

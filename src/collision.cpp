@@ -3,7 +3,7 @@
 #include "mesh.hpp"
 #include "physicsObject.hpp"
 
-bool areColliding( AABB a, AABB b ) {
+bool areCollidingAABB( AABB a, AABB b ) {
   
   if( 
        a.right  <= b.left
@@ -26,12 +26,29 @@ bool areColliding( AABB a, AABB b ) {
   return true;
 }
 
+bool areCollisingMeshData( std::vector<glm::vec3> vertexDataA, std::vector<glm::vec3> vertexDataB ) {
+  
+  for( unsigned int a = 0; a < vertexDataA.size(); a++ ) {
+    for( unsigned int b = 0; b < vertexDataB.size(); b++ ) {
+      std::cout << "a x is " << vertexDataA[ a ].x << std::endl;
+      std::cout << "b x is " << vertexDataB[ b ].x << std::endl;
+    }
+  }
+  
+  return true;
+}
+
 CollisionData Collision::collisionData( std::shared_ptr<PhysicsObject> a, std::shared_ptr<PhysicsObject> b ) {
   
   CollisionData collisionData;
   
-  if( areColliding( a -> aabb(), b -> aabb() ) )
-    collisionData.setCollisionData();
+  if( !areCollidingAABB( a -> aabb(), b -> aabb() ) )
+    return collisionData;
+  
+  /* if( !areCollisingMeshData( a -> vertices(), b -> vertices() ) )
+    return collisionData; */
+  
+  collisionData.setCollisionData();
   
   return collisionData;
 }

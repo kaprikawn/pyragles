@@ -21,7 +21,7 @@ class Ship : public PhysicsObject {
     Timer     collidedTimer_;
     
   public:
-    Ship( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<InputHandler> inputHander, std::shared_ptr<glm::vec3>    shipPosition, std::shared_ptr<Target> target );
+    Ship( PhysicsObjectParams physicsObjectParams, std::shared_ptr<Target> target );
     ~Ship(){}
     
     void  update( GLfloat dt, bool skipMove = false );

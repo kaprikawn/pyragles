@@ -3,7 +3,7 @@
 
 void MeshLoader::addVertex( glm::vec3 position, glm::vec3 colour, int shapeType ) {
   
-  shapeMeshes_[ shapeType ].push_back( position );
+  shapeVertices_[ shapeType ].push_back( position );
   
   Vertex vertex = { position, colour };
   

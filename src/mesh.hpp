@@ -4,6 +4,7 @@
 #include <GLES2/gl2.h>
 #include <glm/glm.hpp>
 #include <vector>
+#include <array>
 
 struct AABB {
   GLfloat   top;
@@ -18,8 +19,10 @@ class Mesh {
   
   private:
     
-    std::vector<glm::vec3> originalMesh_;
-    std::vector<glm::vec3> mesh_;
+    std::vector<glm::vec3> originalVertices_;
+    std::vector<glm::vec3> vertices_;
+    
+    //std::vector<std::array<glm::vec3, 3>> mesh_;
     
     AABB aabb_;
     
@@ -27,7 +30,7 @@ class Mesh {
     
   public:
     
-    Mesh( glm::vec3 initPosition, std::vector<glm::vec3> mesh, bool print = false );
+    Mesh( glm::vec3 initPosition, std::vector<glm::vec3> vertices, bool print = false );
     ~Mesh(){}
     
     void updatePosition( glm::vec3 velocity, GLfloat dt, bool skip = false );
@@ -44,6 +47,7 @@ class Mesh {
     }
     
     AABB aabb() { return aabb_; }
+    std::vector<glm::vec3> vertices() { return vertices_; }
     
     GLfloat x() { return position_.x; }
     GLfloat y() { return position_.y; }

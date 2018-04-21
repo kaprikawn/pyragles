@@ -3,10 +3,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "global.hpp"
 
-Target::Target( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<glm::vec3> shipPosition ) : PhysicsObject( initPosition, bufferData, mesh, renderer, true ) {
+Target::Target( PhysicsObjectParams physicsObjectParams ) : PhysicsObject( physicsObjectParams ) {
   
-  inputHandler_ = inputHandler;
-  shipPosition_ = shipPosition;
+  inputHandler_ = physicsObjectParams.inputHandler;
+  shipPosition_ = physicsObjectParams.shipPosition;
 }
 
 void Target::handleInput( GLfloat dt ) {

@@ -11,7 +11,7 @@ class Floor : public PhysicsObject {
     
   public:
     
-    Floor( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, int shapeType );
+    Floor( PhysicsObjectParams physicsObjectParams, int shapeType );
     ~Floor(){}
     
     void  update( GLfloat dt, bool skipMove = false );
