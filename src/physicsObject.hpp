@@ -8,7 +8,6 @@
 #include <memory>
 #include "shader.hpp"
 #include "mesh.hpp"
-#include "collisionData.hpp"
 
 class Renderer;
 
