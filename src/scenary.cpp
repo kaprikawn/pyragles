@@ -28,6 +28,17 @@ CollisionProperties Scenary::collisionProperties() {
   return collisionProperties;
 }
 
+void Scenary::registerCollision( CollisionData collisionData, CollisionProperties collisionProperties ) {
+  
+  if( lastCollisionID_ == collisionProperties.objectID )
+    return;
+  
+  lastCollisionID_ = collisionProperties.objectID;
+  
+  printf( "Scenary\n");
+  
+}
+
 void Scenary::clean() {
   PhysicsObject::clean();
 }

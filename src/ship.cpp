@@ -137,7 +137,12 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
 }
 
 void Ship::registerCollision( CollisionData collisionData, CollisionProperties collisionProperties ) {
+  if( lastCollisionID_ == collisionProperties.objectID )
+    return;
   
+  lastCollisionID_ = collisionProperties.objectID;
+  
+  printf("ship\n");
 }
 
 CollisionProperties Ship::collisionProperties() {

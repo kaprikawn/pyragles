@@ -16,7 +16,9 @@ class Scenary : public PhysicsObject {
     void update( GLfloat dt, bool skipMove = false );
     void render( glm::mat4 viewProjectionMatrix );
     void clean();
+    void registerCollision( CollisionData collisionData, CollisionProperties collisionProperties );
     CollisionProperties collisionProperties();
+    
     
     unsigned int stuff() {
       return objectID_;

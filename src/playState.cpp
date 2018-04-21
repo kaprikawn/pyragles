@@ -84,9 +84,12 @@ void PlayState::update( GLfloat dt ) {
       CollisionData collisionData = collision_.collisionData( liveObjects_[ i ], liveObjects_[ j ] );
       
       if( collisionData.isColliding() ) {
-        //CollisionProperties collisionProperties = liveObjects_[ i ] -> collisionProperties();
         
-        //liveObjects_[ i ] -> registerCollision( collisionData );
+        CollisionProperties collisionProperties = liveObjects_[ i ] -> collisionProperties();
+        liveObjects_[ j ] -> registerCollision( collisionData, collisionProperties );
+        
+        collisionProperties = liveObjects_[ j ] -> collisionProperties();
+        liveObjects_[ i ] -> registerCollision( collisionData, collisionProperties );
       }
         
     }

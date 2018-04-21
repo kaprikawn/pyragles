@@ -22,6 +22,7 @@ class Target : public PhysicsObject {
     void  render( glm::mat4 viewProjectionMatrix );
     void  clean();
     
+    
     void handleInput( GLfloat dt );
     
     CollisionProperties collisionProperties();

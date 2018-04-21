@@ -47,14 +47,19 @@ class PhysicsObject {
     int           shapeType_      = 0;
     BufferData    bufferData_;
     
+    unsigned int  lastCollisionID_;
+    
+    glm::mat4     modelMatrix_;
+    glm::mat4     rotationMatrix_;
+    
+    
     glm::vec3     acceleration_   = { 0.0f, 0.0f, 0.0f };
     glm::vec3     velocity_       = { 0.0f, 0.0f, 0.0f };
     
     std::shared_ptr<Mesh>     mesh_;
     std::shared_ptr<Renderer> renderer_;
     
-    glm::mat4                 modelMatrix_;
-    glm::mat4                 rotationMatrix_;
+    
     
   public:
     PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer>, bool print = false );
