@@ -64,22 +64,17 @@ void PlayState::update( GLfloat dt ) {
   }
   
   if( liveObjects_[ 1 ] -> fire() ) { // fire bullets
-    
     glm::vec3 initPosition = { shipPosition_ -> x, shipPosition_ -> y, shipPosition_ -> z };
     
     std::shared_ptr<Projectile> newProjectile = std::make_shared<Projectile>( initPosition, meshLoader_ -> bufferData( BULLET ), meshLoader_ -> mesh( BULLET ), renderer_, shipPosition_, target_ );
     
     PlayState::addPhysicsObject( newProjectile, true, false );
-    
-  }
-  
-  for( unsigned int i = 0; i < liveObjects_.size(); i++ ) {
-    liveObjects_[ i ] -> update( dt );
   }
   
   ship_ -> calculateRotation( dt );
   
-  for( unsigned int i = 1; i < liveObjects_.size(); i++ ) { // starting at 1 because target collision is irrelevent
+  // collisions - starting at 1 because target collision is irrelevent
+  for( unsigned int i = 1; i < liveObjects_.size(); i++ ) {
     for( unsigned int j = i + 1; j < liveObjects_.size(); j++ ) {
       CollisionData collisionData = collision_.collisionData( liveObjects_[ i ], liveObjects_[ j ] );
       
@@ -91,17 +86,18 @@ void PlayState::update( GLfloat dt ) {
         collisionProperties = liveObjects_[ j ] -> collisionProperties();
         liveObjects_[ i ] -> registerCollision( collisionData, collisionProperties );
       }
-        
     }
   }
   
+  for( unsigned int i = 0; i < liveObjects_.size(); i++ ) {
+    liveObjects_[ i ] -> update( dt );
+  }
 }
 
 void PlayState::render() {
   
   for( unsigned int i = 0; i < liveObjects_.size(); i++ )
     liveObjects_[ i ] -> render( viewProjectionMatrix_ );
-    
 }
 
 void PlayState::addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, bool init, bool isLoading ) {
@@ -113,8 +109,6 @@ void PlayState::addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, 
   
   if( init )
     liveObjects_.push_back( physicsObject );
-  
-  
 }
 
 bool PlayState::onExit() {

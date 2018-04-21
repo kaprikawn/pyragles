@@ -28,6 +28,8 @@ void PhysicsObject::render( glm::mat4 viewProjectionMatrix ) {
   glm::mat4 mvp = viewProjectionMatrix * modelMatrix_;
   
   renderer_ -> renderObject( bufferData_.vertexOffset, bufferData_.indexOffset, bufferData_.numIndices, mvp );
+  
+  newObjectState_ = UNDEF_STATE;
 }
 
 void PhysicsObject::registerCollision( CollisionData collisionData, CollisionProperties collisionProperties ) {

@@ -15,22 +15,40 @@ Ship::Ship( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3
 
 void Ship::calculateRotation( GLfloat dt ) {
   
-  GLfloat targetX = target_ -> position().x;
-  GLfloat targetY = target_ -> position().y;
-  GLfloat targetZ = target_ -> position().z;
+  GLfloat yAngle = 0.0f;
+  GLfloat xAngle = 0.0f;
+  GLfloat zAngle = zAngle_;
   
-  GLfloat shipX = mesh_ -> x();
-  GLfloat shipY = mesh_ -> y();
-  GLfloat shipZ = mesh_ -> z();
+  if( objectState_ == COLLIDED ) {
+    
+    if( zAngle_ < -20.0f ) {
+      collidedDirection_ = 10.0f;
+    } else if( zAngle_ > 20.0f ) {
+      collidedDirection_ = -10.0f;
+    }
+    zAngle = zAngle_ + collidedDirection_;
+    
+  } else {
+    
+    GLfloat targetX = target_ -> position().x;
+    GLfloat targetY = target_ -> position().y;
+    GLfloat targetZ = target_ -> position().z;
+    
+    GLfloat shipX = mesh_ -> x();
+    GLfloat shipY = mesh_ -> y();
+    GLfloat shipZ = mesh_ -> z();
+    
+    yAngle = ( atan( ( targetX - shipX ) / ( targetZ ) ) * 180 / PI ); 
+    
+    xAngle = ( atan( ( targetY - shipY ) / ( shipZ - targetZ ) ) * 180 / PI );
+    
+    yAngle = 0.0f;
+    xAngle = 0.0f;
+    
+    zAngle = -velocity_.x * 2 ;
+  }
   
-  GLfloat yAngle = ( atan( ( targetX - shipX ) / ( targetZ ) ) * 180 / PI ); 
-  
-  GLfloat xAngle = ( atan( ( targetY - shipY ) / ( shipZ - targetZ ) ) * 180 / PI );
-  
-  yAngle = 0.0f;
-  xAngle = 0.0f;
-  
-  GLfloat zAngle = -velocity_.x * 2 ;
+  zAngle_ = zAngle;
   
   rotationMatrix_ = glm::rotate( glm::mat4(), glm::radians( xAngle ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   rotationMatrix_ = glm::rotate( rotationMatrix_, glm::radians( yAngle ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
@@ -38,6 +56,9 @@ void Ship::calculateRotation( GLfloat dt ) {
 }
 
 void Ship::handleInput( GLfloat dt ) {
+  
+  if( objectState_ == COLLIDED )
+    return;
   
   if( inputHandler_ -> justPressed( FIRE ) )
     fire_ = true;
@@ -125,6 +146,15 @@ void Ship::update( GLfloat dt, bool skipMove ) {
   
   handleInput( dt );
   
+  if( newObjectState_ == COLLIDED )
+    collidedTimer_.setCoundownTimer( 0.8f );
+  
+  if( objectState_ == COLLIDED ) {
+    collidedTimer_.update( dt );
+    if( collidedTimer_.timeLeft() <= 0.0f )
+      changeState( UNDEF_STATE );
+  }
+  
   PhysicsObject::update( dt, skipMove );
   
   shipPosition_ -> x = mesh_ -> x();
@@ -142,7 +172,8 @@ void Ship::registerCollision( CollisionData collisionData, CollisionProperties c
   
   lastCollisionID_ = collisionProperties.objectID;
   
-  printf("ship\n");
+  PhysicsObject::changeState( COLLIDED );
+  
 }
 
 CollisionProperties Ship::collisionProperties() {

@@ -90,6 +90,11 @@ class PhysicsObject {
       objectID_ = objectID;
     }
     
+    void changeState( ObjectState state ) {
+      objectState_    = state;
+      newObjectState_ = state;
+    }
+    
 };
 
 #endif // PHYSICSOBJECT_HPP
