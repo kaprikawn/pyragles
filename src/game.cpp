@@ -1,10 +1,12 @@
 #include "game.hpp"
 #include <iostream>
 #include <GLES2/gl2.h>
-#include "global.hpp"
 #include "gameStateMachine.hpp"
 
 Game::Game( bool fullscreen ) {
+  
+  int windowWidth   = 1280;
+  int windowHeight  = 720;
   
   Uint32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
   if( fullscreen )
@@ -18,14 +20,14 @@ Game::Game( bool fullscreen ) {
   
 }
 
-bool Game::init( const char* title, int xpos, int ypos, int width, int height, int flags ) {
+bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int windowHeight, int flags ) {
   
   if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) != 0 ) {
     std::cout << "Failed to load SDL : " << SDL_GetError() << std::endl;
     return false;
   }
   
-  window_ = SDL_CreateWindow( title, xpos, ypos, width, height, flags );
+  window_ = SDL_CreateWindow( title, xpos, ypos, windowWidth, windowHeight, flags );
   if( !window_ ) {
     std::cout << "Failed to create window : " << SDL_GetError() << std::endl;
     return false;
@@ -41,9 +43,11 @@ bool Game::init( const char* title, int xpos, int ypos, int width, int height, i
   glClearColor( 0.0f, 0.65f, 1.0f, 1.0f );
   glEnable( GL_DEPTH_TEST );
   glDepthFunc( GL_LESS );
+  glViewport( 0, 0, windowWidth, windowHeight );
   
   gameStateMachine_ = std::make_unique<GameStateMachine>();
   inputHandler_     = std::make_shared<InputHandler>();
+  camera_           = std::make_shared<Camera>( windowWidth, windowHeight );
   
   inputHandler_ -> initialiseGamepads();
   
@@ -102,7 +106,7 @@ void Game::setNewState( int newState, int transitionType = 0 ) {
 void Game::changeGameState( int newState, int transitionType ) {
   if( newState == PLAY ) {
     std::unique_ptr<GameState> playState ( std::make_unique<PlayState>() );
-    gameStateMachine_ -> changeState( std::move( playState ), inputHandler_ );
+    gameStateMachine_ -> changeState( std::move( playState ), inputHandler_, camera_ );
   }
   newState_ = -1;
 }

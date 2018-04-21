@@ -10,7 +10,7 @@ class Camera {
     glm::mat4   view_;
     
   public:
-    Camera();
+    Camera( int windowWidth, int windowHeight );
     ~Camera(){}
   
   glm::mat4 viewProjectionMatrix() {

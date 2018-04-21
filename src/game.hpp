@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <memory>
 #include "inputHandler.hpp"
+#include "camera.hpp"
 #include "gameStateMachine.hpp"
 
 class Game {
@@ -12,6 +13,7 @@ class Game {
     SDL_GLContext   glContext_;
     
     std::shared_ptr<InputHandler>     inputHandler_;
+    std::shared_ptr<Camera>           camera_;
     std::unique_ptr<GameStateMachine> gameStateMachine_;
     
     int             newState_ = -1;

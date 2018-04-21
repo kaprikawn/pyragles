@@ -1,10 +1,9 @@
 #include "camera.hpp"
 #include <glm/gtc/matrix_transform.hpp>
-#include "global.hpp"
 
-Camera::Camera() {
+Camera::Camera( int windowWidth, int windowHeight ) {
   
-  projection_ = glm::perspective( glm::radians( 60.0f ), windowWidth / windowHeight, 1.0f, 65.0f );
+  projection_ = glm::perspective( glm::radians( 60.0f ), ( float ) windowWidth / ( float ) windowHeight, 1.0f, 65.0f );
   
   view_ = glm::lookAt(
       glm::vec3( 0.0f, 0.0f, 4.0f )

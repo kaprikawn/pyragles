@@ -29,7 +29,7 @@ class PlayState : public GameState {
     
   public:
     
-    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler );
+    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera );
     virtual void update( GLfloat dt );
     virtual void render();
     virtual bool onExit();
