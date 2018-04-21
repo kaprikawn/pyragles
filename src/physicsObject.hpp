@@ -63,7 +63,6 @@ class PhysicsObject {
     virtual void  render( glm::mat4 viewProjectionMatrix );
     virtual void  clean();
     virtual void  calculateRotation( GLfloat dt );
-    virtual void  registerCollision( CollisionData collisionData );
     
     
     bool fire() {

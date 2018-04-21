@@ -24,8 +24,6 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   renderer_   -> generateBuffer( meshLoader_ -> totalVertexBufferSize(), meshLoader_ -> totalIndexBufferSize() );
   renderer_   -> addBufferData( meshLoader_ );
   
-  collision_ = std::make_unique<Collision>();
-  
   shipPosition_           = std::make_shared<glm::vec3>();
   GLfloat shipStartZ      = -3.0f;
   GLfloat targetDistance  = 15.0f;

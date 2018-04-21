@@ -8,7 +8,6 @@
 #include "target.hpp"
 #include "meshLoader.hpp"
 #include "scenary.hpp"
-#include "collision.hpp"
 #include "floor.hpp"
 
 class PlayState : public GameState {
@@ -17,7 +16,6 @@ class PlayState : public GameState {
     
     std::shared_ptr<Renderer>   renderer_;
     std::shared_ptr<MeshLoader> meshLoader_;
-    std::unique_ptr<Collision>  collision_;
     
     glm::mat4                   viewProjectionMatrix_;
     

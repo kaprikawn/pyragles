@@ -13,10 +13,6 @@ Ship::Ship( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3
   
 }
 
-void Ship::registerCollision( CollisionData collisionData ) {
-  
-}
-
 void Ship::calculateRotation( GLfloat dt ) {
   
   GLfloat targetX = target_ -> position().x;
