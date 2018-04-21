@@ -3,6 +3,7 @@
 let cores=`grep -c ^processor /proc/cpuinfo`
 
 useHUD=1
+fullscreen=1
 
 clear
 
@@ -15,12 +16,20 @@ else
   make || exit 1
 fi
 
+command=""
+
 if [[ $useHUD -eq 1 ]]
 then
-  GALLIUM_HUD=".dfps;cpu0+cpu1+cpu2+cpu3;GPU-load;VRAM-usage" ./exe
-else
-  ./exe
+  command+='GALLIUM_HUD=".dfps;cpu0+cpu1+cpu2+cpu3;GPU-load;VRAM-usage" '
 fi
 
-exit 0
+command+='./exe'
 
+if [[ fullscreen -eq 1 ]]
+then
+  command+=' --fullscreen'
+fi
+
+eval $command
+
+exit 0

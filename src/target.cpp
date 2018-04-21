@@ -1,119 +1,113 @@
-#include <iostream>
-#include <cmath>
 #include "target.hpp"
-#include "inputHandler.hpp"
+#include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
+#include "global.hpp"
 
-Target::Target( int shapeType, GLuint programID, std::shared_ptr<glm::vec3> heroPosition ) : GlObject( shapeType, 0.0f, 0.0f, -15.0f, programID ) {
+Target::Target( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<glm::vec3> shipPosition ) : PhysicsObject( initPosition, bufferData, mesh, renderer ) {
   
-  heroPosition_ = heroPosition;
-  
-  rotation_ = glm::mat4();
+  inputHandler_ = inputHandler;
+  shipPosition_ = shipPosition;
 }
 
-void Target::handleInput( float dt ) {
+void Target::handleInput( GLfloat dt ) {
   
-  joyAxisX_ = TheInputHandler::Instance() -> joyAxisX();
-  joyAxisY_ = TheInputHandler::Instance() -> joyAxisY();
+  bool invertY = true;
   
-  if( joyAxisX_ == 0.0f ) {
-    if( TheInputHandler::Instance() -> isPressed( RIGHT ) ) {
-      joyAxisX_ = 1.0f;
-    } else if( TheInputHandler::Instance() -> isPressed( LEFT ) ) {
-      joyAxisX_ = -1.0f;
+  GLfloat multiplier  = 100.0f;
+  GLfloat resetSpeed  = 20.0f;
+  
+  GLfloat joyAxisX    = inputHandler_ -> joyAxisX();
+  acceleration_.x     = joyAxisX * multiplier;
+  
+  velocity_.x += acceleration_.x * dt;
+  
+  GLfloat xMax = 20.0f;
+  if( velocity_.x > xMax )
+    velocity_.x = xMax;
+  if( velocity_.x < -xMax )
+    velocity_.x = -xMax;
+    
+  if( joyAxisX == 0.0f ) { // drift back to ship
+    
+    GLfloat shipX   = shipPosition_ -> x;
+    GLfloat targetX = mesh_ -> x();
+    
+    if( targetX > shipX ) {
+      mesh_ -> setX ( targetX - resetSpeed * dt );
+      if( mesh_ -> x() < shipX )
+        mesh_ -> setX ( shipX );
+    } else if( targetX < shipX ) {
+      mesh_ -> setX ( targetX + resetSpeed * dt );
+      if( mesh_ -> x() > shipX )
+        mesh_ -> setX ( shipX );
     }
+    velocity_.x = 0.0f;
   }
   
-  if( joyAxisY_ == 0.0f ) {
-    if( TheInputHandler::Instance() -> isPressed( RISE ) ) {
-      joyAxisY_ = 1.0f;
-    } else if( TheInputHandler::Instance() -> isPressed( FALL ) ) {
-      joyAxisY_ = -1.0f;
+  GLfloat joyaxisY    = inputHandler_ -> joyAxisY( invertY );
+  acceleration_.y     = joyaxisY * multiplier;
+  
+  velocity_.y += acceleration_.y * dt;
+  
+  GLfloat yMax = 20.0f;
+  if( velocity_.y > yMax )
+    velocity_.y = yMax;
+  if( velocity_.y < -yMax )
+    velocity_.y = -yMax;
+  
+  if( joyaxisY == 0.0f ) { // drift back to ship
+    
+    GLfloat shipY   = shipPosition_ -> y;
+    GLfloat targetY = mesh_ -> y();
+    
+    if( targetY > shipY ) {
+      mesh_ -> setY ( targetY - resetSpeed * dt );
+      if( mesh_ -> y() < shipY )
+        mesh_ -> setY ( shipY );
+    } else if( targetY < shipY ) {
+      mesh_ -> setY ( targetY + resetSpeed * dt );
+      if( mesh_ -> y() > shipY )
+        mesh_ -> setY ( shipY );
     }
+    velocity_.y = 0.0f;
   }
-  
-  if( invertY_ ) {
-    joyAxisY_ = -joyAxisY_;
-  }
-  
-  currentX_         = position_.coordinates().x;
-  shipX_            = heroPosition_ -> x;
-  destinationX_     = shipX_ + joyAxisX_ * maxDistFromShipX_;
-  currentY_         = position_.coordinates().y;
-  shipY_            = heroPosition_ -> y;
-  destinationY_     = shipY_ + joyAxisY_ * maxDistFromShipY_;
-  
-  targetX_          = currentX_;
-  targetY_          = currentY_;
-  
-  if( joyAxisX_ > 0.0f ) {
-    if( targetX_ < destinationX_ )
-      targetX_ += speedFactor_ * dt;
-    
-    if( targetX_ > shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f )
-      targetX_ = shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f;
-    
-  } else if( joyAxisX_ < 0.0f ) {
-    if( targetX_ > destinationX_ )
-      targetX_ -= speedFactor_ * dt;
-    
-    if( targetX_ < shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f )
-      targetX_ = shipX_ + joyAxisX_ * maxDistFromShipX_ * 0.9f;
-      
-  } else {
-    if( destinationX_ > currentX_ ) {
-      targetX_ += speedFactor_ * dt;
-      if( targetX_ > shipX_ )
-        targetX_ = shipX_;
-    } else if( destinationX_ < currentX_ ) {
-      targetX_ -= speedFactor_ * dt;
-      if( targetX_ < shipX_ )
-        targetX_ = shipX_;
-    }
-  }
-  
-  if( joyAxisY_ > 0.0f ) { // rising
-    if( targetY_ < destinationY_ )
-      targetY_ += speedFactor_ * dt;
-    
-    if( targetY_ > shipY_ + joyAxisY_ * maxDistFromShipY_ * 0.9f )
-      targetY_ = shipY_ + joyAxisY_ * maxDistFromShipY_ * 0.9f;
-    
-  } else if( joyAxisY_ < 0.0f ) { // falling
-    if( targetY_ > destinationY_ )
-      targetY_ -= speedFactor_ * dt;
-    
-    if( targetY_ < shipY_ - -joyAxisY_ * maxDistFromShipY_ * 0.9f )
-      targetY_ = shipY_ - -joyAxisY_ * maxDistFromShipY_ * 0.9f;
-      
-  } else {
-    if( destinationY_ > currentY_ ) {
-      targetY_ += speedFactor_ * dt;
-      if( targetY_ > shipY_ )
-        targetY_ = shipY_;
-    } else if( destinationY_ < currentY_ ) {
-      targetY_ -= speedFactor_ * dt;
-      if( targetY_ < shipY_ )
-        targetY_ = shipY_;
-    }
-  }
-  
-  position_.setCoordinates( targetX_, targetY_, heroPosition_ -> z - 15.0f );
   
 }
 
-void Target::update( float dt ) {
+void Target::update( GLfloat dt, bool skipMove ) {
   
   Target::handleInput( dt );
   
-  model_ = glm::translate( glm::mat4(), position_.coordinates() );
+  GLfloat maxDist = 10.0f;
   
+  GLfloat targetX = mesh_ -> x();
+  GLfloat targetY = mesh_ -> y();
+  GLfloat shipX   = shipPosition_ -> x;
+  GLfloat shipY   = shipPosition_ -> y;
   
+  if( targetX > shipX + maxDist ) {
+    mesh_ -> setX ( shipX + maxDist );
+  } else if( targetX < shipX - maxDist ) {
+    mesh_ -> setX( shipX - maxDist );
+  }
+  
+  if( targetY > shipY + maxDist ) {
+    mesh_ -> setY ( shipY + maxDist );
+  } else if( targetY < shipY - maxDist ) {
+    mesh_ -> setY( shipY - maxDist );
+  }
+  
+  if( mesh_ -> y() < FLOOR_Y + 1.3f ) {
+    mesh_ -> setY ( FLOOR_Y + 1.3f );
+  }
+  
+  PhysicsObject::update( dt, skipMove );
 }
 
-void Target::render() {
-  GlObject::render();
+void Target::render( glm::mat4 viewProjectionMatrix ) {
+  PhysicsObject::render( viewProjectionMatrix );
 }
 
 void Target::clean() {
-  GlObject::clean();
+  
 }

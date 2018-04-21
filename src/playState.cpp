@@ -1,126 +1,94 @@
 #include "playState.hpp"
 #include <iostream>
-#include <vector>
-#include "game.hpp"
 #include "shader.hpp"
-#include "projectile.hpp"
-#include "floor.hpp"
+#include "camera.hpp"
+#include "global.hpp"
+#include "collisionData.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
-void PlayState::addGlObject( std::shared_ptr<GlObject> glObject, bool init, bool isLoading ) {
+bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   
-  if( isLoading ) {
-    vertexBufferSize_ += glObject -> vertexBufferSize();
-    indexBufferSize_  += glObject -> indexBufferSize();
-    
-    levelObjects_.push_back( glObject );
-  }
+  std::shared_ptr<Camera> camera = std::make_shared<Camera>();
+  std::shared_ptr<Shader> shader = std::make_shared<Shader>();
   
-  if( init )
-    liveObjects_.push_back( glObject );
+  viewProjectionMatrix_ = camera -> viewProjectionMatrix();
   
-}
-
-bool PlayState::onEnter() {
+  GLuint programID = shader -> init();
   
-  std::unique_ptr<Shader> shader = std::make_unique<Shader>();
-  programID_ = shader -> init();
-  
-  if( programID_ == 0 )
+  if( programID == 0 )
     return false;
-    
-  glUseProgram( programID_ );
   
-  heroPosition_ = std::make_shared<glm::vec3>();
-  target_ = std::make_shared<Target>( TARGET, programID_, heroPosition_ );
-  hero_   = std::make_shared<Hero>( SHIP, programID_, target_, heroPosition_ );
+  meshLoader_ = std::make_shared<MeshLoader>();
+  meshLoader_ -> generateMeshes();
   
-  PlayState::addGlObject( hero_   , true, true );
-  PlayState::addGlObject( target_ , true, true );
+  renderer_ = std::make_shared<Renderer>( programID, camera );
+  renderer_   -> generateBuffer( meshLoader_ -> totalVertexBufferSize(), meshLoader_ -> totalIndexBufferSize() );
+  renderer_   -> addBufferData( meshLoader_ );
   
-  PlayState::addGlObject( std::make_shared<Projectile>( BULLET, programID_, glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) ), false, true );
+  collision_ = std::make_unique<Collision>();
   
-  PlayState::addGlObject( std::make_shared<Floor>( FLOOR1, programID_, -7.0f ), true, true );
-  PlayState::addGlObject( std::make_shared<Floor>( FLOOR2, programID_, -7.1f ), true, true );
+  shipPosition_           = std::make_shared<glm::vec3>();
+  GLfloat shipStartZ      = -3.0f;
+  GLfloat targetDistance  = 15.0f;
   
-  glBuffer_ = std::make_unique<GlBuffer>( vertexBufferSize_, indexBufferSize_ );
+  int shapeType = TARGET;
+  target_ = std::make_shared<Target>( glm::vec3( -3, 0, shipStartZ - targetDistance ), meshLoader_ -> bufferData( shapeType ), meshLoader_ -> mesh( shapeType ), renderer_, inputHandler, shipPosition_ );
+  addPhysicsObject( target_, true, true );
   
-  for( unsigned int i = 0; i < levelObjects_.size(); i++ ) {
-    
-    GLsizeiptr vertexOffset = glBuffer_ -> addVertexBufferData ( 
-        levelObjects_[i] -> vertexBufferSize()
-      , levelObjects_[i] -> vertexDataPointer()
-    ); // add the vertex data to the buffer
-    
-    GLsizeiptr indexOffset = glBuffer_ -> addIndexBufferData (
-        levelObjects_[i] -> indexBufferSize()
-      , levelObjects_[i] -> indexDataPointer()
-    );
-    
-    levelObjects_[i] -> setOffsetLocations( vertexOffset, indexOffset );
-    
-    int shapeType = levelObjects_[i] -> shapeType();
-    
-    vertexOffsets_[ shapeType ] = vertexOffset;
-    indexOffsets_[ shapeType ]  = indexOffset;
-  }
+  shapeType = SHIP;
+  ship_ = std::make_shared<Ship>( glm::vec3( -3, 0, shipStartZ ), meshLoader_ -> bufferData( shapeType ), meshLoader_ -> mesh( shapeType ), renderer_, inputHandler, shipPosition_, target_ );
+  addPhysicsObject( ship_, true, true );
   
-  levelStart_ = SDL_GetTicks();
+  shapeType = ARCH;
+  addPhysicsObject( std::make_shared<Scenary>( glm::vec3( -3, -5, -40 ), meshLoader_ -> bufferData( shapeType ), meshLoader_ -> mesh( shapeType ), renderer_ ), true, true );
   
-  glClearColor( 0.0f, 0.65f, 1.0f, 1.0f );
-  glEnable( GL_DEPTH_TEST );
-  glDepthFunc( GL_LESS );
-  glViewport( 0, 0, windowWidth, windowHeight );
+  shapeType = FLOOR1;
+  addPhysicsObject( std::make_shared<Floor>( glm::vec3( 0, FLOOR_Y, -10 ), meshLoader_ -> bufferData( shapeType ), meshLoader_ -> mesh( shapeType ), renderer_, shapeType ), true, true );
+  
+  shapeType = FLOOR2;
+  addPhysicsObject( std::make_shared<Floor>( glm::vec3( 0, FLOOR_Y - 0.02, 0 ), meshLoader_ -> bufferData( shapeType ), meshLoader_ -> mesh( shapeType ), renderer_, shapeType ), true, true );
+  
+  
+  
   
   return true;
 }
 
-void PlayState::gameLogic( float dt ) {
-  
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  
-  // delete stuff that needs deleting
-  for( unsigned i = liveObjects_.size(); i-- > 0; ) {
-    if( liveObjects_[i] -> deleteObject() ) {
-      liveObjects_[i] -> clean();
-      liveObjects_.erase( liveObjects_.begin() + i );
-    }
-  }
+void PlayState::update( GLfloat dt ) {
   
   for( unsigned int i = 0; i < liveObjects_.size(); i++ ) {
-    liveObjects_[i] -> update( dt );
+    liveObjects_[ i ] -> update( dt );
   }
   
-  liveObjects_[0] -> calculateRotation( dt ); // calculate rotation of hero
+  ship_ -> calculateRotation( dt );
   
-  if( liveObjects_[0] -> fire() ) {
-    std::shared_ptr<Projectile> newBullet =
-      std::make_shared<Projectile>( BULLET, programID_, hero_ -> coordinates(), target_ -> coordinates() );
-    
-    newBullet -> setOffsetLocations( vertexOffsets_[ BULLET ], indexOffsets_[ BULLET ] );
-    PlayState::addGlObject( newBullet, true, false );
-  }
+  /* CollisionData collisionData = collision_ -> collisionData( ship_, arch_ );
   
-}
-
-void PlayState::update( float dt ) {
-   
-   PlayState::gameLogic( dt );
-   
+  if( collisionData.isColliding() ) {
+    ship_ -> registerCollision( collisionData );
+    //arch_ -> registerCollision( collisionData );
+  } */
 }
 
 void PlayState::render() {
   
-  for( unsigned int i = 0; i < liveObjects_.size(); i++ ) {
-    liveObjects_[i] -> render();
-  }
+  for( unsigned int i = 0; i < liveObjects_.size(); i++ )
+    liveObjects_[ i ] -> render( viewProjectionMatrix_ );
+    
+}
+
+void PlayState::addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, bool init, bool isLoading ) {
   
-  SDL_GL_SwapWindow( TheGame::Instance() -> getWindow() );
+  if( isLoading )
+    levelObjects_.push_back( physicsObject );
+  
+  if( init )
+    liveObjects_.push_back( physicsObject );
+  
 }
 
 bool PlayState::onExit() {
-  //delete hero_;
-  //delete target_;
+  
   return true;
 }

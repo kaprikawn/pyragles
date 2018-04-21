@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+CMAKE_MINIMUM_REQUIRED( VERSION 3.1 )
 
 project( pyragles )
 
@@ -10,7 +10,12 @@ if ( CMAKE_COMPILER_IS_GNUCC )
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
 endif ( CMAKE_COMPILER_IS_GNUCC )
 
-add_executable( exe shader.cpp projectile.cpp position.cpp glBuffer.cpp glObject.cpp target.cpp hero.cpp floor.cpp shape.cpp camera.cpp gameStateMachine.cpp playState.cpp inputHandler.cpp game.cpp main.cpp )
+add_executable( exe
+  inputHandler.cpp camera.cpp shader.cpp renderer.cpp mesh.cpp meshLoader.cpp
+  collision.cpp gameStateMachine.cpp playState.cpp
+  physicsObject.cpp ship.cpp scenary.cpp target.cpp floor.cpp
+  game.cpp main.cpp
+)
 
 include( FindPkgConfig )
 

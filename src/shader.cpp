@@ -46,23 +46,15 @@ void checkShaderError( GLuint shader, GLuint flag, bool isProgram, const std::st
 
 GLuint loadShader( const char* shaderSrc, GLenum type ) {
   
-  GLuint  shader;
+  GLuint shader = glCreateShader( type );
   
-  // create the shader object
-  shader = glCreateShader( type );
-  
-  if( shader == 0 ) {
+  if( shader == 0 )
     return 0;
-  }
   
-  // load the shader source
   glShaderSource( shader, 1, &shaderSrc, NULL );
   
-  // compile the shader
   glCompileShader( shader );
   
-  // check the compile status
-  //glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
   checkShaderError( shader, GL_COMPILE_STATUS, false, "Error compiling shader!");
   
   return shader;
@@ -73,8 +65,8 @@ GLuint Shader::init() {
   GLuint  vs;
   GLuint  fs;
   
-  std::string vsSrcStr = getFile( "./shaders/triangle.vs" );
-  std::string fsSrcStr = getFile( "./shaders/triangle.fs" );
+  std::string vsSrcStr = getFile( "./assets/triangle.vs" );
+  std::string fsSrcStr = getFile( "./assets/triangle.fs" );
   
   const GLchar* vsSrc;
   const GLchar* fsSrc;
@@ -85,7 +77,6 @@ GLuint Shader::init() {
   vs = loadShader( vsSrc, GL_VERTEX_SHADER );
   fs = loadShader( fsSrc, GL_FRAGMENT_SHADER );
   
-  // create the program object
   GLuint programID = glCreateProgram();
   
   if( programID == 0 ) {
@@ -96,10 +87,13 @@ GLuint Shader::init() {
   glAttachShader( programID, vs );
   glAttachShader( programID, fs );
   
-  glLinkProgram( programID ); // link the program
+  glLinkProgram( programID );
   
-  checkShaderError( programID, GL_LINK_STATUS, true, "Error linking shader program" ); // check the link status
+  checkShaderError( programID, GL_LINK_STATUS, true, "Error linking shader program" );
+  
+  positionID_ = glGetAttribLocation( programID,  "aPosition" );
+  colourID_   = glGetAttribLocation( programID,  "aColour" );
+  mvpID_      = glGetUniformLocation( programID, "uMVP" );
   
   return programID;
 }
-
