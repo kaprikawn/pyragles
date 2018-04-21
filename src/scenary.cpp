@@ -1,24 +1,23 @@
 #include "scenary.hpp"
 #include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
+#include "global.hpp"
 
-Scenary::Scenary( int shapeType, GLuint programID, glm::vec3 startPos ) : GlObject( shapeType, startPos.x, startPos.y, startPos.z, programID ) {
-  velocity_.setZ( SCROLL_SPEED );
+Scenary::Scenary( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer )
+  : PhysicsObject( initPosition, bufferData, mesh, renderer ) {
+  
+  velocity_.z = SCROLL_SPEED;
+}
+    
+void Scenary::update( GLfloat dt, bool skipMove ) {
+  
+  PhysicsObject::update( dt, skipMove );
 }
 
-void Scenary::updatePosition( float dt ) {
-  position_.updatePosition( velocity_, dt );
-}
-
-void Scenary::update( float dt ) {
-  Scenary::updatePosition( dt );
-  model_ = glm::translate( glm::mat4(), position_.coordinates() );
-  GlObject::update( dt );
-}
-
-void Scenary::render() {
-  GlObject::render();
+void Scenary::render( glm::mat4 viewProjectionMatrix ) {
+  PhysicsObject::render( viewProjectionMatrix );
 }
 
 void Scenary::clean() {
-  GlObject::clean();
+  PhysicsObject::clean();
 }

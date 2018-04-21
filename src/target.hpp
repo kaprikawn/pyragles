@@ -1,42 +1,32 @@
 #ifndef TARGET_HPP
 #define TARGET_HPP
 
-#include "glObject.hpp"
+#include <GLES2/gl2.h>
+#include <memory>
+#include "physicsObject.hpp"
+#include "renderer.hpp"
+#include "inputHandler.hpp"
 
-class Target : public GlObject {
-  
+class Target : public PhysicsObject {
   private:
     
-    std::shared_ptr<glm::vec3> heroPosition_;
+    std::shared_ptr<InputHandler> inputHandler_;
     
-    GLfloat   joyAxisX_;
-    GLfloat   joyAxisY_;
+    std::shared_ptr<glm::vec3> shipPosition_;
     
-    GLfloat speedFactor_      = 30.0f;
-  
-    GLfloat maxDistFromShipX_ = 10.0f;
-    GLfloat maxDistFromShipY_ = 5.0f;
-    GLfloat currentX_         = 0.0f;
-    GLfloat shipX_;
-    GLfloat destinationX_;
-    GLfloat currentY_         = 0.0f;
-    GLfloat shipY_;
-    GLfloat destinationY_;
-    GLfloat targetX_;
-    GLfloat targetY_;
-  
   public:
-    Target( int shapeType, GLuint programID, std::shared_ptr<glm::vec3> heroPosition );
+    Target( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<glm::vec3> shipPosition );
     virtual ~Target(){}
     
-    void handleInput( float dt );
+    void  update( GLfloat dt, bool skipMove = false );
+    void  render( glm::mat4 viewProjectionMatrix );
+    void  clean();
     
-    virtual void update( float dt );
-    virtual void render();
-    virtual void clean();
+    void handleInput( GLfloat dt );
     
-    Position position() { return position_; }
-  
+    glm::vec3 position() {
+      return mesh_ -> position();
+    }
 };
 
-#endif //TARGET_HPP
+#endif // TARGET_HPP

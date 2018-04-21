@@ -1,36 +1,20 @@
-#include <SDL2/SDL.h>
 #include <iostream>
+#include <memory>
 #include "game.hpp"
-#include "structs.hpp"
+#include "global.hpp"
 
-int main( int argc, char* args[] ) {
-
-  Uint32  currentTime_;
-  Uint32  previousTime_;
-  Uint32  msFrameDiff_      = 0;
-  float   dt_               = 0.0f;
+int main( int argc, char* argv[] ) {
   
-  const int   FPS           = 60;
-  const float DELAY_TIME    = 1000.0f / FPS;
+  bool fullscreen = false;
   
-  if( !TheGame::Instance() -> init( "GLES2 Test", 20, 20, windowWidth, windowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN ) ) {
-    std::cout << "Game initialisation failed" << std::endl;
+  for ( int i = 1; i < argc; i++ ) {
+    if( strcmp( argv[i], "--fullscreen" ) == 0 )
+      fullscreen = true;
   }
   
-  while( TheGame::Instance() -> gameRunning() ) {
-    previousTime_ = currentTime_;
-    currentTime_ = SDL_GetTicks();
-    msFrameDiff_ = currentTime_ - previousTime_;
-    dt_ = msFrameDiff_ / 1000.0f; 
-    
-    TheGame::Instance() -> handleInputs();
-    TheGame::Instance() -> update( dt_ );
-    TheGame::Instance() -> render();
-    
-    if( msFrameDiff_ < DELAY_TIME ) {
-      SDL_Delay( ( DELAY_TIME - msFrameDiff_ ) );
-    }
-  }
-
+  std::shared_ptr<Game> game = std::make_shared<Game>( fullscreen );
+  
+  game -> run();
+  
   return 0;
 }

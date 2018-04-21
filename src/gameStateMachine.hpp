@@ -3,18 +3,29 @@
 
 #include <vector>
 #include <memory>
+#include <GLES2/gl2.h>
 #include "gameState.hpp"
+#include "playState.hpp"
+#include "inputHandler.hpp"
+
+enum GameStates {
+  TRANSITION, PLAY, MENU
+};
+
+enum TransitionType {
+  LOADLEVEL, GAMEOVER, SPLASH
+};
 
 class GameStateMachine {
   private:
     std::vector<std::unique_ptr<GameState>> gameStates_;
     
   public:
-    void pushState  ( std::unique_ptr<GameState> state );
-    void changeState( std::unique_ptr<GameState> state );
+    void pushState  ( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler );
+    void changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler );
     void popState   ();
     
-    void update     ( float dt );
+    void update     ( GLfloat dt );
     void render     ();
     
     std::string     getCurrentGameStateID();

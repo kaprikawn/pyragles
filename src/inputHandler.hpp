@@ -1,65 +1,78 @@
 #ifndef INPUTHANDLER_HPP
 #define INPUTHANDLER_HPP
 
-#include <vector>
 #include <SDL2/SDL.h>
-#include "vector.hpp"
+#include <GLES2/gl2.h>
+#include <vector>
+
+enum Buttons {
+    LEFT, RIGHT, ASCEND, DESCEND, FIRE
+  , MAX_BUTTON_NUM
+  , MAX_BUTTON = MAX_BUTTON_NUM
+};
 
 class InputHandler {
-  private:
   
-    bool justPressed_[5];
+  private:
+    
+    Uint32 lastFrameTime_ = 0;
+    
+    GLfloat joyAxisX_ = 0.0f;
+    GLfloat joyAxisY_ = 0.0f;
+    
+    bool justPressed_[ MAX_BUTTON ];
   
     // keyboard
     const Uint8*  keystates_ = SDL_GetKeyboardState( NULL );
-    void          onKeyDown( SDL_Event &event );
-    void          onKeyUp();
+    void          onKeyDown( SDL_Event& event );
+    void          onKeyUp( SDL_Event& event );
     
     // gamepad
     bool    gamepadsInitialised_ = false;
     int     whichOne_;
-    Uint8   currentHat_ = 0;
     void    onJoystickAxisMove( SDL_Event &event );
-    static const int joystickDeadZone_ = 3000;
-    Sint16  joyAxisX_   = 0;
-    Sint16  joyAxisY_   = 0;
+    
+    bool    fireJustPressed_ = false;
+    
+    Uint8   currentHat_   = 0;
     
     std::vector<SDL_Joystick*>  gamepads_;
-    std::vector<bool>           buttonStates_;
-    std::vector<bool>           padJustPressed_;
     
-    InputHandler  (){}
-    ~InputHandler (){}
-    static InputHandler* instance_;
-  
+    bool quit_ = false;
+    
   public:
+    
+    void processEvent( SDL_Event& event, Uint32 frameTime );
+    void reset();
+    
+    void calculateJoyAxis();
+    
+    bool isPressed( int button );
+    bool justPressed( int button ) {
+      if( justPressed_[ button ] ) {
+        justPressed_[ button ] = false;
+        return true;
+      }
+      return false;
+    }
+    
+    GLfloat joyAxisX() { return joyAxisX_; }
+    GLfloat joyAxisY( bool invertY ) {
+      if( invertY )
+        return -joyAxisY_;
+      
+      return joyAxisY_;
+    }
     
     // gamepad
     void  initialiseGamepads();
     bool  gamepadsInitialised() { return gamepadsInitialised_; }
-    bool  getButtonState( int buttonNumber ) { return buttonStates_[buttonNumber]; }
+    //bool  getButtonState( int buttonNumber ) { return buttonStates_[buttonNumber]; }
     void  onHatMotion( SDL_Event &event );
     void  onGamepadButtonDown( SDL_Event &event );
-    GLfloat joyAxisX();
-    GLfloat joyAxisY();
     
-    // keyboard
-    bool  isKeyDown( SDL_Scancode key );
+    bool quit() { return quit_; }
     
-    bool  isPressed( int button );
-    bool  justPressed( int button );
-    
-    void update();
-    void clean();
-    
-    static InputHandler* Instance() {
-      if( instance_ == 0 ) {
-        instance_ = new InputHandler();
-      }
-      return instance_;
-    }
 };
-
-typedef InputHandler TheInputHandler;
 
 #endif //INPUTHANDLER_HPP
