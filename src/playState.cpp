@@ -3,6 +3,7 @@
 #include "shader.hpp"
 #include "camera.hpp"
 #include "global.hpp"
+#include "projectile.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -50,6 +51,24 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
 }
 
 void PlayState::update( GLfloat dt ) {
+  
+  // delete stuff that needs deleting
+  for( unsigned i = liveObjects_.size(); i-- > 0; ) {
+    if( liveObjects_[i] -> deleteObject() ) {
+      liveObjects_[i]   -> clean();
+      liveObjects_.erase( liveObjects_.begin() + i );
+    }
+  }
+  
+  if( liveObjects_[ 1 ] -> fire() ) { // fire bullets
+    
+    glm::vec3 initPosition = { shipPosition_ -> x, shipPosition_ -> y, shipPosition_ -> z };
+    
+    std::shared_ptr<Projectile> newProjectile = std::make_shared<Projectile>( initPosition, meshLoader_ -> bufferData( BULLET ), meshLoader_ -> mesh( BULLET ), renderer_, shipPosition_, target_ );
+    
+    PlayState::addPhysicsObject( newProjectile, true, false );
+    
+  }
   
   for( unsigned int i = 0; i < liveObjects_.size(); i++ ) {
     liveObjects_[ i ] -> update( dt );

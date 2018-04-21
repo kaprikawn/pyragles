@@ -56,7 +56,7 @@ void MeshLoader::generateMeshes() {
   indices_[ currentShape ] = indices;
   indices.clear();
   
-  // target
+  // target //
   currentShape  = TARGET;
   colour        = { 0.729f, 0.129f, 0.176f };
   
@@ -94,6 +94,52 @@ void MeshLoader::generateMeshes() {
     , 7,  8,  9
     , 10, 11, 8
     , 10, 8,  3
+  };
+  indices_[ currentShape ] = indices;
+  indices.clear();
+  
+  // bullet //
+  currentShape  = BULLET;
+  
+  GLfloat scaler = 0.4f;
+  
+  position  = {  0.0f,  0.0f, -1.0f };
+  colour    = { 1, 0, 0 };
+  position *= scaler;
+  addVertex( position, colour, currentShape );
+  
+  colour    = { 0.0f, 0.0f, 1.0f };
+  
+  position  = {  0.0f,  0.6f,  0.6f };
+  position *= scaler;
+  addVertex( position, colour, currentShape );
+  
+  position  = {  1.0f,  0.0f,  0.6f };
+  position *= scaler;
+  addVertex( position, colour, currentShape );
+  
+  position  = { -1.0f,  0.0f,  0.6f };
+  position *= scaler;
+  addVertex( position, colour, currentShape );
+  
+  position  = {  0.0f, -0.4f,  0.6f };
+  position *= scaler;
+  addVertex( position, colour, currentShape );
+  
+  position  = {  0.0f,  0.0f,  1.0f };
+  colour    = {  1.0f,  1.0f,  1.0f };
+  position *= scaler;
+  addVertex( position, colour, currentShape );
+  
+  indices = {
+      0, 1, 2 // f t r
+    , 0, 1, 3 // f t l
+    , 0, 4, 2 // f b r
+    , 0, 4, 3 // f b l
+    , 5, 1, 2 // b t r
+    , 5, 1, 3 // b t l
+    , 5, 4, 2 // b b r
+    , 5, 4, 3 // b b l
   };
   indices_[ currentShape ] = indices;
   indices.clear();
