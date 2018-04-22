@@ -44,6 +44,7 @@ bool Game::init( const char* title, int xpos, int ypos, int width, int height, i
   
   gameStateMachine_ = std::make_unique<GameStateMachine>();
   inputHandler_     = std::make_shared<InputHandler>();
+  camera_           = std::make_shared<Camera>();
   
   inputHandler_ -> initialiseGamepads();
   
@@ -102,7 +103,7 @@ void Game::setNewState( int newState, int transitionType = 0 ) {
 void Game::changeGameState( int newState, int transitionType ) {
   if( newState == PLAY ) {
     std::unique_ptr<GameState> playState ( std::make_unique<PlayState>() );
-    gameStateMachine_ -> changeState( std::move( playState ), inputHandler_ );
+    gameStateMachine_ -> changeState( std::move( playState ), inputHandler_, camera_ );
   }
   newState_ = -1;
 }

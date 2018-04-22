@@ -21,8 +21,8 @@ class GameStateMachine {
     std::vector<std::unique_ptr<GameState>> gameStates_;
     
   public:
-    void pushState  ( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler );
-    void changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler );
+    void pushState  ( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera );
+    void changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera );
     void popState   ();
     
     void update     ( GLfloat dt );

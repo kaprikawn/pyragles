@@ -1,9 +1,9 @@
 #include <iostream>
 #include "gameStateMachine.hpp"
 
-void GameStateMachine::pushState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler ) {
+void GameStateMachine::pushState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
   gameStates_.push_back( std::move( state ) );
-  gameStates_.back() -> onEnter( inputHandler );
+  gameStates_.back() -> onEnter( inputHandler, camera );
 }
 
 void GameStateMachine::popState() {
@@ -21,7 +21,7 @@ std::string GameStateMachine::getCurrentGameStateID() {
   return NULL;
 }
 
-void GameStateMachine::changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler ) {
+void GameStateMachine::changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
   std::cout << "Changing game state to " << state -> getStateID() << std::endl;
   if( !gameStates_.empty() ) {
     if( gameStates_.back() -> getStateID() == state -> getStateID() ) {
@@ -34,7 +34,7 @@ void GameStateMachine::changeState( std::unique_ptr<GameState> state, std::share
   
   gameStates_.push_back( std::move( state ) );
   
-  gameStates_.back() -> onEnter( inputHandler );
+  gameStates_.back() -> onEnter( inputHandler, camera );
   
   std::cout << "finished changing state - stateID is now " << gameStates_.back() -> getStateID() << std::endl;
 }

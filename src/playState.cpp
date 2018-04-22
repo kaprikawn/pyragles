@@ -1,15 +1,13 @@
 #include "playState.hpp"
 #include <iostream>
 #include "shader.hpp"
-#include "camera.hpp"
 #include "global.hpp"
 #include "projectile.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
-bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
+bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
   
-  std::shared_ptr<Camera> camera = std::make_shared<Camera>();
   std::shared_ptr<Shader> shader = std::make_shared<Shader>();
   
   viewProjectionMatrix_ = camera -> viewProjectionMatrix();
