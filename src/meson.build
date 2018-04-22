@@ -1,4 +1,4 @@
-src = [ 'inputHandler.cpp', 'camera.cpp', 'shader.cpp', 'renderer.cpp', 'mesh.cpp', 'meshLoader.cpp', 'gameStateMachine.cpp', 'playState.cpp', 'physicsObject.cpp', 'ship.cpp', 'scenary.cpp', 'target.cpp', 'floor.cpp', 'projectile.cpp', 'game.cpp', 'main.cpp' ]
+src = [ 'inputHandler.cpp', 'camera.cpp', 'shader.cpp', 'renderer.cpp', 'mesh.cpp', 'meshLoader.cpp', 'gameStateMachine.cpp', 'playState.cpp', 'collision.cpp', 'physicsObject.cpp', 'ship.cpp', 'scenary.cpp', 'target.cpp', 'floor.cpp', 'projectile.cpp', 'game.cpp', 'main.cpp' ]
 
 executable( 'exe', src, dependencies : [ sdl2_dep, gles_dep ] )
 

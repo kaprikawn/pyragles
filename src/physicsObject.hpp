@@ -8,6 +8,8 @@
 #include <memory>
 #include "shader.hpp"
 #include "mesh.hpp"
+#include "collisionData.hpp"
+#include "inputHandler.hpp"
 
 class Renderer;
 
@@ -34,6 +36,16 @@ struct BufferData {
   GLsizei    numIndices;
 };
 
+struct PhysicsObjectParams {
+  int         shapeType;
+  glm::vec3   initPosition;
+  BufferData  bufferData;
+  std::shared_ptr<Mesh>                 mesh;
+  std::shared_ptr<Renderer>             renderer;
+  std::shared_ptr<InputHandler>         inputHandler;
+  std::shared_ptr<glm::vec3>            shipPosition;
+};
+
 class PhysicsObject {
   protected:
     
@@ -46,23 +58,29 @@ class PhysicsObject {
     int           shapeType_      = 0;
     BufferData    bufferData_;
     
+    unsigned int  lastCollisionID_;
+    
+    glm::mat4     modelMatrix_;
+    glm::mat4     rotationMatrix_;
+    
+    
     glm::vec3     acceleration_   = { 0.0f, 0.0f, 0.0f };
     glm::vec3     velocity_       = { 0.0f, 0.0f, 0.0f };
     
     std::shared_ptr<Mesh>     mesh_;
     std::shared_ptr<Renderer> renderer_;
     
-    glm::mat4                 modelMatrix_;
-    glm::mat4                 rotationMatrix_;
-    
   public:
-    PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> );
+    PhysicsObject( PhysicsObjectParams physicsObjectParams, bool print = false );
     virtual ~PhysicsObject(){}
     
     virtual void  update( GLfloat dt, bool skipMove = false );
     virtual void  render( glm::mat4 viewProjectionMatrix );
     virtual void  clean();
     virtual void  calculateRotation( GLfloat dt );
+    virtual void  registerCollision( CollisionData collisionData, CollisionProperties collisionProperties );
+    
+    virtual CollisionProperties collisionProperties();
     
     bool fire() {
       if( fire_ ) {
@@ -72,9 +90,28 @@ class PhysicsObject {
       return false;
     }
     
-    AABB aabb() { return mesh_ -> aabb(); }
+    AABB aabb()             { return mesh_ -> aabb(); }
+    int  shapeType()        { return shapeType_; }
     
-    bool deleteObject() { return delete_; }
+    std::vector<std::array<glm::vec3, 3>> mesh() {
+      return mesh_ -> mesh();
+    }
+    
+    bool deleteObject()     { return delete_; }
+    unsigned int objectID() { return objectID_; }
+    
+    std::vector<glm::vec3> vertices() {
+      return mesh_ -> vertices();
+    }
+    
+    void setObjectID( unsigned int objectID ) {
+      objectID_ = objectID;
+    }
+    
+    void changeState( ObjectState state ) {
+      objectState_    = state;
+      newObjectState_ = state;
+    }
     
 };
 

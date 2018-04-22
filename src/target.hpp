@@ -15,14 +15,17 @@ class Target : public PhysicsObject {
     std::shared_ptr<glm::vec3> shipPosition_;
     
   public:
-    Target( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<glm::vec3> shipPosition );
+    Target( PhysicsObjectParams physicsObjectParams );
     virtual ~Target(){}
     
     void  update( GLfloat dt, bool skipMove = false );
     void  render( glm::mat4 viewProjectionMatrix );
     void  clean();
     
+    
     void handleInput( GLfloat dt );
+    
+    CollisionProperties collisionProperties();
     
     glm::vec3 position() {
       return mesh_ -> position();

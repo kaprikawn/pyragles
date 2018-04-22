@@ -11,3 +11,9 @@ Acknowledgements
 https://github.com/Cloudef/wlc/blob/master/CMake/FindGLESv2.cmake
 
 https://github.com/tcbrindle/sdl2-cmake-scripts
+
+- triangleOverlap.h obtained from 
+
+https://github.com/benardp/contours/blob/master/freestyle/view_map/triangle_triangle_intersection.c
+
+I tried to find a license for this code but there does not appear to be any

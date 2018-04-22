@@ -9,6 +9,7 @@
 #include "meshLoader.hpp"
 #include "scenary.hpp"
 #include "floor.hpp"
+#include "collision.hpp"
 
 class PlayState : public GameState {
   private:
@@ -24,10 +25,14 @@ class PlayState : public GameState {
     std::shared_ptr<Target>     target_;
     std::shared_ptr<Scenary>    arch_;
     
+    Collision                   collision_;
+    
+    unsigned int                nextObjectID_ = 1;
+    
     
   public:
     
-    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler );
+    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera );
     virtual void update( GLfloat dt );
     virtual void render();
     virtual bool onExit();

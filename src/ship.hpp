@@ -7,6 +7,7 @@
 #include "renderer.hpp"
 #include "inputHandler.hpp"
 #include "target.hpp"
+#include "timer.hpp"
 
 class Ship : public PhysicsObject {
   private:
@@ -15,14 +16,20 @@ class Ship : public PhysicsObject {
     std::shared_ptr<glm::vec3>    shipPosition_;
     std::shared_ptr<Target>       target_;
     
+    GLfloat   collidedDirection_  = 1.0f;
+    GLfloat   zAngle_             = 0.0f;
+    Timer     collidedTimer_;
+    
   public:
-    Ship( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer, std::shared_ptr<InputHandler> inputHander, std::shared_ptr<glm::vec3>    shipPosition, std::shared_ptr<Target> target );
+    Ship( PhysicsObjectParams physicsObjectParams, std::shared_ptr<Target> target );
     ~Ship(){}
     
     void  update( GLfloat dt, bool skipMove = false );
     void  render( glm::mat4 viewProjectionMatrix );
     void  clean();
     void  calculateRotation( GLfloat dt );
+    void registerCollision( CollisionData collisionData, CollisionProperties collisionProperties );
+    CollisionProperties collisionProperties();
     
     void handleInput( GLfloat dt );
 };

@@ -5,17 +5,22 @@
 #include "renderer.hpp"
 #include "camera.hpp"
 
-PhysicsObject::PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer ) {
+PhysicsObject::PhysicsObject( PhysicsObjectParams physicsObjectParams, bool print ) {
   
-  mesh_       = std::make_shared<Mesh>( initPosition, mesh );
-  bufferData_ = bufferData;
-  renderer_   = renderer;
+  bufferData_   = physicsObjectParams.bufferData;
+  renderer_     = physicsObjectParams.renderer;
+  mesh_         = physicsObjectParams.mesh;
+  renderer_     = physicsObjectParams.renderer;
+  shapeType_    = physicsObjectParams.shapeType;
   
+  modelMatrix_  = glm::translate( glm::mat4(), mesh_ -> position() );
+  
+  mesh_ -> updatePosition( glm::vec3( 0, 0, 0 ), 0.0f, true );
 }
 
 void PhysicsObject::update( GLfloat dt, bool skipMove ) {
   mesh_ -> updatePosition( velocity_, dt, skipMove );
-  mesh_ -> updateMesh( modelMatrix_ );
+  mesh_ -> updateVertices( modelMatrix_, true );
 }
 
 void PhysicsObject::render( glm::mat4 viewProjectionMatrix ) {
@@ -26,12 +31,23 @@ void PhysicsObject::render( glm::mat4 viewProjectionMatrix ) {
   glm::mat4 mvp = viewProjectionMatrix * modelMatrix_;
   
   renderer_ -> renderObject( bufferData_.vertexOffset, bufferData_.indexOffset, bufferData_.numIndices, mvp );
+  
+  newObjectState_ = UNDEF_STATE;
 }
 
-void PhysicsObject::clean() {
+void PhysicsObject::registerCollision( CollisionData collisionData, CollisionProperties collisionProperties ) {
   
 }
 
 void PhysicsObject::calculateRotation( GLfloat dt ) {
+  
+}
+
+CollisionProperties PhysicsObject::collisionProperties() {
+  CollisionProperties collisionProperties;
+  return collisionProperties;
+}
+
+void PhysicsObject::clean() {
   
 }

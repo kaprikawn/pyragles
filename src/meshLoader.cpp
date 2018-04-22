@@ -3,11 +3,13 @@
 
 void MeshLoader::addVertex( glm::vec3 position, glm::vec3 colour, int shapeType ) {
   
-  shapeMeshes_[ shapeType ].push_back( position );
+  shapeVertices_[ shapeType ].push_back( position );
   
   Vertex vertex = { position, colour };
   
   vertices_[ shapeType ].push_back( vertex );
+  
+  vertexPositions_[ shapeType ].push_back( position );
   
   if( !loadMesh_[ shapeType ] )
     loadMesh_[ shapeType ] = true;
@@ -54,6 +56,19 @@ void MeshLoader::generateMeshes() {
     , 5, 4, 3 // b b l
   };
   indices_[ currentShape ] = indices;
+  
+  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
+    mesh_[ currentShape ].push_back(
+      std::array<glm::vec3, 3> {
+          vertexPositions_[ currentShape ][ indices[ i ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
+      }
+    );
+    
+    i++;
+    i++;
+  }
   indices.clear();
   
   // target //
@@ -96,6 +111,19 @@ void MeshLoader::generateMeshes() {
     , 10, 8,  3
   };
   indices_[ currentShape ] = indices;
+  
+  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
+    mesh_[ currentShape ].push_back(
+      std::array<glm::vec3, 3> {
+          vertexPositions_[ currentShape ][ indices[ i ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
+      }
+    );
+    
+    i++;
+    i++;
+  }
   indices.clear();
   
   // bullet //
@@ -142,6 +170,19 @@ void MeshLoader::generateMeshes() {
     , 5, 4, 3 // b b l
   };
   indices_[ currentShape ] = indices;
+  
+  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
+    mesh_[ currentShape ].push_back(
+      std::array<glm::vec3, 3> {
+          vertexPositions_[ currentShape ][ indices[ i ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
+      }
+    );
+    
+    i++;
+    i++;
+  }
   indices.clear();
   
   // arch
@@ -249,6 +290,20 @@ void MeshLoader::generateMeshes() {
   };
   indices_[ currentShape ] = indices;
   
+  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
+    mesh_[ currentShape ].push_back(
+      std::array<glm::vec3, 3> {
+          vertexPositions_[ currentShape ][ indices[ i ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
+      }
+    );
+    
+    i++;
+    i++;
+  }
+  indices.clear();
+  
   // floor 1
   currentShape = FLOOR1;
   colour = { 0.87f, 0.733f, 0.129f };
@@ -267,6 +322,19 @@ void MeshLoader::generateMeshes() {
     , 3, 2, 0
   };
   indices_[ currentShape ] = indices;
+  
+  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
+    mesh_[ currentShape ].push_back(
+      std::array<glm::vec3, 3> {
+          vertexPositions_[ currentShape ][ indices[ i ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
+      }
+    );
+    
+    i++;
+    i++;
+  }
   indices.clear();
   
   // floor 2
@@ -287,6 +355,19 @@ void MeshLoader::generateMeshes() {
     , 3, 2, 0
   };
   indices_[ currentShape ] = indices;
+  
+  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
+    mesh_[ currentShape ].push_back(
+      std::array<glm::vec3, 3> {
+          vertexPositions_[ currentShape ][ indices[ i ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
+      }
+    );
+    
+    i++;
+    i++;
+  }
   indices.clear();
   
   setOffsets();

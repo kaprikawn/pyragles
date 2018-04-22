@@ -10,14 +10,20 @@ class Scenary : public PhysicsObject {
   private:
     
   public:
-    Scenary( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> renderer );
+    Scenary( PhysicsObjectParams physicsObjectParams );
     ~Scenary(){}
     
     void update( GLfloat dt, bool skipMove = false );
     void render( glm::mat4 viewProjectionMatrix );
     void clean();
+    void registerCollision( CollisionData collisionData, CollisionProperties collisionProperties );
+    CollisionProperties collisionProperties();
     
-    //void calculateRotation( GLfloat dt );
+    
+    unsigned int stuff() {
+      return objectID_;
+    }
+    
 };
 
 #endif // SCENARY_HPP

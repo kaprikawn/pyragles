@@ -15,7 +15,6 @@ class Shader {
   public:
     GLuint init();
     
-    
 };
 
 #endif //SHADER_HPP
