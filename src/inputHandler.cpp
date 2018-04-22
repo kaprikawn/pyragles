@@ -91,7 +91,8 @@ void InputHandler::onHatMotion( SDL_Event &event ) {
 }
 
 void InputHandler::onGamepadButtonDown( SDL_Event &event ) {
-  
+  if( event.jbutton.button == 2 )
+    justPressed_[ FIRE ] = true;
 }
 
 void InputHandler::onJoystickAxisMove( SDL_Event &event ) {
@@ -136,6 +137,8 @@ void InputHandler::processEvent( SDL_Event& event, Uint32 frameTime ) {
     // gamepad
     case SDL_JOYAXISMOTION:
       onJoystickAxisMove( event );    break;
+    case SDL_JOYBUTTONDOWN:
+      onGamepadButtonDown( event );   break;
       
     // keyboard
     case SDL_KEYDOWN:

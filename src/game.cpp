@@ -23,7 +23,7 @@ Game::Game( bool fullscreen ) {
     SDL_GetDesktopDisplayMode( 0, &dm );
     windowWidth   = dm.w;
     windowHeight  = dm.h;
-    SDL_DestroyWindow(nullWindow);
+    SDL_DestroyWindow( nullWindow );
     
     windowX       = SDL_WINDOWPOS_UNDEFINED;
     windowY       = SDL_WINDOWPOS_UNDEFINED;
@@ -105,6 +105,8 @@ void Game::run() {
     gameStateMachine_ -> render();
     
     Game::render();
+    
+    inputHandler_ -> reset();
   } while( running_ );
   
 }
