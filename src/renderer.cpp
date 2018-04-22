@@ -6,7 +6,7 @@
 Renderer::Renderer( GLuint programID, std::shared_ptr<Camera> camera ) {
   
   glUseProgram( programID );
-  glViewport( 0, 0, windowWidth, windowHeight );
+  glViewport( 0, 0, camera -> windowWidth(), camera -> windowHeight() );
   
   positionID_ = glGetAttribLocation( programID,  "aPosition" );
   colourID_   = glGetAttribLocation( programID,  "aColour" );

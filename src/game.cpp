@@ -6,26 +6,44 @@
 
 Game::Game( bool fullscreen ) {
   
+  int windowWidth   = 1280;
+  int windowHeight  = 720;
+  
+  int windowX       = 10;
+  int windowY       = 10;
+  
   Uint32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-  if( fullscreen )
+  if( fullscreen ) {
     sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN;
+    
+    // create window to native desktop size to query screen dimensions
+    SDL_Init( SDL_INIT_VIDEO );
+    SDL_Window* nullWindow = SDL_CreateWindow( "undef", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_FULLSCREEN );
+    SDL_DisplayMode dm;
+    SDL_GetDesktopDisplayMode( 0, &dm );
+    windowWidth   = dm.w;
+    windowHeight  = dm.h;
+    SDL_DestroyWindow(nullWindow);
+    
+    windowX       = SDL_WINDOWPOS_UNDEFINED;
+    windowY       = SDL_WINDOWPOS_UNDEFINED;
+  }
   
-  
-  bool init = Game::init( "GLES2 Test", 20, 20, windowWidth, windowHeight, sdlFlags );
+  bool init = Game::init( "GLES2 Test", windowX, windowY, windowWidth, windowHeight, sdlFlags );
   
   if( !init )
     std::cout << "Error - game failed to start" << std::endl;
   
 }
 
-bool Game::init( const char* title, int xpos, int ypos, int width, int height, int flags ) {
+bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int windowHeight, int flags ) {
   
   if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) != 0 ) {
     std::cout << "Failed to load SDL : " << SDL_GetError() << std::endl;
     return false;
   }
   
-  window_ = SDL_CreateWindow( title, xpos, ypos, width, height, flags );
+  window_ = SDL_CreateWindow( title, xpos, ypos, windowWidth, windowHeight, flags );
   if( !window_ ) {
     std::cout << "Failed to create window : " << SDL_GetError() << std::endl;
     return false;
@@ -44,7 +62,7 @@ bool Game::init( const char* title, int xpos, int ypos, int width, int height, i
   
   gameStateMachine_ = std::make_unique<GameStateMachine>();
   inputHandler_     = std::make_shared<InputHandler>();
-  camera_           = std::make_shared<Camera>();
+  camera_ = std::make_shared<Camera>( windowWidth, windowHeight );
   
   inputHandler_ -> initialiseGamepads();
   

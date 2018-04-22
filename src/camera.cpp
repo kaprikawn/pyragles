@@ -1,10 +1,17 @@
 #include "camera.hpp"
+#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
-#include "global.hpp"
 
-Camera::Camera() {
+Camera::Camera( int windowWidth, int windowHeight ) {
   
-  projection_ = glm::perspective( glm::radians( 60.0f ), windowWidth / windowHeight, 1.0f, 65.0f );
+  windowWidth_  = windowWidth;
+  windowHeight_ = windowHeight;
+  
+  float aspect = ( float ) windowWidth / ( float ) windowHeight;
+  
+  std::cout << "aspect is " << aspect << std::endl;
+  
+  projection_ = glm::perspective( glm::radians( 60.0f ), aspect, 1.0f, 65.0f );
   
   view_ = glm::lookAt(
       glm::vec3( 0.0f, 0.0f, 4.0f )
