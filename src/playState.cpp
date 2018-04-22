@@ -36,7 +36,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   int shapeType = TARGET;
   PhysicsObjectParams params;
   params.initPosition = { -3, 0, shipStartZ - targetDistance };
-  std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ) );
+  std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
@@ -49,7 +49,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   
   shapeType = SHIP;
   params.initPosition = { -3, 0, shipStartZ };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ) );
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
@@ -63,7 +63,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   
   shapeType = ARCH;
   params.initPosition = { -3, -5, -40 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ) );
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
@@ -75,7 +75,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   
   shapeType = FLOOR1;
   params.initPosition = { 0, FLOOR_Y, -10 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ) );
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
@@ -85,7 +85,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   
   shapeType = FLOOR2;
   params.initPosition = { 0, FLOOR_Y - 0.02, -10 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ) );
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
@@ -108,7 +108,7 @@ void PlayState::update( GLfloat dt ) {
     
     PhysicsObjectParams params;
     params.initPosition = { shipPosition_ -> x, shipPosition_ -> y, shipPosition_ -> z };
-    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( BULLET ) );
+    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( BULLET ), meshLoader_ -> mesh( BULLET ) );
     params.bufferData   = meshLoader_ -> bufferData( BULLET );
     params.mesh         = mesh;
     params.renderer     = renderer_;

@@ -2,12 +2,13 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
-Mesh::Mesh( glm::vec3 initPosition, std::vector<glm::vec3> vertices, bool print ) {
+Mesh::Mesh( glm::vec3 initPosition, std::vector<glm::vec3> vertices, std::vector<std::array<glm::vec3, 3>> mesh, bool print ) {
   
-  position_     = initPosition;
-  vertices_     = vertices;
+  position_         = initPosition;
+  vertices_         = vertices;
   originalVertices_ = vertices_;
-  
+  mesh_             = mesh;
+  originalMesh_     = mesh_;
 }
 
 void Mesh::updatePosition(  glm::vec3 velocity, GLfloat dt, bool skip ) {
@@ -17,11 +18,20 @@ void Mesh::updatePosition(  glm::vec3 velocity, GLfloat dt, bool skip ) {
 
 void Mesh::updateMesh( glm::mat4 modelMatrix ) {
   
+  for( unsigned int i = 0; i < mesh_.size(); i++ ) {
+    for( unsigned int j = 0; j < 3; j++ ) {
+      mesh_[ i ][ j ] = glm::vec3( modelMatrix * glm::vec4( originalMesh_[ i ][ j ], 1 ) );
+    }
+  }
+}
+
+void Mesh::updateVertices( glm::mat4 modelMatrix, bool runUpdateMesh ) {
+  
   AABB aabb;
   bool firstPass = true;
   
   for( unsigned int i = 0; i < vertices_.size(); i++ ) {
-    
+    // std::vector<glm::vec3> vertices_;
     vertices_[ i ] = glm::vec3( modelMatrix * glm::vec4( originalVertices_[i], 1 ) );
     
     if( firstPass || vertices_[ i ].x > aabb.right ) {
@@ -52,6 +62,9 @@ void Mesh::updateMesh( glm::mat4 modelMatrix ) {
   }
   
   aabb_ = aabb;
+  
+  if( runUpdateMesh )
+    updateMesh( modelMatrix );
 }
 
 void Mesh::setPosition( glm::vec3 coordinates ) {

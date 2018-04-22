@@ -39,10 +39,10 @@ struct BufferData {
 struct PhysicsObjectParams {
   glm::vec3   initPosition;
   BufferData  bufferData;
-  std::shared_ptr<Mesh>         mesh;
-  std::shared_ptr<Renderer>     renderer;
-  std::shared_ptr<InputHandler> inputHandler;
-  std::shared_ptr<glm::vec3>    shipPosition;
+  std::shared_ptr<Mesh>                 mesh;
+  std::shared_ptr<Renderer>             renderer;
+  std::shared_ptr<InputHandler>         inputHandler;
+  std::shared_ptr<glm::vec3>            shipPosition;
 };
 
 class PhysicsObject {
@@ -90,6 +90,11 @@ class PhysicsObject {
     }
     
     AABB aabb()             { return mesh_ -> aabb(); }
+    
+    std::vector<std::array<glm::vec3, 3>> mesh() {
+      return mesh_ -> mesh();
+    }
+    
     bool deleteObject()     { return delete_; }
     unsigned int objectID() { return objectID_; }
     

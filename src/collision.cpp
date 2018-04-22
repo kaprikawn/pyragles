@@ -2,6 +2,7 @@
 #include <iostream>
 #include "mesh.hpp"
 #include "physicsObject.hpp"
+#include "triangleOverlap.h"
 
 bool areCollidingAABB( AABB a, AABB b ) {
   
@@ -26,16 +27,25 @@ bool areCollidingAABB( AABB a, AABB b ) {
   return true;
 }
 
-bool areCollisingMeshData( std::vector<glm::vec3> vertexDataA, std::vector<glm::vec3> vertexDataB ) {
+bool areCollisingMesh( std::vector<std::array<glm::vec3, 3>> meshA, std::vector<std::array<glm::vec3, 3>> meshB ) {
   
-  for( unsigned int a = 0; a < vertexDataA.size(); a++ ) {
-    for( unsigned int b = 0; b < vertexDataB.size(); b++ ) {
-      std::cout << "a x is " << vertexDataA[ a ].x << std::endl;
-      std::cout << "b x is " << vertexDataB[ b ].x << std::endl;
+  for( unsigned int a = 0; a < meshA.size(); a++ ) {
+    for( unsigned int b = 0; b < meshB.size(); b++ ) {
+      
+      real p1[3] = { meshA[a][0].x, meshA[a][0].y, meshA[a][0].z };
+      real q1[3] = { meshA[a][1].x, meshA[a][1].y, meshA[a][1].z };
+      real r1[3] = { meshA[a][2].x, meshA[a][2].y, meshA[a][2].z };
+      
+      real p2[3] = { meshB[b][0].x, meshB[b][0].y, meshB[b][0].z };
+      real q2[3] = { meshB[b][1].x, meshB[b][1].y, meshB[b][1].z };
+      real r2[3] = { meshB[b][2].x, meshB[b][2].y, meshB[b][2].z };
+      
+      if( tri_tri_overlap_test_2d( p1, q1, r1, p2, q2, r2 ) == 1)
+        return true;
     }
   }
   
-  return true;
+  return false;
 }
 
 CollisionData Collision::collisionData( std::shared_ptr<PhysicsObject> a, std::shared_ptr<PhysicsObject> b ) {
@@ -45,8 +55,8 @@ CollisionData Collision::collisionData( std::shared_ptr<PhysicsObject> a, std::s
   if( !areCollidingAABB( a -> aabb(), b -> aabb() ) )
     return collisionData;
   
-  /* if( !areCollisingMeshData( a -> vertices(), b -> vertices() ) )
-    return collisionData; */
+  if( !areCollisingMesh( a -> mesh(), b -> mesh() ) )
+    return collisionData;
   
   collisionData.setCollisionData();
   

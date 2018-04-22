@@ -19,7 +19,7 @@ PhysicsObject::PhysicsObject( PhysicsObjectParams physicsObjectParams, bool prin
 
 void PhysicsObject::update( GLfloat dt, bool skipMove ) {
   mesh_ -> updatePosition( velocity_, dt, skipMove );
-  mesh_ -> updateMesh( modelMatrix_ );
+  mesh_ -> updateVertices( modelMatrix_, true );
 }
 
 void PhysicsObject::render( glm::mat4 viewProjectionMatrix ) {

@@ -21,6 +21,7 @@ class MeshLoader {
     BufferData bufferData_[ MAX_SHAPE ];
     
     std::vector<std::array<glm::vec3, 3>> mesh_[ MAX_SHAPE ];
+    std::vector<glm::vec3> vertexPositions_[ MAX_SHAPE ];
     
     bool loadMesh_[ MAX_SHAPE ] = { false };
         
@@ -63,6 +64,10 @@ class MeshLoader {
     
     std::vector<glm::vec3> vertices( int shapeType ) {
       return shapeVertices_[ shapeType ];
+    }
+    
+    std::vector<std::array<glm::vec3, 3>> mesh( int shapeType ) {
+      return mesh_[ shapeType ];
     }
     
 };

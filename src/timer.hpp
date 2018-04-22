@@ -15,7 +15,6 @@ class Timer {
     ~Timer(){}
     
   void setCoundownTimer( GLfloat t ) {
-    std::cout << "setting timer to " << t << std::endl;
     timeLeft_ = t;
   }
   
