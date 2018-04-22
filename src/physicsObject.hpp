@@ -37,6 +37,7 @@ struct BufferData {
 };
 
 struct PhysicsObjectParams {
+  int         shapeType;
   glm::vec3   initPosition;
   BufferData  bufferData;
   std::shared_ptr<Mesh>                 mesh;
@@ -90,6 +91,7 @@ class PhysicsObject {
     }
     
     AABB aabb()             { return mesh_ -> aabb(); }
+    int  shapeType()        { return shapeType_; }
     
     std::vector<std::array<glm::vec3, 3>> mesh() {
       return mesh_ -> mesh();

@@ -35,9 +35,10 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   
   int shapeType = TARGET;
   PhysicsObjectParams params;
+  params.shapeType    = shapeType;
   params.initPosition = { -3, 0, shipStartZ - targetDistance };
-  std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( shapeType );
+  std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
   params.inputHandler = inputHandler;
@@ -48,9 +49,10 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   params = {};
   
   shapeType = SHIP;
+  params.shapeType    = shapeType;
   params.initPosition = { -3, 0, shipStartZ };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( shapeType );
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
   params.inputHandler = inputHandler;
@@ -62,9 +64,10 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   
   
   shapeType = ARCH;
+  params.shapeType    = shapeType;
   params.initPosition = { -3, -5, -40 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( shapeType );
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
   params.inputHandler = inputHandler;
@@ -74,22 +77,24 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler ) {
   params = {};
   
   shapeType = FLOOR1;
+  params.shapeType    = shapeType;
   params.initPosition = { 0, FLOOR_Y, -10 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( shapeType );
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
   
-  addPhysicsObject( std::make_shared<Floor>( params, shapeType ), true, true );
+  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, true );
   params = {};
   
   shapeType = FLOOR2;
+  params.shapeType    = shapeType;
   params.initPosition = { 0, FLOOR_Y - 0.02, -10 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( shapeType ), meshLoader_ -> mesh( shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( shapeType );
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
-  addPhysicsObject( std::make_shared<Floor>( params, shapeType ), true, true );
+  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, true );
   
   return true;
 }
@@ -107,9 +112,10 @@ void PlayState::update( GLfloat dt ) {
   if( liveObjects_[ 1 ] -> fire() ) { // fire bullets
     
     PhysicsObjectParams params;
+    params.shapeType    = BULLET;
     params.initPosition = { shipPosition_ -> x, shipPosition_ -> y, shipPosition_ -> z };
-    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( BULLET ), meshLoader_ -> mesh( BULLET ) );
-    params.bufferData   = meshLoader_ -> bufferData( BULLET );
+    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+    params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
     params.mesh         = mesh;
     params.renderer     = renderer_;
     params.shipPosition = shipPosition_;
@@ -123,6 +129,10 @@ void PlayState::update( GLfloat dt ) {
   // collisions - starting at 1 because target collision is irrelevent
   for( unsigned int i = 1; i < liveObjects_.size(); i++ ) {
     for( unsigned int j = i + 1; j < liveObjects_.size(); j++ ) {
+      
+      if( liveObjects_[ i ] -> shapeType() == SHIP && liveObjects_[ j ] -> shapeType() == BULLET )
+        continue;
+      
       CollisionData collisionData = collision_.collisionData( liveObjects_[ i ], liveObjects_[ j ] );
       
       if( collisionData.isColliding() ) {

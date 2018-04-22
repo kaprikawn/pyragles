@@ -11,6 +11,7 @@ PhysicsObject::PhysicsObject( PhysicsObjectParams physicsObjectParams, bool prin
   renderer_     = physicsObjectParams.renderer;
   mesh_         = physicsObjectParams.mesh;
   renderer_     = physicsObjectParams.renderer;
+  shapeType_    = physicsObjectParams.shapeType;
   
   modelMatrix_  = glm::translate( glm::mat4(), mesh_ -> position() );
   
