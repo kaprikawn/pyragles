@@ -19,6 +19,9 @@ Projectile::Projectile( PhysicsObjectParams physicsObjectParams, std::shared_ptr
 
 void Projectile::update( GLfloat dt, bool skipMove ) {
   PhysicsObject::update( dt, skipMove );
+  
+  if( mesh_ -> position().z < -70.0f )
+    delete_ = true;
 }
 
 void Projectile::render( glm::mat4 viewProjectionMatrix ) {

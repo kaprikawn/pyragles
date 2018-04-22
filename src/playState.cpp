@@ -60,7 +60,6 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   addPhysicsObject( ship_, true, true );
   params = {};
   
-  
   shapeType = ARCH;
   params.shapeType    = shapeType;
   params.initPosition = { -3, -5, -40 };
