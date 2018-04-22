@@ -33,9 +33,6 @@ void Scenary::registerCollision( CollisionData collisionData, CollisionPropertie
     return;
   
   lastCollisionID_ = collisionProperties.objectID;
-  
-  
-  
 }
 
 void Scenary::clean() {

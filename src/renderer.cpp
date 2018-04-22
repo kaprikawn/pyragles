@@ -29,23 +29,6 @@ void Renderer::generateBuffer( GLsizeiptr vertexBufferSize, GLsizeiptr indexBuff
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexBufferSize, 0, GL_STATIC_DRAW );
 }
 
-/* GLsizeiptr Renderer::addBufferData( int bufferType, GLsizeiptr size, const GLvoid* data ) {
-  
-  GLsizeiptr thisOffet = 0;
-  
-  if(  bufferType == VERTEX ) {
-    thisOffet = vertexOffset_;
-    glBufferSubData( GL_ARRAY_BUFFER, thisOffet, size, data );
-    vertexOffset_ += size;
-  } else if( bufferType == INDEX ) {
-    thisOffet = indexOffset_;
-    glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, thisOffet, size, data );
-    indexOffset_ += size;
-  }
-  
-  return thisOffet;
-} */
-
 void Renderer::addBufferData( std::shared_ptr<MeshLoader> meshLoader ) {
   
   for( unsigned int i = 0; i < MAX_SHAPE; i++ ) {
@@ -69,8 +52,6 @@ void Renderer::renderObject( GLsizeiptr vertexOffset, GLsizeiptr indexOffset, GL
   glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), (GLvoid*)vertexOffset );
   
   glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), (GLvoid*)( vertexOffset + sizeof( GLfloat ) * 3 ) );
-  
-  //glm::mat4 mvp = camera_ -> viewProjectionMatrix() * modelMatrix;
   
   glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp[0][0] );
   

@@ -34,7 +34,6 @@ class Renderer {
     ~Renderer(){}
     
     void generateBuffer( GLsizeiptr vertexBufferSize, GLsizeiptr indexBufferSize, GLenum usage = GL_STATIC_DRAW );
-    //GLsizeiptr addBufferData( int bufferType, GLsizeiptr size, const GLvoid* data );
     void addBufferData( std::shared_ptr<MeshLoader> meshLoader );
     void renderObject( GLsizeiptr vertexOffset, GLsizeiptr indexOffset, GLsizei numIndices, glm::mat4 mvp );
     

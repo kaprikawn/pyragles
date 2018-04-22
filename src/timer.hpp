@@ -27,7 +27,6 @@ class Timer {
   GLfloat timeLeft() {
     return timeLeft_;
   }
-    
   
 };
 

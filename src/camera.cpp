@@ -9,8 +9,6 @@ Camera::Camera( int windowWidth, int windowHeight ) {
   
   float aspect = ( float ) windowWidth / ( float ) windowHeight;
   
-  std::cout << "aspect is " << aspect << std::endl;
-  
   projection_ = glm::perspective( glm::radians( 60.0f ), aspect, 1.0f, 65.0f );
   
   view_ = glm::lookAt(
