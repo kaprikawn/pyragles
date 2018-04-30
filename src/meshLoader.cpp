@@ -189,104 +189,213 @@ void MeshLoader::generateMeshes() {
   currentShape  = ARCH;
   colour        = { 1, 0, 0 };
   
-  position  = { -3, 0, 1 };
+  // object part 001
+  position = { -3.00f, 3.00f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -2, 0, 1 };
+  position = { -2.00f, 2.70f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -3, 3, 1 };
+  position = { -2.00f, -0.00f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -2, 2.7, 1 };
+  position = { -3.00f, -0.00f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -2, 4, 1 };
+  position = { -2.00f, 4.00f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -1.6, 3.1, 1 };
+  position = { -1.60f, 3.10f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 2, 4, 1 };
+  position = { 2.00f, 4.00f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 1.6, 3.1, 1 };
+  position = { 1.60f, 3.10f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3, 2.7, 1 };
+  position = { 3.00f, 3.00f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 2, 2.7, 1 };
+  position = { 2.00f, 2.70f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3, 0, 1 };
+  position = { 3.00f, -0.00f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 2, 0, 1 };
+  position = { 2.00f, -0.00f, 1.50f };
   addVertex( position, colour, currentShape );
-
-  colour = { 0, 0, 1 };
   
-  position  = { -3.4, 0, 0.3 };
+  colour = { 0, 0, 1 };
+  // object part 003
+  position = { 4.00f, -0.00f, 0.50f };
   addVertex( position, colour, currentShape );
-  position  = { -3, 0, 1 };
+  position = { 4.00f, 3.30f, 0.50f };
   addVertex( position, colour, currentShape );
-  position  = { -3.4, 3.4, 0.3 };
+  position = { 4.00f, 3.30f, -0.50f };
   addVertex( position, colour, currentShape );
-  position  = { -3, 3, 1 };
+  position = { 4.00f, 0.00f, -0.50f };
   addVertex( position, colour, currentShape );
-  position  = { -2.4, 4.4, 0.3 };
+  position = { 2.70f, 4.70f, 0.50f };
   addVertex( position, colour, currentShape );
-  position  = { -2, 4, 1 };
+  position = { 2.70f, 4.70f, -0.50f };
   addVertex( position, colour, currentShape );
-  position  = { 2.4, 4.4, 0.3 };
+  position = { -2.70f, 4.70f, 0.50f };
   addVertex( position, colour, currentShape );
-  position  = { 2, 4, 1 };
+  position = { -2.70f, 4.70f, -0.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3.4, 3.4, 0.3 };
+  position = { -4.00f, 3.30f, 0.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3, 2.7, 1 };
+  position = { -4.00f, 3.30f, -0.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3.4, 0, 0.3 };
+  position = { -4.00f, 0.00f, -0.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3, 0, 1 };
+  position = { -4.00f, -0.00f, 0.50f };
   addVertex( position, colour, currentShape );
-  position  = { -3.4, 0, -0.3 };
+  
+  colour = { 0.741, 0.741, 0.741 };
+  // object part 005
+  position = { 2.00f, 2.70f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -3.4, 0, 0.3 };
+  position = { 2.00f, -0.00f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -3.4, 3.4, -0.3 };
+  position = { 2.00f, 0.00f, -1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -3.4, 3.4, 0.3 };
+  position = { 2.00f, 2.70f, -1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -2.4, 4.4, -0.3 };
+  position = { 1.60f, 3.10f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { -2.4, 4.4, 0.3 };
+  position = { 1.60f, 3.10f, -1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 2.4, 4.4, -0.3 };
+  position = { -1.60f, 3.10f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 2.4, 4.4, 0.3 };
+  position = { -1.60f, 3.10f, -1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3.4, 3.4, -0.3 };
+  position = { -2.00f, 2.70f, 1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3.4, 3.4, 0.3 };
+  position = { -2.00f, 2.70f, -1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3.4, 0, -0.3 };
+  position = { -2.00f, 0.00f, -1.50f };
   addVertex( position, colour, currentShape );
-  position  = { 3.4, 0, 0.3 };
+  position = { -2.00f, -0.00f, 1.50f };
+  addVertex( position, colour, currentShape );
+  
+  colour = { 0, 1, 0 };
+  // object part 002
+  position = { -3.00f, 3.00f, 1.50f };
+  addVertex( position, colour, currentShape );
+  position = { -3.00f, -0.00f, 1.50f };
+  addVertex( position, colour, currentShape );
+  position = { -2.00f, 4.00f, 1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 2.00f, 4.00f, 1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 3.00f, 3.00f, 1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 3.00f, -0.00f, 1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 4.00f, 3.30f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 4.00f, -0.00f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 2.70f, 4.70f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { -2.70f, 4.70f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { -4.00f, 3.30f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { -4.00f, -0.00f, 0.50f };
+  addVertex( position, colour, currentShape );
+  
+  colour = { 1, 1, 1 };
+  // object part 004
+  position = { -3.00f, 3.00f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { -2.00f, 2.70f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { -2.00f, 0.00f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { -3.00f, 0.00f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { -2.00f, 4.00f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { -1.60f, 3.10f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 2.00f, 4.00f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 1.60f, 3.10f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 3.00f, 3.00f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 2.00f, 2.70f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 3.00f, 0.00f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { 2.00f, 0.00f, -1.50f };
+  addVertex( position, colour, currentShape );
+  position = { -4.00f, 0.00f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { -4.00f, 3.30f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { -2.70f, 4.70f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 2.70f, 4.70f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 4.00f, 3.30f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 4.00f, 0.00f, -0.50f };
   addVertex( position, colour, currentShape );
 
   indices = {
-      0, 1, 2
-    , 1, 3, 2
-    , 2, 3, 4
-    , 3, 5, 4
-    , 4, 5, 6
-    , 5, 7, 6
-    , 6, 7, 8
-    , 7, 9, 8
-    , 8, 9, 10
-    , 9, 11, 10
-    
+      0, 2, 3
+    , 1, 4, 5
+    , 5, 6, 7
+    , 7, 8, 9
+    , 9, 10, 11
+    , 0, 1, 2
+    , 1, 0, 4
+    , 5, 4, 6
+    , 7, 6, 8
+    , 9, 8, 10
+    , 12, 14, 15
+    , 13, 17, 14
+    , 16, 19, 17
+    , 18, 21, 19
+    , 22, 20, 21
     , 12, 13, 14
-    , 13, 15, 14
-    , 14, 15, 16
-    , 15, 17, 16
-    , 16, 17, 18
-    , 17, 19, 18
-    , 18, 19, 20
-    , 19, 21, 20
-    , 20, 21, 22
-    , 21, 23, 22
+    , 13, 16, 17
+    , 16, 18, 19
+    , 18, 20, 21
+    , 22, 23, 20
+    , 24, 26, 27
+    , 28, 27, 29
+    , 30, 29, 31
+    , 32, 31, 33
+    , 32, 34, 35
+    , 24, 25, 26
+    , 28, 24, 27
+    , 30, 28, 29
+    , 32, 30, 31
+    , 32, 33, 34
+    , 41, 42, 43
+    , 40, 44, 42
+    , 39, 45, 44
+    , 38, 46, 45
+    , 37, 46, 36
+    , 41, 40, 42
+    , 40, 39, 44
+    , 39, 38, 45
+    , 38, 36, 46
+    , 37, 47, 46
+    , 48, 50, 51
+    , 49, 52, 53
+    , 53, 54, 55
+    , 55, 56, 57
+    , 57, 58, 59
+    , 51, 61, 48
+    , 52, 61, 62
+    , 54, 62, 63
+    , 56, 63, 64
+    , 58, 64, 65
+    , 48, 49, 50
+    , 49, 48, 52
+    , 53, 52, 54
+    , 55, 54, 56
+    , 57, 56, 58
+    , 51, 60, 61
+    , 52, 48, 61
+    , 54, 52, 62
+    , 56, 54, 63
+    , 58, 56, 64
   };
   indices_[ currentShape ] = indices;
   
