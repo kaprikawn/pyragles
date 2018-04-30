@@ -23,6 +23,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   renderer_ = std::make_shared<Renderer>( programID, camera );
   renderer_   -> generateBuffer( meshLoader_ -> totalVertexBufferSize(), meshLoader_ -> totalIndexBufferSize() );
   renderer_   -> addBufferData( meshLoader_ );
+  camera_   = camera;
   
   Collision collision;
   collision_ = collision;
@@ -146,6 +147,10 @@ void PlayState::update( GLfloat dt ) {
   for( unsigned int i = 0; i < liveObjects_.size(); i++ ) {
     liveObjects_[ i ] -> update( dt );
   }
+  
+  camera_ -> update( shipPosition_, dt );
+  viewProjectionMatrix_ = camera_ -> viewProjectionMatrix();
+  
 }
 
 void PlayState::render() {

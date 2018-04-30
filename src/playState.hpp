@@ -17,6 +17,7 @@ class PlayState : public GameState {
     
     std::shared_ptr<Renderer>   renderer_;
     std::shared_ptr<MeshLoader> meshLoader_;
+    std::shared_ptr<Camera>     camera_;
     
     glm::mat4                   viewProjectionMatrix_;
     
