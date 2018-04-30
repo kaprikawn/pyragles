@@ -296,4 +296,5 @@ builddir/
 .vscode/
 Makefile
 CMakeFiles/
+*.mtl
 
