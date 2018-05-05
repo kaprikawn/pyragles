@@ -10,7 +10,7 @@ Camera::Camera( int windowWidth, int windowHeight ) {
   
   float aspect = ( float ) windowWidth / ( float ) windowHeight;
   
-  projection_ = glm::perspective( glm::radians( 60.0f ), aspect, 0.01f, 65.0f );
+  projection_ = glm::perspective( glm::radians( 70.0f ), aspect, 0.01f, 65.0f );
   
   position_ = { 0.0f, START_Y, START_Z };
   

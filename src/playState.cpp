@@ -63,7 +63,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   shapeType = ARCH;
   params.shapeType    = shapeType;
-  params.initPosition = { 0, FLOOR_Y, START_Z - 40 };
+  params.initPosition = { -3.0f, FLOOR_Y, START_Z - 60 };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;

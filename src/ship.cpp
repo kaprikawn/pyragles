@@ -136,6 +136,14 @@ void Ship::handleInput( GLfloat dt ) {
   if( velocity_.y < -yMax )
     velocity_.y = -yMax;
     
+  
+  
+}
+
+void Ship::update( GLfloat dt, bool skipMove ) {
+  
+  handleInput( dt );
+  
   if( mesh_ -> y() < 0.55f && velocity_.y < 0.0f )
     velocity_.y = 0.0f;
   if( mesh_ -> y() > CEILING && velocity_.y > 0.0f )
@@ -146,12 +154,6 @@ void Ship::handleInput( GLfloat dt ) {
     velocity_.x = 0.0f;
   if( mesh_ -> x() < -maxX && velocity_.x < 0.0f )
     velocity_.x = 0.0f;
-  
-}
-
-void Ship::update( GLfloat dt, bool skipMove ) {
-  
-  handleInput( dt );
   
   if( newObjectState_ == COLLIDED )
     collidedTimer_.setCoundownTimer( 0.8f );

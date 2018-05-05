@@ -13,7 +13,7 @@ void Target::handleInput( GLfloat dt ) {
   
   bool invertY = true;
   
-  GLfloat multiplier  = 100.0f;
+  GLfloat multiplier  = 200.0f;
   GLfloat resetSpeed  = 20.0f;
   
   GLfloat joyAxisX    = inputHandler_ -> joyAxisX();
