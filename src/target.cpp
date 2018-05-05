@@ -13,7 +13,7 @@ void Target::handleInput( GLfloat dt ) {
   
   bool invertY = true;
   
-  GLfloat multiplier  = 100.0f;
+  GLfloat multiplier  = 200.0f;
   GLfloat resetSpeed  = 20.0f;
   
   GLfloat joyAxisX    = inputHandler_ -> joyAxisX();
@@ -97,9 +97,12 @@ void Target::update( GLfloat dt, bool skipMove ) {
     mesh_ -> setY( shipY - maxDist );
   }
   
-  if( mesh_ -> y() < FLOOR_Y + 1.3f ) {
+  if( mesh_ -> y() < FLOOR_Y + 1.3f )
     mesh_ -> setY ( FLOOR_Y + 1.3f );
-  }
+  
+  if( mesh_ -> y() > CEILING + 2 )
+    mesh_ -> setY( CEILING + 2 );
+  
   PhysicsObject::update( dt, skipMove );
 }
 

@@ -29,13 +29,13 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   collision_ = collision;
   
   shipPosition_           = std::make_shared<glm::vec3>();
-  GLfloat shipStartZ      = -3.0f;
+  GLfloat shipStartZ      = START_Z - 7.0f;
   GLfloat targetDistance  = 15.0f;
   
   int shapeType = TARGET;
   PhysicsObjectParams params;
   params.shapeType    = shapeType;
-  params.initPosition = { -3, 0, shipStartZ - targetDistance };
+  params.initPosition = { -3, START_Y, shipStartZ - targetDistance };
   std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
@@ -49,7 +49,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   shapeType = SHIP;
   params.shapeType    = shapeType;
-  params.initPosition = { -3, 0, shipStartZ };
+  params.initPosition = { 0, START_Y, shipStartZ };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
@@ -63,7 +63,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   shapeType = ARCH;
   params.shapeType    = shapeType;
-  params.initPosition = { -3, FLOOR_Y, -40 };
+  params.initPosition = { -3.0f, FLOOR_Y, START_Z - 60 };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
@@ -122,8 +122,6 @@ void PlayState::update( GLfloat dt ) {
     PlayState::addPhysicsObject( newProjectile, true, false );
   }
   
-  ship_ -> calculateRotation( dt );
-  
   // collisions - starting at 1 because target collision is irrelevent
   for( unsigned int i = 1; i < liveObjects_.size(); i++ ) {
     for( unsigned int j = i + 1; j < liveObjects_.size(); j++ ) {
@@ -147,6 +145,8 @@ void PlayState::update( GLfloat dt ) {
   for( unsigned int i = 0; i < liveObjects_.size(); i++ ) {
     liveObjects_[ i ] -> update( dt );
   }
+  
+  ship_ -> calculateRotation( dt );
   
   camera_ -> update( shipPosition_, dt );
   viewProjectionMatrix_ = camera_ -> viewProjectionMatrix();
