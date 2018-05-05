@@ -97,9 +97,12 @@ void Target::update( GLfloat dt, bool skipMove ) {
     mesh_ -> setY( shipY - maxDist );
   }
   
-  if( mesh_ -> y() < FLOOR_Y + 1.3f ) {
+  if( mesh_ -> y() < FLOOR_Y + 1.3f )
     mesh_ -> setY ( FLOOR_Y + 1.3f );
-  }
+  
+  if( mesh_ -> y() > CEILING + 2 )
+    mesh_ -> setY( CEILING + 2 );
+  
   PhysicsObject::update( dt, skipMove );
 }
 

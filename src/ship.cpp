@@ -1,6 +1,7 @@
 #include "ship.hpp"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+#include "global.hpp"
 
 #define PI 3.141592653589793238462643383279
 
@@ -39,9 +40,6 @@ void Ship::calculateRotation( GLfloat dt ) {
     yAngle = ( atan( ( targetX - shipX ) / ( targetZ ) ) * 180 / PI ); 
     
     xAngle = ( atan( ( targetY - shipY ) / ( shipZ - targetZ ) ) * 180 / PI );
-    
-    yAngle = 0.0f;
-    xAngle = 0.0f;
     
     zAngle = -velocity_.x * 2 ;
   }
@@ -137,6 +135,17 @@ void Ship::handleInput( GLfloat dt ) {
   
   if( velocity_.y < -yMax )
     velocity_.y = -yMax;
+    
+  if( mesh_ -> y() < 0.55f && velocity_.y < 0.0f )
+    velocity_.y = 0.0f;
+  if( mesh_ -> y() > CEILING && velocity_.y > 0.0f )
+    velocity_.y = 0.0f;  
+  
+  GLfloat maxX = 10.0f;
+  if( mesh_ -> x() > maxX && velocity_.x > 0.0f )
+    velocity_.x = 0.0f;
+  if( mesh_ -> x() < -maxX && velocity_.x < 0.0f )
+    velocity_.x = 0.0f;
   
 }
 
@@ -149,8 +158,10 @@ void Ship::update( GLfloat dt, bool skipMove ) {
   
   if( objectState_ == COLLIDED ) {
     collidedTimer_.update( dt );
-    if( collidedTimer_.timeLeft() <= 0.0f )
-      changeState( UNDEF_STATE );
+    if( collidedTimer_.timeLeft() <= 0.0f ) {
+      PhysicsObject::changeState( UNDEF_STATE );
+      lastCollisionID_ = 0;
+    }
   }
   
   PhysicsObject::update( dt, skipMove );

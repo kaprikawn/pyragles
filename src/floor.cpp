@@ -35,8 +35,8 @@ void Floor::render( glm::mat4 viewProjectionMatrix ) {
 
   bool odd = false;
 
-  for( int i = -30; i < 0; i++ ) {
-    for( int n = -16; n < 16; n++ ) {
+  for( int i = 0; i < 35; i++ ) {
+    for( int n = -22; n < 22; n++ ) {
       mesh_ -> setPosition( glm::vec3( x + n * 4.0f, y, z ) );
       modelMatrix_ = glm::translate( glm::mat4(), mesh_ -> position() );
       PhysicsObject::render( viewProjectionMatrix );
