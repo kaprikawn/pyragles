@@ -14,7 +14,7 @@ add_executable( exe
   inputHandler.cpp camera.cpp shader.cpp renderer.cpp mesh.cpp meshLoader.cpp
   gameStateMachine.cpp playState.cpp
   collision.cpp
-  physicsObject.cpp ship.cpp scenary.cpp target.cpp floor.cpp projectile.cpp
+  physicsObject.cpp ship.cpp scenary.cpp target.cpp floor.cpp projectile.cpp enemy.cpp
   game.cpp main.cpp
 )
 

@@ -90,6 +90,8 @@ sub process_string {
 sub process_file {
   my ( $filename, $dir ) = @_;
   
+  $filename = $ARGV[0] if( $ARGV[0] );
+  
   my $file_string =   `cat $dir/$filename`;
   
   &process_string( $file_string );

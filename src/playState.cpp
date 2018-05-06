@@ -3,6 +3,7 @@
 #include "shader.hpp"
 #include "global.hpp"
 #include "projectile.hpp"
+#include "enemy.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -72,6 +73,17 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   params.shipPosition = shipPosition_;
   
   addPhysicsObject( std::make_shared<Scenary>( params ), true, true );
+  params = {};
+  
+  shapeType = ENEMY_POD;
+  params.shapeType    = shapeType;
+  params.initPosition = { 3.0f, 5, START_Z - 100 };
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
+  params.mesh         = mesh;
+  params.renderer     = renderer_;
+  
+  addPhysicsObject( std::make_shared<Enemy>( params ), true, true );
   params = {};
   
   shapeType = FLOOR1;

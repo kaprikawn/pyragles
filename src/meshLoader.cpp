@@ -185,6 +185,82 @@ void MeshLoader::generateMeshes() {
   }
   indices.clear();
   
+  // enemy pod
+  currentShape  = ENEMY_POD;
+  colour        = { 0, 1, 0 };
+  
+  // object part 
+  position = { 0.00f, 1.00f, 1.00f };
+  addVertex( position, colour, currentShape );
+  position = { -0.87f, 1.00f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { -0.87f, 1.00f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 0.00f, 1.00f, -1.00f };
+  addVertex( position, colour, currentShape );
+  position = { 0.87f, 1.00f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 0.87f, 1.00f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 0.50f, 0.00f, 0.87f };
+  addVertex( position, colour, currentShape );
+  position = { -0.50f, 0.00f, 0.87f };
+  addVertex( position, colour, currentShape );
+  position = { -1.00f, 0.00f, -0.00f };
+  addVertex( position, colour, currentShape );
+  position = { -0.50f, 0.00f, -0.87f };
+  addVertex( position, colour, currentShape );
+  position = { 0.50f, 0.00f, -0.87f };
+  addVertex( position, colour, currentShape );
+  position = { 1.00f, 0.00f, 0.00f };
+  addVertex( position, colour, currentShape );
+  position = { 0.00f, 0.50f, 0.00f };
+  addVertex( position, colour, currentShape );
+  position = { 0.00f, 1.40f, 0.00f };
+  addVertex( position, colour, currentShape );
+
+  indices = {
+      2, 13, 3
+    , 9, 2, 3
+    , 2, 8, 1
+    , 7, 0, 1
+    , 6, 5, 0
+    , 5, 11, 4
+    , 10, 3, 4
+    , 6, 12, 5
+    , 6, 0, 12
+    , 11, 5, 12
+    , 4, 11, 12
+    , 4, 12, 10
+    , 10, 12, 3
+    , 3, 12, 9
+    , 9, 12, 2
+    , 8, 2, 12
+    , 1, 8, 12
+    , 1, 12, 7
+    , 7, 12, 0
+    , 5, 13, 0
+    , 13, 1, 0
+    , 1, 13, 2
+    , 3, 13, 4
+    , 4, 13, 5
+  };
+  indices_[ currentShape ] = indices;
+  
+  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
+    mesh_[ currentShape ].push_back(
+      std::array<glm::vec3, 3> {
+          vertexPositions_[ currentShape ][ indices[ i ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
+      }
+    );
+    
+    i++;
+    i++;
+  }
+  indices.clear();
+  
   // arch
   currentShape  = ARCH;
   colour        = { 1, 0, 0 };

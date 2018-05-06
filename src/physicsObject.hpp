@@ -15,6 +15,7 @@ class Renderer;
 
 enum ShapeTypes {
     UNDEF_SHAPE, SHIP, TARGET, BULLET
+  , ENEMY_POD
   , ARCH
   , FLOOR1, FLOOR2
   , MAX_SHAPE_NUM
