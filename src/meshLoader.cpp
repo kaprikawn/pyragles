@@ -187,9 +187,55 @@ void MeshLoader::generateMeshes() {
   
   // enemy pod
   currentShape  = ENEMY_POD;
-  colour        = { 0, 1, 0 };
   
-  // object part 
+  // object part 001
+  colour   = { 1, 0, 0 }; // red
+  position = { 0.00f, 1.00f, 1.00f };
+  addVertex( position, colour, currentShape );
+  position = { -0.87f, 1.00f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { -0.87f, 1.00f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 0.00f, 1.00f, -1.00f };
+  addVertex( position, colour, currentShape );
+  position = { 0.87f, 1.00f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 0.87f, 1.00f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 0.50f, 0.00f, 0.87f };
+  addVertex( position, colour, currentShape );
+  position = { -1.00f, 0.00f, -0.00f };
+  addVertex( position, colour, currentShape );
+  position = { 0.50f, 0.00f, -0.87f };
+  addVertex( position, colour, currentShape );
+  position = { 0.00f, 1.40f, 0.00f };
+  addVertex( position, colour, currentShape );
+
+  // object part 002
+  colour   = { 1, 1, 1 }; // white
+  position = { 0.00f, 1.00f, 1.00f };
+  addVertex( position, colour, currentShape );
+  position = { -0.87f, 1.00f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { -0.87f, 1.00f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 0.00f, 1.00f, -1.00f };
+  addVertex( position, colour, currentShape );
+  position = { 0.87f, 1.00f, -0.50f };
+  addVertex( position, colour, currentShape );
+  position = { 0.87f, 1.00f, 0.50f };
+  addVertex( position, colour, currentShape );
+  position = { -0.50f, 0.00f, 0.87f };
+  addVertex( position, colour, currentShape );
+  position = { -0.50f, 0.00f, -0.87f };
+  addVertex( position, colour, currentShape );
+  position = { 1.00f, 0.00f, 0.00f };
+  addVertex( position, colour, currentShape );
+  position = { 0.00f, 1.40f, 0.00f };
+  addVertex( position, colour, currentShape );
+
+  // object part 003
+  colour   = { 0, 0, 1 }; // blue
   position = { 0.00f, 1.00f, 1.00f };
   addVertex( position, colour, currentShape );
   position = { -0.87f, 1.00f, 0.50f };
@@ -216,34 +262,32 @@ void MeshLoader::generateMeshes() {
   addVertex( position, colour, currentShape );
   position = { 0.00f, 0.50f, 0.00f };
   addVertex( position, colour, currentShape );
-  position = { 0.00f, 1.40f, 0.00f };
-  addVertex( position, colour, currentShape );
 
   indices = {
-      2, 13, 3
-    , 9, 2, 3
-    , 2, 8, 1
-    , 7, 0, 1
+      2, 9, 3
+    , 2, 7, 1
     , 6, 5, 0
-    , 5, 11, 4
-    , 10, 3, 4
-    , 6, 12, 5
-    , 6, 0, 12
-    , 11, 5, 12
-    , 4, 11, 12
-    , 4, 12, 10
-    , 10, 12, 3
-    , 3, 12, 9
-    , 9, 12, 2
-    , 8, 2, 12
-    , 1, 8, 12
-    , 1, 12, 7
-    , 7, 12, 0
-    , 5, 13, 0
-    , 13, 1, 0
-    , 1, 13, 2
-    , 3, 13, 4
-    , 4, 13, 5
+    , 8, 3, 4
+    , 9, 1, 0
+    , 4, 9, 5
+    , 17, 12, 13
+    , 16, 10, 11
+    , 15, 18, 14
+    , 15, 19, 10
+    , 11, 19, 12
+    , 13, 19, 14
+    , 26, 32, 25
+    , 26, 20, 32
+    , 31, 25, 32
+    , 24, 31, 32
+    , 24, 32, 30
+    , 30, 32, 23
+    , 23, 32, 29
+    , 29, 32, 22
+    , 28, 22, 32
+    , 21, 28, 32
+    , 21, 32, 27
+    , 27, 32, 20
   };
   indices_[ currentShape ] = indices;
   
@@ -260,6 +304,7 @@ void MeshLoader::generateMeshes() {
     i++;
   }
   indices.clear();
+
   
   // arch
   currentShape  = ARCH;

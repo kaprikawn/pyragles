@@ -13,6 +13,8 @@ class Enemy : public PhysicsObject {
     std::shared_ptr<InputHandler> inputHandler_;
     //std::shared_ptr<glm::vec3>    shipPosition_;
     
+    GLfloat yAngle_ = 0.0f;
+    
   public:
     Enemy( PhysicsObjectParams physicsObjectParams );
     ~Enemy(){}

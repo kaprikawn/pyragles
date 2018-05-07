@@ -77,7 +77,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   shapeType = ENEMY_POD;
   params.shapeType    = shapeType;
-  params.initPosition = { 3.0f, 5, START_Z - 100 };
+  params.initPosition = { 40.0f, 5, START_Z - 20 };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
