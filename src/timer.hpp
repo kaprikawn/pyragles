@@ -14,7 +14,7 @@ class Timer {
     Timer(){}
     ~Timer(){}
     
-  void setCoundownTimer( GLfloat t ) {
+  void setCountdownTimer( GLfloat t ) {
     timeLeft_ = t;
   }
   

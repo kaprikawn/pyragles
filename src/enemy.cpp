@@ -4,11 +4,37 @@
 #include "global.hpp"
 
 Enemy::Enemy( PhysicsObjectParams physicsObjectParams ) : PhysicsObject( physicsObjectParams ) {
-  //velocity_.z = SCROLL_SPEED;
-  velocity_.x = -4;
+  
+  NextMovement nextMovement;
+  nextMovement.y = 4;
+  
+  movements_.push_back( nextMovement );
+  
+  nextMovement.x = -4;
+  nextMovement.y = 0;
+  
+  movements_.push_back( nextMovement );
+  
+  
+  velocity_.x = movements_.back().x;
+  
+  movementTimer_.setCountdownTimer( movements_.back().duration );
 }
 
 void Enemy::update( GLfloat dt, bool skipMove ) {
+  
+  movementTimer_.update( dt );
+  if( movementTimer_.timeLeft() == 0.0f ) {
+    movements_.pop_back();
+    movementTimer_.setCountdownTimer( movements_.back().duration );
+  }
+  
+  if( velocity_.x > movements_.back().x ) {
+    velocity_.x -= dt * 10;
+  }
+  if( velocity_.y < movements_.back().y ) {
+    velocity_.y += dt * 10;
+  }
   
   calculateRotation( dt );
   
