@@ -1,7 +1,7 @@
 #include "physicsObject.hpp"
 #include <iostream>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/glm.hpp"
+#include "../deps/glm/gtc/matrix_transform.hpp"
 #include "renderer.hpp"
 #include "camera.hpp"
 

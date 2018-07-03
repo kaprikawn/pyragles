@@ -1,6 +1,6 @@
 #include "scenary.hpp"
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/gtc/matrix_transform.hpp"
 #include "global.hpp"
 
 Scenary::Scenary( PhysicsObjectParams physicsObjectParams ) : PhysicsObject( physicsObjectParams ) {

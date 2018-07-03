@@ -1,6 +1,6 @@
 #include "ship.hpp"
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/gtc/matrix_transform.hpp"
 #include "global.hpp"
 
 #define PI 3.141592653589793238462643383279

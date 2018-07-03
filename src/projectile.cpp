@@ -1,7 +1,7 @@
 #include "projectile.hpp"
 #include <iostream>
 #include "global.hpp"
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/gtc/matrix_transform.hpp"
 
 #define PI 3.141592653589793238462643383279
 

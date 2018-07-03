@@ -1,6 +1,6 @@
 #include "enemy.hpp"
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/gtc/matrix_transform.hpp"
 #include "global.hpp"
 
 Enemy::Enemy( PhysicsObjectParams physicsObjectParams ) : PhysicsObject( physicsObjectParams ) {

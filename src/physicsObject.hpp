@@ -3,7 +3,7 @@
 
 #include <GLES2/gl2.h>
 #include <SDL2/SDL.h>
-#include <glm/glm.hpp>
+#include "../deps/glm/glm.hpp"
 #include <vector>
 #include <memory>
 #include "shader.hpp"

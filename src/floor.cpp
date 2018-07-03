@@ -1,6 +1,6 @@
 #include "floor.hpp"
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/gtc/matrix_transform.hpp"
 #include "global.hpp"
 
 Floor::Floor( PhysicsObjectParams physicsObjectParams, int shapeType ) : PhysicsObject( physicsObjectParams ) {

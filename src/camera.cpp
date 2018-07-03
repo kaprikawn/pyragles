@@ -1,6 +1,6 @@
 #include "camera.hpp"
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/gtc/matrix_transform.hpp"
 #include "global.hpp"
 
 Camera::Camera( int windowWidth, int windowHeight ) {

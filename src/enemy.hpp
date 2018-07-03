@@ -20,7 +20,7 @@ class Enemy : public PhysicsObject {
   private:
     
     std::shared_ptr<InputHandler> inputHandler_;
-    //std::shared_ptr<glm::vec3>    shipPosition_;
+    //std::shared_ptr"../deps/glm::vec3>    shipPosition_;
     std::vector<NextMovement>     movements_;
     
     GLfloat yAngle_ = 0.0f;

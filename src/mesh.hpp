@@ -2,7 +2,7 @@
 #define MESH_HPP
 
 #include <GLES2/gl2.h>
-#include <glm/glm.hpp>
+#include "../deps/glm/glm.hpp"
 #include <vector>
 #include <array>
 

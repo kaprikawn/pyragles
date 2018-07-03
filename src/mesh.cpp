@@ -1,6 +1,6 @@
 #include "mesh.hpp"
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/gtc/matrix_transform.hpp"
 
 Mesh::Mesh( glm::vec3 initPosition, std::vector<glm::vec3> vertices, std::vector<std::array<glm::vec3, 3>> mesh, bool print ) {
   
