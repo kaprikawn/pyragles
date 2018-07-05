@@ -49,15 +49,6 @@ void Enemy::update( GLfloat dt, bool skipMove ) {
   velocity_.y = newVelocity.y;
   velocity_.z = newVelocity.z;
   
-  /*
-  if( velocity_.x > movements_.back().x ) {
-    velocity_.x -= dt * 10;
-  }
-  if( velocity_.y < movements_.back().y ) {
-    velocity_.y += dt * 10;
-  }
-  */
-  
   calculateRotation( dt );
   
   PhysicsObject::update( dt, skipMove );
