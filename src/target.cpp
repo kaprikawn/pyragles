@@ -1,6 +1,6 @@
 #include "target.hpp"
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/gtc/matrix_transform.hpp"
 #include "global.hpp"
 
 Target::Target( PhysicsObjectParams physicsObjectParams ) : PhysicsObject( physicsObjectParams ) {

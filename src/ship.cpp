@@ -1,6 +1,6 @@
 #include "ship.hpp"
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
+#include "../deps/glm/gtc/matrix_transform.hpp"
 #include "global.hpp"
 
 #define PI 3.141592653589793238462643383279
@@ -156,7 +156,7 @@ void Ship::update( GLfloat dt, bool skipMove ) {
     velocity_.x = 0.0f;
   
   if( newObjectState_ == COLLIDED )
-    collidedTimer_.setCoundownTimer( 0.8f );
+    collidedTimer_.setCountdownTimer( 0.8f );
   
   if( objectState_ == COLLIDED ) {
     collidedTimer_.update( dt );

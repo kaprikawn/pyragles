@@ -2,7 +2,7 @@
 #include <iostream>
 #include "mesh.hpp"
 #include "physicsObject.hpp"
-#include "triangleOverlap.h"
+#include "../deps/triangleOverlap.h"
 
 bool areCollidingAABB( AABB a, AABB b ) {
   

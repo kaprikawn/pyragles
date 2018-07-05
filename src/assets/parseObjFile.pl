@@ -74,7 +74,7 @@ sub process_string {
   my $first_index = 1;
   foreach my $array( @indices ) {
     if( $first_index ) {
-      print $br . $br . '  indices = {' . $br;
+      print $br . '  indices = {' . $br;
       print             '      ' .join( ', ', @{$array } ) . $br;
       $first_index = 0;
     } else {
@@ -83,6 +83,23 @@ sub process_string {
   }
   
   print '  };' . $br;
+  
+  print qq~  indices_[ currentShape ] = indices;
+  
+  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
+    mesh_[ currentShape ].push_back(
+      std::array<glm::vec3, 3> {
+          vertexPositions_[ currentShape ][ indices[ i ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
+        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
+      }
+    );
+    
+    i++;
+    i++;
+  }
+  indices.clear();~ . $br . $br;
+  
     
   return 0;
 }
