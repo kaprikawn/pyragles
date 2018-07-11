@@ -4,12 +4,12 @@ cd ..
 
 if [[ ! -d buillder ]]
 then
-  meson builddir
+  meson builddir || exit 1
 fi
 
 cd builddir
 
-ninja
+ninja || exit 1
 
 cd src
 
