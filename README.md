@@ -18,3 +18,7 @@ https://github.com/tcbrindle/sdl2-cmake-scripts
 https://github.com/benardp/contours/blob/master/freestyle/view_map/triangle_triangle_intersection.c
 
 I tried to find a license for this code but there does not appear to be any
+
+Music used under Creative Commons license obtained from :
+
+https://soundcloud.com/punch-deck/organic-to-synthetic

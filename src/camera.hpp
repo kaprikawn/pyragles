@@ -30,6 +30,4 @@ class Camera {
     GLsizei windowHeight()  { return windowHeight_; }
 };
 
-typedef Camera TheCamera;
-
 #endif //CAMERA_HPP
