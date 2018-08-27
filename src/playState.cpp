@@ -27,7 +27,8 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   camera_   = camera;
   
   Collision collision;
-  collision_ = collision;
+  collision_  = collision;
+  audio_ = std::make_shared<Audio>();
   
   shipPosition_           = std::make_shared<glm::vec3>();
   GLfloat shipStartZ      = START_Z - 7.0f;
@@ -105,6 +106,9 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   params.mesh         = mesh;
   params.renderer     = renderer_;
   addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, true );
+  
+  audio_ -> load( "assets/musicLevel01_organic_to_synthetic7.wav" );
+  audio_ -> play();
   
   return true;
 }

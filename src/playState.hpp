@@ -10,6 +10,7 @@
 #include "scenary.hpp"
 #include "floor.hpp"
 #include "collision.hpp"
+#include "audio.hpp"
 
 class PlayState : public GameState {
   private:
@@ -27,6 +28,7 @@ class PlayState : public GameState {
     std::shared_ptr<Scenary>    arch_;
     
     Collision                   collision_;
+    std::shared_ptr<Audio>      audio_;
     
     unsigned int                nextObjectID_ = 1;
     
