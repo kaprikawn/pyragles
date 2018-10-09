@@ -73,9 +73,9 @@ void Target::update( float dt ) {
   
   position_.updatePosition( velocity_, dt );
   
-  model_ = glm::translate( glm::mat4(), position_.coordinates() );
+  model_ = glm::translate( glm::mat4( 1.0f ), position_.coordinates() );
   
-  rotation_ = glm::mat4();
+  rotation_ = glm::mat4( 1.0f );
 }
 
 void Target::render() {

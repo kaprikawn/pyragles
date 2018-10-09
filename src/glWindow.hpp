@@ -25,11 +25,11 @@ class GlWindow {
     GLint     colourID_;
     GLint     mvpID_;
     
-    glm::mat4   projection_;
-    glm::mat4   view_;
-    glm::mat4   model_;
-    glm::mat4   rotation_;
-    glm::mat4   mvp_;
+    glm::mat4   projection_ = glm::vec4( 1.0f );
+    glm::mat4   view_       = glm::vec4( 1.0f );
+    glm::mat4   model_      = glm::vec4( 1.0f );
+    glm::mat4   rotation_   = glm::vec4( 1.0f );
+    glm::mat4   mvp_        = glm::vec4( 1.0f );
     
     GLfloat     yAngle_ = 0.0f;
     GLfloat     xAngle_ = 0.0f;

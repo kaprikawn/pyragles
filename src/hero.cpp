@@ -38,7 +38,7 @@ void Hero::calculateRotation( float dt ) {
     zAngle_ += -zAngle_ * dt;
   }
   
-  rotation_ = glm::rotate( glm::mat4(), glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  rotation_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   rotation_ = glm::rotate( rotation_, glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   rotation_ = glm::rotate( rotation_, glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
 }
@@ -71,7 +71,7 @@ void Hero::update( float dt ) {
   
   Hero::calculateRotation( dt );
   
-  model_ = glm::translate( glm::mat4(), position_.coordinates() );
+  model_ = glm::translate( glm::mat4( 1.0f ), position_.coordinates() );
   model_ *= rotation_;
   
   GlObject::update( dt );
