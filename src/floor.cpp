@@ -3,7 +3,7 @@
 
 Floor::Floor( int shapeType, GLuint programID, GLfloat y ) : GlObject( shapeType, 0.0f, y, -20.0f, programID ) {
   
-  rotation_ = glm::mat4();
+  rotation_ = glm::mat4( 1.0f );
   
   shapeType_ = shapeType;
 
@@ -23,7 +23,7 @@ void Floor::update( float dt ) {
 void Floor::render() {
 
   if( shapeType_ == FLOOR2 ) {
-    model_ = glm::translate( glm::mat4(), position_.coordinates() );
+    model_ = glm::translate( glm::mat4( 1.0f ), position_.coordinates() );
     GlObject::render();
     return;
   }
@@ -45,7 +45,7 @@ void Floor::render() {
   for( int i = -10; i < 15; i++ ) {
     for( int n = -13; n < 13; n++ ) {
       position_.setCoordinates( x + n * 4.0f, y, z );
-      model_ = glm::translate( glm::mat4(), position_.coordinates() );
+      model_ = glm::translate( glm::mat4( 1.0f ), position_.coordinates() );
       GlObject::render();
     }
 
@@ -57,7 +57,6 @@ void Floor::render() {
       x += 2.0f;
       odd = true;
     }
-    
   }
   
   position_.setCoordinates( initX, initY, initZ );
