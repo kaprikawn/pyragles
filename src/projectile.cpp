@@ -43,7 +43,7 @@ void  Projectile::calculateRotation( GLfloat dt ) {
   GLfloat xAngle = ( atan( ( targetY - projectileY ) / ( projectileZ - targetZ ) ) * 180 / PI );
   
   
-  rotationMatrix_ = glm::rotate( glm::mat4(), glm::radians( xAngle ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( xAngle ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   rotationMatrix_ = glm::rotate( rotationMatrix_, glm::radians( yAngle ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
 }
 

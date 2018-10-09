@@ -60,8 +60,8 @@ class PhysicsObject {
     
     unsigned int  lastCollisionID_;
     
-    glm::mat4     modelMatrix_;
-    glm::mat4     rotationMatrix_;
+    glm::mat4     modelMatrix_    = glm::mat4( 1.0f );
+    glm::mat4     rotationMatrix_ = glm::mat4( 1.0f );
     
     
     glm::vec3     acceleration_   = { 0.0f, 0.0f, 0.0f };
