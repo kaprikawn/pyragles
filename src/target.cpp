@@ -7,7 +7,7 @@ Target::Target( int shapeType, GLuint programID, std::shared_ptr<glm::vec3> hero
   
   heroPosition_ = heroPosition;
   
-  rotation_ = glm::mat4();
+  rotation_ = glm::mat4( 1.0f );
 }
 
 void Target::handleInput( float dt ) {
@@ -105,7 +105,7 @@ void Target::update( float dt ) {
   
   Target::handleInput( dt );
   
-  model_ = glm::translate( glm::mat4(), position_.coordinates() );
+  model_ = glm::translate( glm::mat4( 1.0f ), position_.coordinates() );
   
   
 }

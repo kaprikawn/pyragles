@@ -23,7 +23,7 @@ void Projectile::update( float dt ) {
   
   glm::mat4 scale_ = glm::scale( glm::mat4( 1.0f ), glm::vec3( 0.2f ) ); 
   
-  model_ = glm::translate( glm::mat4(), position_.coordinates() );
+  model_ = glm::translate( glm::mat4( 1.0f ), position_.coordinates() );
   model_ *= rotation_;
   model_ *= scale_;
   
