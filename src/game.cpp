@@ -27,6 +27,8 @@ Game::Game( bool fullscreen ) {
     
     windowX       = SDL_WINDOWPOS_UNDEFINED;
     windowY       = SDL_WINDOWPOS_UNDEFINED;
+    
+    SDL_ShowCursor( SDL_DISABLE );
   }
   
   bool init = Game::init( "GLES2 Test", windowX, windowY, windowWidth, windowHeight, sdlFlags );
