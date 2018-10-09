@@ -13,7 +13,7 @@ PhysicsObject::PhysicsObject( PhysicsObjectParams physicsObjectParams, bool prin
   renderer_     = physicsObjectParams.renderer;
   shapeType_    = physicsObjectParams.shapeType;
   
-  modelMatrix_  = glm::translate( glm::mat4(), mesh_ -> position() );
+  modelMatrix_  = glm::translate( glm::mat4( 1.0f ), mesh_ -> position() );
   
   mesh_ -> updatePosition( glm::vec3( 0, 0, 0 ), 0.0f, true );
 }
@@ -25,7 +25,7 @@ void PhysicsObject::update( GLfloat dt, bool skipMove ) {
 
 void PhysicsObject::render( glm::mat4 viewProjectionMatrix ) {
   
-  modelMatrix_ = glm::translate( glm::mat4(), mesh_ -> position() );
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), mesh_ -> position() );
   modelMatrix_ *= rotationMatrix_;
   
   glm::mat4 mvp = viewProjectionMatrix * modelMatrix_;

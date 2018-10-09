@@ -7,8 +7,8 @@
 class Camera {
   private:
     
-    glm::mat4   projection_;
-    glm::mat4   view_;
+    glm::mat4   projection_ = glm::mat4( 1.0f );
+    glm::mat4   view_       = glm::mat4( 1.0f );
     
     GLsizei windowWidth_;
     GLsizei windowHeight_;
