@@ -52,8 +52,8 @@ class PhysicsObject {
     std::shared_ptr<Mesh>     mesh_;
     std::shared_ptr<Renderer> renderer_;
     
-    glm::mat4                 modelMatrix_;
-    glm::mat4                 rotationMatrix_;
+    glm::mat4                 modelMatrix_    = glm::mat4( 1.0f );
+    glm::mat4                 rotationMatrix_ = glm::mat4( 1.0f );
     
   public:
     PhysicsObject( glm::vec3 initPosition, BufferData bufferData, std::vector<glm::vec3> mesh, std::shared_ptr<Renderer> );

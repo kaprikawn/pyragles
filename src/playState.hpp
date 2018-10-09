@@ -17,7 +17,7 @@ class PlayState : public GameState {
     std::shared_ptr<Renderer>   renderer_;
     std::shared_ptr<MeshLoader> meshLoader_;
     
-    glm::mat4                   viewProjectionMatrix_;
+    glm::mat4                   viewProjectionMatrix_ = glm::mat4( 1.0f );
     
     std::shared_ptr<glm::vec3>  shipPosition_;
     std::shared_ptr<Ship>       ship_;

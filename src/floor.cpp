@@ -17,7 +17,7 @@ void Floor::update( GLfloat dt, bool skipMove ) {
 void Floor::render( glm::mat4 viewProjectionMatrix ) {
   
   if( shapeType_ == FLOOR2 ) {
-    modelMatrix_ = glm::translate( glm::mat4(), mesh_ -> position() );
+    modelMatrix_ = glm::translate( glm::mat4( 1.0f ), mesh_ -> position() );
     PhysicsObject::render( viewProjectionMatrix );
     return;
   }
@@ -39,7 +39,7 @@ void Floor::render( glm::mat4 viewProjectionMatrix ) {
   for( int i = -30; i < 0; i++ ) {
     for( int n = -16; n < 16; n++ ) {
       mesh_ -> setPosition( glm::vec3( x + n * 4.0f, y, z ) );
-      modelMatrix_ = glm::translate( glm::mat4(), mesh_ -> position() );
+      modelMatrix_ = glm::translate( glm::mat4( 1.0f ), mesh_ -> position() );
       PhysicsObject::render( viewProjectionMatrix );
     }
 

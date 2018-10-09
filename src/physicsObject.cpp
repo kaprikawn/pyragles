@@ -20,7 +20,7 @@ void PhysicsObject::update( GLfloat dt, bool skipMove ) {
 
 void PhysicsObject::render( glm::mat4 viewProjectionMatrix ) {
   
-  modelMatrix_ = glm::translate( glm::mat4(), mesh_ -> position() );
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), mesh_ -> position() );
   modelMatrix_ *= rotationMatrix_;
   
   glm::mat4 mvp = viewProjectionMatrix * modelMatrix_;
