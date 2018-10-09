@@ -41,9 +41,9 @@ void Hero::update( float dt ) {
   
   Hero::updatePosition( dt );
   
-  model_ = glm::translate( glm::mat4(), glm::vec3( coordinates_.getX(), coordinates_.getY(), -10.0f ) );
+  model_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( coordinates_.getX(), coordinates_.getY(), -10.0f ) );
   
-  rotation_ = glm::rotate( glm::mat4(), glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  rotation_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   rotation_ = glm::rotate( rotation_, glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   rotation_ = glm::rotate( rotation_, glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
   

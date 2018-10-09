@@ -84,7 +84,7 @@ void GlWindow::update( float dt ) {
     , glm::vec3( 0, 1, 0 )
   );
   
-  model_ = glm::translate( glm::mat4(), glm::vec3( 0.0f, 0.0f, -10.0f ) );
+  model_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, -10.0f ) );
   
   if( TheInputHandler::Instance() -> isPressed( RIGHT ) ) {
     yAngle_ += 50.0f * dt;
@@ -98,7 +98,7 @@ void GlWindow::update( float dt ) {
     yAngle_ += 360.0f;
   }
   
-  rotation_ = glm::rotate( glm::mat4(), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+  rotation_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   
   if( TheInputHandler::Instance() -> isPressed( UP ) ) {
     xAngle_ += 50.0f * dt;
@@ -120,7 +120,7 @@ void GlWindow::update( float dt ) {
   glDrawElements( GL_TRIANGLES, shape_ -> numIndices(), GL_UNSIGNED_INT, 0 );
   
   // cube 2
-  model_    = glm::translate( glm::mat4(), glm::vec3( 2.0f, 2.0f, -12.0f ) );
+  model_    = glm::translate( glm::mat4( 1.0f ), glm::vec3( 2.0f, 2.0f, -12.0f ) );
   rotation_ = glm::mat4();
   mvp_      = projection_ * view_ * model_ * rotation_;
   glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp_[0][0] );

@@ -26,8 +26,8 @@ enum ShapeTypes {
 };
 
 struct Vertex {
-  glm::vec3   position;
-  glm::vec3   colour;
+  glm::vec3   position  = glm::vec3( 0, 0, 0 );
+  glm::vec3   colour    = glm::vec3( 0, 0, 0 );
 };
 
 #endif //STRUCTS_HPP
