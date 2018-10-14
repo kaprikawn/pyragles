@@ -1,6 +1,6 @@
 #include "enemy.hpp"
 #include <iostream>
-#include "../deps/glm/gtc/matrix_transform.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 #include "global.hpp"
 
 Enemy::Enemy( PhysicsObjectParams physicsObjectParams ) : PhysicsObject( physicsObjectParams ) {
@@ -83,7 +83,7 @@ void Enemy::calculateRotation( GLfloat dt ) {
   
   yAngle_ += dt * 100;
   
-  rotationMatrix_ = glm::rotate( glm::mat4(), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+  rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
 }
 
 void Enemy::registerCollision( CollisionData collisionData, CollisionProperties collisionProperties ) {

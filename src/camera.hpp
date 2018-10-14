@@ -2,7 +2,7 @@
 #define CAMERA_HPP
 
 #include <GLES2/gl2.h>
-#include "../deps/glm/glm.hpp"
+#include <glm/glm.hpp>
 #include <memory>
 
 class Camera {

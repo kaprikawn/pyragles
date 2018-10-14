@@ -1,6 +1,6 @@
 #include "ship.hpp"
 #include <iostream>
-#include "../deps/glm/gtc/matrix_transform.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 #include "global.hpp"
 
 #define PI 3.141592653589793238462643383279
@@ -46,7 +46,7 @@ void Ship::calculateRotation( GLfloat dt ) {
   
   zAngle_ = zAngle;
   
-  rotationMatrix_ = glm::rotate( glm::mat4(), glm::radians( xAngle ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( xAngle ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   rotationMatrix_ = glm::rotate( rotationMatrix_, glm::radians( yAngle ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   rotationMatrix_ = glm::rotate( rotationMatrix_, glm::radians( zAngle ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
 }
