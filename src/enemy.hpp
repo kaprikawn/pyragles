@@ -24,11 +24,12 @@ class Enemy : public PhysicsObject {
     std::shared_ptr<InputHandler> inputHandler_;
     std::shared_ptr<glm::vec3>    shipPosition_;
     std::vector<NextMovement>     movements_;
+    std::vector<Timer>            fireTimers_;
     
-    GLfloat   yAngle_ = 0.0f;
+    GLfloat   yAngle_     = 0.0f;
     Timer     movementTimer_;
     Movement  movement_;
-    int       hitpoints = 1;
+    int       hitpoints_  = 1;
     
   public:
     Enemy( PhysicsObjectParams physicsObjectParams );
@@ -38,7 +39,7 @@ class Enemy : public PhysicsObject {
     void  render( glm::mat4 viewProjectionMatrix );
     void  clean();
     void  calculateRotation( GLfloat dt );
-    void registerCollision( CollisionData collisionData, CollisionProperties collisionProperties );
+    void  registerCollision( CollisionData collisionData, CollisionProperties collisionProperties );
     CollisionProperties collisionProperties();
 };
 

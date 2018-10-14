@@ -37,10 +37,20 @@ struct BufferData {
   GLsizei    numIndices;
 };
 
+enum ObjectType {
+  UNDEF_OBJ_TYPE, FRIENDLY, ENEMY, SCENARY
+};
+
 struct PhysicsObjectParams {
   int         shapeType;
+  int         objectType    = 0;
+  bool        canFire       = false;
+  bool        damageShip    = false;
+  bool        damageEnemy   = false;
+  GLfloat     velMultiplier = 0.0f;
   glm::vec3   initPosition;
   BufferData  bufferData;
+  unsigned int                          spawnerID = 0;
   std::shared_ptr<Mesh>                 mesh;
   std::shared_ptr<Renderer>             renderer;
   std::shared_ptr<InputHandler>         inputHandler;
@@ -53,10 +63,13 @@ class PhysicsObject {
     unsigned int  objectID_;
     unsigned int  objectState_    = UNDEF_STATE;
     unsigned int  newObjectState_ = UNDEF_STATE;
+    unsigned int  spawnerID_      = 0;
     
     bool          delete_         = false;
+    bool          canFire_        = false;
     bool          fire_           = false;
     int           shapeType_      = 0;
+    int           objectType_     = 0;
     BufferData    bufferData_;
     
     unsigned int  lastCollisionID_;
@@ -98,8 +111,15 @@ class PhysicsObject {
       return mesh_ -> mesh();
     }
     
-    bool deleteObject()     { return delete_; }
-    unsigned int objectID() { return objectID_; }
+    glm::vec3 position() {
+      return mesh_ -> position();
+    }
+    
+    bool  deleteObject()      { return delete_; }
+    bool  canFire()           { return canFire_; }
+    int   objectType()        { return objectType_; }
+    unsigned int objectID()   { return objectID_; }
+    unsigned int spawnerID()  { return spawnerID_; }
     
     std::vector<glm::vec3> vertices() {
       return mesh_ -> vertices();

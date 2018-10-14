@@ -135,9 +135,6 @@ void Ship::handleInput( GLfloat dt ) {
   
   if( velocity_.y < -yMax )
     velocity_.y = -yMax;
-    
-  
-  
 }
 
 void Ship::update( GLfloat dt, bool skipMove ) {
@@ -185,6 +182,7 @@ void Ship::registerCollision( CollisionData collisionData, CollisionProperties c
   
   PhysicsObject::changeState( COLLIDED );
   
+  hitpoints_ =- collisionProperties.damageToShip;
 }
 
 CollisionProperties Ship::collisionProperties() {

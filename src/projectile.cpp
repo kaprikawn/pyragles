@@ -5,16 +5,23 @@
 
 #define PI 3.141592653589793238462643383279
 
-Projectile::Projectile( PhysicsObjectParams physicsObjectParams, std::shared_ptr<Target> target ) : PhysicsObject( physicsObjectParams ) {
+Projectile::Projectile( PhysicsObjectParams physicsObjectParams, glm::vec3 targetPosition, bool generateSpread, unsigned int spawnerID ) : PhysicsObject( physicsObjectParams ) {
   
-  shipPosition_ = physicsObjectParams.shipPosition;
-  target_       = target;
+  shipPosition_   = physicsObjectParams.shipPosition;
+  targetPosition_ = targetPosition;
+  spawnerID_      = spawnerID;
   
   calculateRotation( 1.0f );
   
   mesh_ -> updatePosition( velocity_, 0.01f );
   
-  velocity_ = glm::normalize( target -> position() - physicsObjectParams.initPosition ) * 100.0f;
+  velocity_ = glm::normalize( targetPosition_ - physicsObjectParams.initPosition ) * physicsObjectParams.velMultiplier;
+  
+  if( physicsObjectParams.damageShip )
+    damageShip_ = true;
+    
+  if( physicsObjectParams.damageEnemy )
+    damageEnemy_ = true;
 }
 
 void Projectile::update( GLfloat dt, bool skipMove ) {
@@ -30,9 +37,9 @@ void Projectile::render( glm::mat4 viewProjectionMatrix ) {
 
 void  Projectile::calculateRotation( GLfloat dt ) {
   
-  GLfloat targetX = target_ -> position().x;
-  GLfloat targetY = target_ -> position().y;
-  GLfloat targetZ = target_ -> position().z;
+  GLfloat targetX = targetPosition_.x;
+  GLfloat targetY = targetPosition_.y;
+  GLfloat targetZ = targetPosition_.z;
   
   GLfloat projectileX = mesh_ -> x();
   GLfloat projectileY = mesh_ -> y();
@@ -48,10 +55,17 @@ void  Projectile::calculateRotation( GLfloat dt ) {
 }
 
 CollisionProperties Projectile::collisionProperties() {
+  
   CollisionProperties collisionProperties;
   
-  collisionProperties.objectID      = objectID_;
-  collisionProperties.damageToEnemy = 1;
+  collisionProperties.objectID = objectID_;
+  if( damageShip_ )
+    collisionProperties.damageToShip = 1;
+    
+  if( damageEnemy_ )
+    collisionProperties.damageToEnemy = 1;
+    
+  delete_ = true;
   
   return collisionProperties;
 }

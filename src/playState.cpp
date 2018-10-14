@@ -37,6 +37,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   int shapeType = TARGET;
   PhysicsObjectParams params;
   params.shapeType    = shapeType;
+  params.objectType   = FRIENDLY;
   params.initPosition = { -3, START_Y, shipStartZ - targetDistance };
   std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
@@ -51,6 +52,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   shapeType = SHIP;
   params.shapeType    = shapeType;
+  params.objectType   = FRIENDLY;
   params.initPosition = { 0, START_Y, shipStartZ };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
@@ -65,6 +67,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   shapeType = ARCH;
   params.shapeType    = shapeType;
+  params.objectType   = SCENARY;
   params.initPosition = { -3.0f, FLOOR_Y, START_Z - 60 };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
@@ -78,17 +81,20 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   shapeType = ENEMY_POD;
   params.shapeType    = shapeType;
+  params.objectType   = ENEMY;
   params.initPosition = { 40.0f, 5, START_Z - 20 };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
+  params.canFire      = true;
   
   addPhysicsObject( std::make_shared<Enemy>( params ), true, true );
   params = {};
   
   shapeType = FLOOR1;
   params.shapeType    = shapeType;
+  params.objectType   = SCENARY;
   params.initPosition = { 0, FLOOR_Y, -10 };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
@@ -100,6 +106,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   shapeType = FLOOR2;
   params.shapeType    = shapeType;
+  params.objectType   = SCENARY;
   params.initPosition = { 0, FLOOR_Y - 0.02, -10 };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
@@ -126,25 +133,57 @@ void PlayState::update( GLfloat dt ) {
   if( liveObjects_[ 1 ] -> fire() ) { // fire bullets
     
     PhysicsObjectParams params;
-    params.shapeType    = BULLET;
-    params.initPosition = { shipPosition_ -> x, shipPosition_ -> y, shipPosition_ -> z };
+    params.shapeType      = BULLET;
+    params.initPosition   = { shipPosition_ -> x, shipPosition_ -> y, shipPosition_ -> z };
     std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-    params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
-    params.mesh         = mesh;
-    params.renderer     = renderer_;
-    params.shipPosition = shipPosition_;
+    params.bufferData     = meshLoader_ -> bufferData( params.shapeType );
+    params.mesh           = mesh;
+    params.renderer       = renderer_;
+    params.shipPosition   = shipPosition_;
+    params.damageEnemy    = true;
+    params.velMultiplier  = 100.0f;
     
-    std::shared_ptr<Projectile> newProjectile = std::make_shared<Projectile>( params, target_ );
+    std::shared_ptr<Projectile> newProjectile = std::make_shared<Projectile>( params, target_ -> position(), false, liveObjects_[ 1 ] -> objectID() );
     PlayState::addPhysicsObject( newProjectile, true, false );
+  }
+  
+  if( liveObjects_.size() > 1 ) {
+    for( unsigned int i = 2; i < liveObjects_.size(); i++ ) {
+      if( !liveObjects_[ i ] -> canFire() )
+        continue;
+        
+      if( liveObjects_[ i ] -> fire() ) {
+        glm::vec3 enemyPosition = liveObjects_[ i ] -> position();
+        
+        PhysicsObjectParams params;
+        params.shapeType        = BULLET;
+        params.initPosition     = enemyPosition;
+        std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+        params.bufferData       = meshLoader_ -> bufferData( params.shapeType );
+        params.mesh             = mesh;
+        params.renderer         = renderer_;
+        params.shipPosition     = shipPosition_;
+        params.damageShip       = true;
+        params.velMultiplier    = 10.0f;
+        unsigned int spawnerID  = liveObjects_[ i ] -> objectID();
+        params.spawnerID        = spawnerID;
+        
+        glm::vec3 projectileTarget = { shipPosition_ -> x, shipPosition_ -> y, shipPosition_ -> z };
+        
+        std::shared_ptr<Projectile> newProjectile = std::make_shared<Projectile>( params, projectileTarget, false, spawnerID );
+        PlayState::addPhysicsObject( newProjectile, true, false );
+      }
+    }
   }
   
   // collisions - starting at 1 because target collision is irrelevent
   for( unsigned int i = 1; i < liveObjects_.size(); i++ ) {
     for( unsigned int j = i + 1; j < liveObjects_.size(); j++ ) {
       
-      if( liveObjects_[ i ] -> shapeType() == SHIP && liveObjects_[ j ] -> shapeType() == BULLET )
+      // for a bullet if they're touching the ship that spawned it
+      if( liveObjects_[ i ] -> objectID() == liveObjects_[ j ] -> spawnerID() )
         continue;
-      
+        
       CollisionData collisionData = collision_.collisionData( liveObjects_[ i ], liveObjects_[ j ] );
       
       if( collisionData.isColliding() ) {
