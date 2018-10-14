@@ -2,7 +2,7 @@
 #define MESHLOADER_HPP
 
 #include <GLES2/gl2.h>
-#include "../deps/glm/glm.hpp"
+#include <glm/glm.hpp>
 #include <vector>
 #include "physicsObject.hpp"
 

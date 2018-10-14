@@ -3,7 +3,7 @@
 
 #include <GLES2/gl2.h>
 #include <SDL2/SDL.h>
-#include "../deps/glm/glm.hpp"
+#include <glm/glm.hpp>
 #include <vector>
 #include <memory>
 #include "shader.hpp"
@@ -27,8 +27,8 @@ enum ObjectState {
 };
 
 struct Vertex {
-  glm::vec3   position;
-  glm::vec3   colour;
+  glm::vec3   position  = { 0, 0, 0 };
+  glm::vec3   colour    = { 0, 0, 0 };
 };
 
 struct BufferData {
@@ -48,7 +48,7 @@ struct PhysicsObjectParams {
   bool        damageShip    = false;
   bool        damageEnemy   = false;
   GLfloat     velMultiplier = 0.0f;
-  glm::vec3   initPosition;
+  glm::vec3   initPosition  = { 0, 0, 0 };
   BufferData  bufferData;
   unsigned int                          spawnerID = 0;
   std::shared_ptr<Mesh>                 mesh;
