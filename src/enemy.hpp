@@ -26,10 +26,10 @@ class Enemy : public PhysicsObject {
     std::vector<NextMovement>     movements_;
     std::vector<Timer>            fireTimers_;
     
-    GLfloat   yAngle_ = 0.0f;
+    GLfloat   yAngle_     = 0.0f;
     Timer     movementTimer_;
     Movement  movement_;
-    int       hitpoints = 1;
+    int       hitpoints_  = 1;
     
   public:
     Enemy( PhysicsObjectParams physicsObjectParams );

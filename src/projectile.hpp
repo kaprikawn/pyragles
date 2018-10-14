@@ -10,11 +10,15 @@
 class Projectile : public PhysicsObject {
   private:
     
-    std::shared_ptr<glm::vec3>    shipPosition_;
-    std::shared_ptr<Target>       target_;
+    bool damageShip_  = false;
+    bool damageEnemy_ = false;
+    
+    std::shared_ptr<glm::vec3>  shipPosition_;
+    glm::vec3                   targetPosition_;
+    unsigned int                spawnerID_;
     
   public:
-    Projectile( PhysicsObjectParams physicsObjectParams, std::shared_ptr<Target> target );
+    Projectile( PhysicsObjectParams physicsObjectParams, glm::vec3 targetPosition, bool generateSpread, unsigned int spawnerID );
     ~Projectile(){}
     
     void  update( GLfloat dt, bool skipMove = false );

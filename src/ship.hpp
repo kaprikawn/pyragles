@@ -20,6 +20,8 @@ class Ship : public PhysicsObject {
     GLfloat   zAngle_             = 0.0f;
     Timer     collidedTimer_;
     
+    int       hitpoints_          = 100;
+    
   public:
     Ship( PhysicsObjectParams physicsObjectParams, std::shared_ptr<Target> target );
     ~Ship(){}

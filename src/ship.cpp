@@ -182,6 +182,7 @@ void Ship::registerCollision( CollisionData collisionData, CollisionProperties c
   
   PhysicsObject::changeState( COLLIDED );
   
+  hitpoints_ =- collisionProperties.damageToShip;
 }
 
 CollisionProperties Ship::collisionProperties() {

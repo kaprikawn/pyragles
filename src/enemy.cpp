@@ -93,9 +93,9 @@ void Enemy::registerCollision( CollisionData collisionData, CollisionProperties 
   
   lastCollisionID_ = collisionProperties.objectID;
   
-  hitpoints -= collisionProperties.damageToEnemy;
+  hitpoints_ -= collisionProperties.damageToEnemy;
   
-  if( hitpoints <= 0 )
+  if( hitpoints_ <= 0 )
     objectState_ = DEAD;
 }
 
