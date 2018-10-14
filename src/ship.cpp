@@ -135,9 +135,6 @@ void Ship::handleInput( GLfloat dt ) {
   
   if( velocity_.y < -yMax )
     velocity_.y = -yMax;
-    
-  
-  
 }
 
 void Ship::update( GLfloat dt, bool skipMove ) {

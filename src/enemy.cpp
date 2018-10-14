@@ -8,15 +8,23 @@ Enemy::Enemy( PhysicsObjectParams physicsObjectParams ) : PhysicsObject( physics
   // declare movements in reverse order so the next movement is
   // always at the back for convenient access via .back()
   NextMovement nextMovement50;
-  nextMovement50.y      = 10;
-  nextMovement50.vec3.y = 10;
+  nextMovement50.y        = 10;
+  nextMovement50.vec3.y   = 10;
   nextMovement50.duration = 50.0f;
   movements_.push_back( nextMovement50 );
   
   NextMovement nextMovement49;
-  nextMovement49.x      = -10;
-  nextMovement49.vec3.x = -10;
+  nextMovement49.x        = -10;
+  nextMovement49.vec3.x   = -10;
   movements_.push_back( nextMovement49 );
+  
+  Timer fireTimer50;
+  fireTimer50.setCountdownTimer( 50 );
+  fireTimers_.push_back( fireTimer50 );
+  
+  Timer fireTimer49;
+  fireTimer49.setCountdownTimer( 3 );
+  fireTimers_.push_back( fireTimer49 );
   
   velocity_.x = movements_.back().x;
   
@@ -26,12 +34,14 @@ Enemy::Enemy( PhysicsObjectParams physicsObjectParams ) : PhysicsObject( physics
   
   movement_.defineChange( currentVelocity, targetVelocity, changeMagnitude );
   
+  // set duration of this movement until next change in direction
   movementTimer_.setCountdownTimer( movements_.back().duration );
 }
 
 void Enemy::update( GLfloat dt, bool skipMove ) {
   
   movementTimer_.update( dt );
+  
   if( movementTimer_.timeLeft() == 0.0f ) {
     
     glm::vec3 currentVelocity = { movements_.back().x, movements_.back().y, movements_.back().z };
@@ -42,6 +52,13 @@ void Enemy::update( GLfloat dt, bool skipMove ) {
     
     movementTimer_.setCountdownTimer( movements_.back().duration );
   }
+  
+  fireTimers_.back().update( dt );
+  if( fireTimers_.back().timeLeft() == 0.0f ) {
+    fire_ = true;
+    fireTimers_.pop_back();
+  }
+  
   glm::vec3 currentVelocity = { velocity_.x, velocity_.y, velocity_.z };
   glm::vec3 newVelocity = movement_.changeVelocity( currentVelocity, dt );
   

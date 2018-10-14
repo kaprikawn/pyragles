@@ -83,6 +83,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
+  params.canFire      = true;
   
   addPhysicsObject( std::make_shared<Enemy>( params ), true, true );
   params = {};
@@ -136,6 +137,26 @@ void PlayState::update( GLfloat dt ) {
     
     std::shared_ptr<Projectile> newProjectile = std::make_shared<Projectile>( params, target_ );
     PlayState::addPhysicsObject( newProjectile, true, false );
+  }
+  
+  if( liveObjects_.size() > 1 ) {
+    for( unsigned int i = 2; i < liveObjects_.size(); i++ ) {
+      if( !liveObjects_[ i ] -> canFire() )
+        continue;
+        
+      if( liveObjects_[ i ] -> fire() ) {
+        std::cout << "Enemy is firing\n";
+        glm::vec3 enemyPosition = liveObjects_[ i ] -> position();
+        
+        std::cout << "x is " << enemyPosition.x << std::endl;
+        std::cout << "y is " << enemyPosition.y << std::endl;
+        std::cout << "z is " << enemyPosition.z << std::endl;
+        std::cout << "fire towards\n";
+        std::cout << "x is " << shipPosition_ -> x << std::endl;
+        std::cout << "y is " << shipPosition_ -> y << std::endl;
+        std::cout << "z is " << shipPosition_ -> z << std::endl;
+      }
+    }
   }
   
   // collisions - starting at 1 because target collision is irrelevent

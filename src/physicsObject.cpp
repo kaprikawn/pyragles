@@ -12,6 +12,7 @@ PhysicsObject::PhysicsObject( PhysicsObjectParams physicsObjectParams, bool prin
   mesh_         = physicsObjectParams.mesh;
   renderer_     = physicsObjectParams.renderer;
   shapeType_    = physicsObjectParams.shapeType;
+  canFire_      = physicsObjectParams.canFire;
   
   modelMatrix_  = glm::translate( glm::mat4(), mesh_ -> position() );
   

@@ -39,6 +39,7 @@ struct BufferData {
 
 struct PhysicsObjectParams {
   int         shapeType;
+  bool        canFire = false;
   glm::vec3   initPosition;
   BufferData  bufferData;
   std::shared_ptr<Mesh>                 mesh;
@@ -55,6 +56,7 @@ class PhysicsObject {
     unsigned int  newObjectState_ = UNDEF_STATE;
     
     bool          delete_         = false;
+    bool          canFire_        = false;
     bool          fire_           = false;
     int           shapeType_      = 0;
     BufferData    bufferData_;
@@ -98,7 +100,12 @@ class PhysicsObject {
       return mesh_ -> mesh();
     }
     
+    glm::vec3 position() {
+      return mesh_ -> position();
+    }
+    
     bool deleteObject()     { return delete_; }
+    bool canFire()          { return canFire_; }
     unsigned int objectID() { return objectID_; }
     
     std::vector<glm::vec3> vertices() {
