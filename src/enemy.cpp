@@ -71,6 +71,15 @@ void Enemy::calculateRotation( GLfloat dt ) {
 
 void Enemy::registerCollision( CollisionData collisionData, CollisionProperties collisionProperties ) {
   
+  if( lastCollisionID_ == collisionProperties.objectID )
+    return;
+  
+  lastCollisionID_ = collisionProperties.objectID;
+  
+  hitpoints -= collisionProperties.damageToEnemy;
+  
+  if( hitpoints <= 0 )
+    objectState_ = DEAD;
 }
 
 CollisionProperties Enemy::collisionProperties() {

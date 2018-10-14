@@ -50,7 +50,8 @@ void  Projectile::calculateRotation( GLfloat dt ) {
 CollisionProperties Projectile::collisionProperties() {
   CollisionProperties collisionProperties;
   
-  collisionProperties.objectID = objectID_;
+  collisionProperties.objectID      = objectID_;
+  collisionProperties.damageToEnemy = 1;
   
   return collisionProperties;
 }

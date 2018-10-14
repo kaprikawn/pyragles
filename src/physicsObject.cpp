@@ -21,6 +21,9 @@ PhysicsObject::PhysicsObject( PhysicsObjectParams physicsObjectParams, bool prin
 void PhysicsObject::update( GLfloat dt, bool skipMove ) {
   mesh_ -> updatePosition( velocity_, dt, skipMove );
   mesh_ -> updateVertices( modelMatrix_, true );
+  
+  if( objectState_ == DEAD )
+    delete_ = true;
 }
 
 void PhysicsObject::render( glm::mat4 viewProjectionMatrix ) {

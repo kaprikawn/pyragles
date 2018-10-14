@@ -23,7 +23,7 @@ enum ShapeTypes {
 };
 
 enum ObjectState {
-  UNDEF_STATE, NORMAL, COLLIDED
+  UNDEF_STATE, NORMAL, COLLIDED, DYING, DEAD
 };
 
 struct Vertex {

@@ -28,6 +28,7 @@ class Enemy : public PhysicsObject {
     GLfloat   yAngle_ = 0.0f;
     Timer     movementTimer_;
     Movement  movement_;
+    int       hitpoints = 1;
     
   public:
     Enemy( PhysicsObjectParams physicsObjectParams );
