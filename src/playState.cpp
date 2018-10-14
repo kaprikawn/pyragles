@@ -153,7 +153,6 @@ void PlayState::update( GLfloat dt ) {
         continue;
         
       if( liveObjects_[ i ] -> fire() ) {
-        std::cout << "Enemy is firing\n";
         glm::vec3 enemyPosition = liveObjects_[ i ] -> position();
         
         PhysicsObjectParams params;

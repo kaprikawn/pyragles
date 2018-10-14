@@ -21,8 +21,14 @@ add_executable( exe
 include( FindPkgConfig )
 
 pkg_search_module( SDL2 REQUIRED sdl2 )
+pkg_search_module( SDL2_MIXER REQUIRED SDL2_mixer )
 pkg_search_module( GLESv2 REQUIRED glesv2 )
 
-include_directories( ${SDL2_INCLUDE_DIRS} ${GLESv2_INCLUDE_DIRS} )
-target_link_libraries( exe ${SDL2_LIBRARIES} ${GLESv2_LIBRARIES} )
+include_directories( ${SDL2_INCLUDE_DIRS}
+                     ${SDL2_MIXER_INCLUDE_DIRS}
+                     ${GLESv2_INCLUDE_DIRS} )
+
+target_link_libraries( exe ${SDL2_LIBRARIES}
+                           ${SDL2_MIXER_LIBRARIES}
+                           ${GLESv2_LIBRARIES} )
 

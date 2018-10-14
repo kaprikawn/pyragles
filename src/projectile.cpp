@@ -11,8 +11,6 @@ Projectile::Projectile( PhysicsObjectParams physicsObjectParams, glm::vec3 targe
   targetPosition_ = targetPosition;
   spawnerID_      = spawnerID;
   
-  std::cout << "spawnerID is " << spawnerID_ << std::endl;
-  
   calculateRotation( 1.0f );
   
   mesh_ -> updatePosition( velocity_, 0.01f );
