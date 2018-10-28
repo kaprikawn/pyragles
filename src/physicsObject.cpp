@@ -15,6 +15,7 @@ PhysicsObject::PhysicsObject( PhysicsObjectParams physicsObjectParams, bool prin
   canFire_        = physicsObjectParams.canFire;
   spawnerID_      = physicsObjectParams.spawnerID;
   objectType_     = physicsObjectParams.objectType;
+  timeUntilSpawn_ = physicsObjectParams.timeUntilSpawn;
   
   modelMatrix_    = glm::translate( glm::mat4( 1.0f ), mesh_ -> position() );
   rotationMatrix_ = glm::mat4( 1.0f );
