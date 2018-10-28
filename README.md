@@ -6,6 +6,7 @@ https://kaprikawn.wordpress.com/2018/01/07/learning-to-learn-opengl-es-2-0-part-
 Acknowledgements
 
 - glm header files used by terms of MIT license from https://github.com/g-truc/glm
+- json.hpp license details in the header of that file (MIT licensed). File used as per the terms of that license
 - Project uses SDL2 http://libsdl.org/
 - CMake find files obtained from
 

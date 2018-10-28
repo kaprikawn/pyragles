@@ -1,0 +1,33 @@
+{
+    "levelDetails" : {
+      "level" : "1-1"
+    }
+  , "enemies" : [
+      {
+          "shapeType" : "ENEMY_POD"
+        , "objectType" : "ENEMY"
+        , "canFire" : true
+        , "timeUntilSpawn" : 1
+        , "initPosition" : { "x" : 40.0, "y" : 5, "z" : -30 }
+        , "mesh" : {}
+      }
+    , {
+          "shapeType" : "ENEMY_POD"
+        , "objectType" : "ENEMY"
+        , "canFire" : true
+        , "timeUntilSpawn" : 6
+        , "initPosition" : { "x" : 40.0, "y" : 5, "z" : -30 }
+        , "mesh" : {}
+      }
+    ]
+  , "scenary" : [
+      {
+          "shapeType" : "ARCH"
+        , "objectType" : "SCENARY"
+        , "canFire" : false
+        , "timeUntilSpawn" : 12
+        , "initPosition" : { "x" : -3, "y" : 5, "z" : -70 }
+        , "mesh" : {}
+      }
+    ]
+}

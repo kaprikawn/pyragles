@@ -4,10 +4,14 @@
 #include "global.hpp"
 #include "projectile.hpp"
 #include "enemy.hpp"
+#include "jsonLoader.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
 bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
+  
+  JsonLoader jsonLoader;
+  jsonLoader.loadLevel( 11 );
   
   std::shared_ptr<Shader> shader = std::make_shared<Shader>();
   
@@ -65,7 +69,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   addPhysicsObject( ship_, true, false );
   params = {};
   
-  shapeType = ARCH;
+  shapeType             = ARCH;
   params.shapeType      = shapeType;
   params.objectType     = SCENARY;
   params.initPosition   = { -3.0f, FLOOR_Y, START_Z - 60 };
