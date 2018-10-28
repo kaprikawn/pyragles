@@ -4,30 +4,34 @@
     }
   , "enemies" : [
       {
-          "shapeType" : "ENEMY_POD"
-        , "objectType" : "ENEMY"
-        , "canFire" : true
-        , "timeUntilSpawn" : 1
-        , "initPosition" : { "x" : 40.0, "y" : 5, "z" : -30 }
-        , "mesh" : {}
+          "shapeType"       : "ENEMY_POD"
+        , "objectType"      : "ENEMY"
+        , "canFire"         : true
+        , "timeUntilSpawn"  : 1.0
+        , "initPosition"    : { "x" : 40.0, "y" : 5, "z" : -30 }
+        , "meshType"        : "ENEMY_POD"
       }
     , {
-          "shapeType" : "ENEMY_POD"
-        , "objectType" : "ENEMY"
-        , "canFire" : true
-        , "timeUntilSpawn" : 6
-        , "initPosition" : { "x" : 40.0, "y" : 5, "z" : -30 }
-        , "mesh" : {}
+          "shapeType"       : "ENEMY_POD"
+        , "objectType"      : "ENEMY"
+        , "canFire"         : true
+        , "timeUntilSpawn"  : 6
+        , "initPosition"    : { "x" : 40.0, "y" : 5, "z" : -30 }
       }
     ]
-  , "scenary" : [
+  , "meshes" : [
       {
-          "shapeType" : "ARCH"
-        , "objectType" : "SCENARY"
-        , "canFire" : false
-        , "timeUntilSpawn" : 12
-        , "initPosition" : { "x" : -3, "y" : 5, "z" : -70 }
-        , "mesh" : {}
+          "shapeType" : "ENEMY_POD"
+        , "mesh" : [
+            {
+                "colour"    : [ 1.0, 0.0, 0.0 ]
+              , "position"  : [ 0.00, 1.00, 0.00 ]
+            }
+          , {
+                "colour"    : [ 1.0, 0.0, 0.0 ]
+              , "position"  : [ 0.00, 1.00, 0.00 ]
+            }
+          ]
       }
     ]
 }
