@@ -80,7 +80,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   addPhysicsObject( std::make_shared<Scenary>( params ), false, true );
   params = {};
   
-  shapeType = ENEMY_POD;
+  shapeType           = ENEMY_POD;
   params.shapeType    = shapeType;
   params.objectType   = ENEMY;
   params.initPosition = { 40.0f, 5, START_Z - 20 };
@@ -91,6 +91,20 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   params.canFire      = true;
   
   addPhysicsObject( std::make_shared<Enemy>( params ), true, false );
+  params = {};
+  
+  shapeType             = ENEMY_POD;
+  params.shapeType      = shapeType;
+  params.objectType     = ENEMY;
+  params.initPosition   = { 40.0f, 5, START_Z - 20 };
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+  params.bufferData     = meshLoader_ -> bufferData( params.shapeType );
+  params.mesh           = mesh;
+  params.renderer       = renderer_;
+  params.canFire        = true;
+  params.timeUntilSpawn = 6.0f;
+  
+  addPhysicsObject( std::make_shared<Enemy>( params ), false, true );
   params = {};
   
   shapeType = FLOOR1;
@@ -132,22 +146,11 @@ void PlayState::update( GLfloat dt ) {
   }
   
   // spawn anything that needs spawning
-  for( unsigned int i = 0; i < levelObjects_.size(); i++ ) {
-    levelObjects_[ i ] -> reduceSpawnCounter( dt );
-    GLfloat timeUntilSpawn = levelObjects_[ i ] -> timeUntilSpawn();
-    if( timeUntilSpawn <= 0.0f ) {
-      std::cout << "spawn obect\n";
-    }
-  }
-  
   for( unsigned i = levelObjects_.size(); i-- > 0; ) {
     levelObjects_[ i ] -> reduceSpawnCounter( dt );
     GLfloat timeUntilSpawn = levelObjects_[ i ] -> timeUntilSpawn();
     if( timeUntilSpawn <= 0.0f ) {
-      std::cout << "spawn obect\n";
-      
       addPhysicsObject( std::move( levelObjects_[ i ] ), true, false );
-      
       levelObjects_.erase( levelObjects_.begin() + i );
     }
   }
