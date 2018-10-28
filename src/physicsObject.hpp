@@ -43,14 +43,15 @@ enum ObjectType {
 
 struct PhysicsObjectParams {
   int         shapeType;
-  int         objectType    = 0;
-  bool        canFire       = false;
-  bool        damageShip    = false;
-  bool        damageEnemy   = false;
-  GLfloat     velMultiplier = 0.0f;
-  glm::vec3   initPosition  = { 0, 0, 0 };
+  int         objectType      = 0;
+  bool        canFire         = false;
+  bool        damageShip      = false;
+  bool        damageEnemy     = false;
+  GLfloat     velMultiplier   = 0.0f;
+  GLfloat     timeUntilSpawn  = 0.0f;
+  glm::vec3   initPosition    = { 0, 0, 0 };
   BufferData  bufferData;
-  unsigned int                          spawnerID = 0;
+  unsigned int                          spawnerID       = 0;
   std::shared_ptr<Mesh>                 mesh;
   std::shared_ptr<Renderer>             renderer;
   std::shared_ptr<InputHandler>         inputHandler;
@@ -73,6 +74,7 @@ class PhysicsObject {
     BufferData    bufferData_;
     
     unsigned int  lastCollisionID_;
+    GLfloat       timeUntilSpawn_ = 0;
     
     glm::mat4     modelMatrix_;
     glm::mat4     rotationMatrix_;
@@ -115,11 +117,17 @@ class PhysicsObject {
       return mesh_ -> position();
     }
     
-    bool  deleteObject()      { return delete_; }
-    bool  canFire()           { return canFire_; }
-    int   objectType()        { return objectType_; }
-    unsigned int objectID()   { return objectID_; }
-    unsigned int spawnerID()  { return spawnerID_; }
+    bool  deleteObject()          { return delete_; }
+    bool  canFire()               { return canFire_; }
+    int   objectType()            { return objectType_; }
+    unsigned int objectID()       { return objectID_; }
+    unsigned int spawnerID()      { return spawnerID_; }
+    GLfloat timeUntilSpawn() { return timeUntilSpawn_; }
+    void reduceSpawnCounter( GLfloat dt ) {
+      timeUntilSpawn_ -= dt;
+      if( timeUntilSpawn_ < 0.0f )
+        timeUntilSpawn_ = 0.0f;
+    }
     
     std::vector<glm::vec3> vertices() {
       return mesh_ -> vertices();
@@ -133,7 +141,6 @@ class PhysicsObject {
       objectState_    = state;
       newObjectState_ = state;
     }
-    
 };
 
 #endif // PHYSICSOBJECT_HPP

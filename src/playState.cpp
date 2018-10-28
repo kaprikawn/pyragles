@@ -47,7 +47,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   params.shipPosition = shipPosition_;
   
   target_ = std::make_shared<Target>( params );
-  addPhysicsObject( target_, true, true );
+  addPhysicsObject( target_, true, false );
   params = {};
   
   shapeType = SHIP;
@@ -62,24 +62,25 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   params.shipPosition = shipPosition_;
   
   ship_ = std::make_shared<Ship>( params, target_ );
-  addPhysicsObject( ship_, true, true );
+  addPhysicsObject( ship_, true, false );
   params = {};
   
   shapeType = ARCH;
-  params.shapeType    = shapeType;
-  params.objectType   = SCENARY;
-  params.initPosition = { -3.0f, FLOOR_Y, START_Z - 60 };
+  params.shapeType      = shapeType;
+  params.objectType     = SCENARY;
+  params.initPosition   = { -3.0f, FLOOR_Y, START_Z - 60 };
   mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
-  params.mesh         = mesh;
-  params.renderer     = renderer_;
-  params.inputHandler = inputHandler;
-  params.shipPosition = shipPosition_;
+  params.bufferData     = meshLoader_ -> bufferData( params.shapeType );
+  params.mesh           = mesh;
+  params.renderer       = renderer_;
+  params.inputHandler   = inputHandler;
+  params.shipPosition   = shipPosition_;
+  params.timeUntilSpawn = 12.0f;
   
-  addPhysicsObject( std::make_shared<Scenary>( params ), true, true );
+  addPhysicsObject( std::make_shared<Scenary>( params ), false, true );
   params = {};
   
-  shapeType = ENEMY_POD;
+  shapeType           = ENEMY_POD;
   params.shapeType    = shapeType;
   params.objectType   = ENEMY;
   params.initPosition = { 40.0f, 5, START_Z - 20 };
@@ -89,7 +90,21 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   params.renderer     = renderer_;
   params.canFire      = true;
   
-  addPhysicsObject( std::make_shared<Enemy>( params ), true, true );
+  addPhysicsObject( std::make_shared<Enemy>( params ), true, false );
+  params = {};
+  
+  shapeType             = ENEMY_POD;
+  params.shapeType      = shapeType;
+  params.objectType     = ENEMY;
+  params.initPosition   = { 40.0f, 5, START_Z - 20 };
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+  params.bufferData     = meshLoader_ -> bufferData( params.shapeType );
+  params.mesh           = mesh;
+  params.renderer       = renderer_;
+  params.canFire        = true;
+  params.timeUntilSpawn = 6.0f;
+  
+  addPhysicsObject( std::make_shared<Enemy>( params ), false, true );
   params = {};
   
   shapeType = FLOOR1;
@@ -101,7 +116,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   params.mesh         = mesh;
   params.renderer     = renderer_;
   
-  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, true );
+  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false );
   params = {};
   
   shapeType = FLOOR2;
@@ -112,7 +127,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
   params.mesh         = mesh;
   params.renderer     = renderer_;
-  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, true );
+  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false );
   
   audio_ -> load( "assets/musicLevel01_organic_to_synthetic7.wav" );
   audio_ -> play();
@@ -127,6 +142,16 @@ void PlayState::update( GLfloat dt ) {
     if( liveObjects_[i] -> deleteObject() ) {
       liveObjects_[i]   -> clean();
       liveObjects_.erase( liveObjects_.begin() + i );
+    }
+  }
+  
+  // spawn anything that needs spawning
+  for( unsigned i = levelObjects_.size(); i-- > 0; ) {
+    levelObjects_[ i ] -> reduceSpawnCounter( dt );
+    GLfloat timeUntilSpawn = levelObjects_[ i ] -> timeUntilSpawn();
+    if( timeUntilSpawn <= 0.0f ) {
+      addPhysicsObject( std::move( levelObjects_[ i ] ), true, false );
+      levelObjects_.erase( levelObjects_.begin() + i );
     }
   }
   
