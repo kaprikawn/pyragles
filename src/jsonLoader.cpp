@@ -41,6 +41,8 @@ struct PhysicsObjectParams {
     newEnemy.canFire        = enemy[ "canFire" ];
     newEnemy.timeUntilSpawn = enemy[ "timeUntilSpawn" ];
     newEnemy.initPosition.x = enemy[ "initPosition" ][ "x" ];
+    newEnemy.initPosition.y = enemy[ "initPosition" ][ "y" ];
+    newEnemy.initPosition.z = enemy[ "initPosition" ][ "z" ];
     
     
   }
