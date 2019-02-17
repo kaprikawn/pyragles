@@ -8,7 +8,11 @@
 void JsonLoader::loadLevel( int levelNumber ) {
   
   std::map <std::string, int> shapeTypesLookup;
-  shapeTypesLookup[ "ARCH" ] = 5;
+  shapeTypesLookup[ "ENEMY_POD" ] = 4;
+  shapeTypesLookup[ "ARCH" ]      = 5;
+  
+  std::map <std::string, int> ObjectTypesLookup;
+  ObjectTypesLookup[ "ENEMY" ]    = 2;
   
   std::cout << "loading level " << levelNumber << std::endl;
   
@@ -22,47 +26,60 @@ void JsonLoader::loadLevel( int levelNumber ) {
   
   nlohmann::json meshes = j[ "meshes" ];
   for( nlohmann::json::iterator it1 = meshes.begin(); it1 != meshes.end(); ++it1 ) {
-    nlohmann::json mesh = *it1;
-    std::string meshType = mesh[ "meshType" ];
+    nlohmann::json meshContainer = *it1;
+    std::string meshType = meshContainer[ "meshType" ];
     
-    std::cout << "meshType is " << meshType << std::endl;
-    std::cout << "as an int is " << shapeTypesLookup[ meshType ] << std::endl;
-    std::cout << "try again " << shapeTypesLookup[ mesh[ "meshType" ] ] << std::endl;
+    nlohmann::json meshRoot = meshContainer[ "mesh" ];
     
+    for( nlohmann::json::iterator meshObj = meshRoot.begin(); meshObj != meshRoot.end(); ++meshObj ) {
+      
+      nlohmann::json mesh = *meshObj;
+      nlohmann::json meshObjColour = mesh[ "colour" ];
+      nlohmann::json meshObjVertices  = mesh[ "vertices" ];
+      
+      GLfloat r = meshObjColour[ 0 ];
+      GLfloat g = meshObjColour[ 1 ];
+      GLfloat b = meshObjColour[ 2 ];
+      
+      for( nlohmann::json::iterator vertexRoot = meshObjVertices.begin(); vertexRoot != meshObjVertices.end(); ++vertexRoot ) {
+        nlohmann::json vertex = *vertexRoot;
+        float myArray[ 3 ] = *vertexRoot;
+        
+        std::cout << *vertexRoot << std::endl;
+        GLfloat x = vertex[ 0 ];
+        GLfloat y = vertex[ 1 ];
+        GLfloat z = vertex[ 2 ];
+      }
+      
+      
+      
+      //auto a = meshObj.find( "colour" );
+      
+      //float r = meshObj[ "colour" ][ 0 ];
+      //float colour[3] = meshObj[ "colour"];
+      //std::cout << meshObj["colour"]["r"] << std::endl;
+      
+    }
   }
   
   nlohmann::json e = j[ "enemies" ];
   for( nlohmann::json::iterator it1 = e.begin(); it1 != e.end(); ++it1 ) {
     nlohmann::json enemy = *it1;
-    /*
-struct PhysicsObjectParams {
-  int         shapeType;
-  int         objectType      = 0;
-  bool        canFire         = false;
-  bool        damageShip      = false;
-  bool        damageEnemy     = false;
-  GLfloat     velMultiplier   = 0.0f;
-  GLfloat     timeUntilSpawn  = 0.0f;
-  glm::vec3   initPosition    = { 0, 0, 0 };
-  BufferData  bufferData;
-  unsigned int                          spawnerID       = 0;
-  std::shared_ptr<Mesh>                 mesh;
-  std::shared_ptr<Renderer>             renderer;
-  std::shared_ptr<InputHandler>         inputHandler;
-  std::shared_ptr<glm::vec3>            shipPosition;
-};*/
     
     PhysicsObjectParams newEnemy;
+    newEnemy.shapeType      = shapeTypesLookup[ enemy[ "shapeType" ] ];
+    newEnemy.objectType     = ObjectTypesLookup[ enemy[ "objectType" ] ];
     newEnemy.canFire        = enemy[ "canFire" ];
+    newEnemy.damageShip     = enemy[ "damageShip" ];
+    newEnemy.damageEnemy    = enemy[ "damageEnemy" ];
+    newEnemy.velMultiplier  = enemy[ "velMultiplier" ];
     newEnemy.timeUntilSpawn = enemy[ "timeUntilSpawn" ];
     newEnemy.initPosition.x = enemy[ "initPosition" ][ "x" ];
     newEnemy.initPosition.y = enemy[ "initPosition" ][ "y" ];
     newEnemy.initPosition.z = enemy[ "initPosition" ][ "z" ];
-    
-    
   }
   
-  nlohmann::json scenary = j[ "scenary" ];
+  /*nlohmann::json scenary = j[ "scenary" ];
   for( nlohmann::json::iterator it1 = scenary.begin(); it1 != scenary.end(); ++it1 ) {
     nlohmann::json s = *it1;
     
@@ -71,6 +88,6 @@ struct PhysicsObjectParams {
     std::string meshType    = s[ "meshType" ];
     GLfloat timeUntilSpawn  = s[ "timeUntilSpawn" ];
     
-  }
+  }*/
   
 }
