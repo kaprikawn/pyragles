@@ -20,7 +20,7 @@
    ],
    "meshes" : [
       {
-         "meshType" : "ENEMY_POD",
+         "shapeType" : "ENEMY_POD",
          "mesh" : [
             {
                "colour" : [ 1, 0, 0 ],

@@ -5,6 +5,20 @@
 #include <string>
 #include "../deps/json.hpp"
 
+void JsonLoader::addVertex( glm::vec3 position, glm::vec3 colour, int shapeType ) {
+  
+  shapeVertices_[ shapeType ].push_back( position );
+  
+  Vertex vertex = { position, colour };
+  
+  vertices_[ shapeType ].push_back( vertex );
+  
+  vertexPositions_[ shapeType ].push_back( position );
+  
+  if( !loadMesh_[ shapeType ] )
+    loadMesh_[ shapeType ] = true;
+}
+
 void JsonLoader::loadLevel( int levelNumber ) {
   
   std::map <std::string, int> shapeTypesLookup;
@@ -27,7 +41,7 @@ void JsonLoader::loadLevel( int levelNumber ) {
   nlohmann::json meshes = j[ "meshes" ];
   for( nlohmann::json::iterator it1 = meshes.begin(); it1 != meshes.end(); ++it1 ) {
     nlohmann::json meshContainer = *it1;
-    std::string meshType = meshContainer[ "meshType" ];
+    int shapeType = shapeTypesLookup[ meshContainer[ "shapeType" ] ];
     
     nlohmann::json meshRoot = meshContainer[ "mesh" ];
     
@@ -41,24 +55,19 @@ void JsonLoader::loadLevel( int levelNumber ) {
       GLfloat g = meshObjColour[ 1 ];
       GLfloat b = meshObjColour[ 2 ];
       
+      glm::vec3 colour = { r, g, b };
+      
       for( nlohmann::json::iterator vertexRoot = meshObjVertices.begin(); vertexRoot != meshObjVertices.end(); ++vertexRoot ) {
         nlohmann::json vertex = *vertexRoot;
-        float myArray[ 3 ] = *vertexRoot;
         
-        std::cout << *vertexRoot << std::endl;
         GLfloat x = vertex[ 0 ];
         GLfloat y = vertex[ 1 ];
         GLfloat z = vertex[ 2 ];
+        
+        glm::vec3 position = { x, y, z };
+        
+        JsonLoader::addVertex( position, colour, shapeType );
       }
-      
-      
-      
-      //auto a = meshObj.find( "colour" );
-      
-      //float r = meshObj[ "colour" ][ 0 ];
-      //float colour[3] = meshObj[ "colour"];
-      //std::cout << meshObj["colour"]["r"] << std::endl;
-      
     }
   }
   
