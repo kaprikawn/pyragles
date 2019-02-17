@@ -14,7 +14,7 @@ sub get_mesh_data {
   my $lc_meshType = lc $meshType;
   my $input = `cat ${lc_meshType}.obj`;
   my @text  = split( /[\r\n]+/, $input );
-  my $data  = {};
+  my $data  = { meshType => $meshType };
   my @vertices;
   my @indices;
    
@@ -63,7 +63,7 @@ sub get_mesh_data {
 }
 
 sub get_colours {
-  my $text = `cat archColours.txt`;
+  my $text = `cat objColours.txt`;
   my @file = split( /[\r\n]/, $text );
   
   my $return_hashref = {};
@@ -101,7 +101,7 @@ sub process_file {
   
   my $json    = JSON -> new;
   my $hash    = $json -> decode( $baseJsonText );
-  my $meshes  = {};
+  my @processed_meshes;
   #print Dumper( $hash );
   
   foreach my $key( keys %{ $hash } ) {
@@ -110,12 +110,12 @@ sub process_file {
     foreach my $hashref( @{ $hash -> { $key } } ) {
       my $meshType = $hashref -> { meshType };
       next if( !$meshType );
-      next if( exists( $hash -> { meshes }{ $meshType } ) );
+      next if( grep $_ eq $meshType, @processed_meshes );
       
       my $new_mesh = &get_mesh_data( $hashref -> { meshType }, $colours_hashref );
+      push @{ $hash -> { meshes } }, $new_mesh;
       
-      $hash -> { meshes }{ $meshType } = $new_mesh;
-      
+      push @processed_meshes, $meshType;
       #print $hashref -> { meshType } . $br;
       #print Dumper( $new_mesh );
     }
@@ -126,6 +126,10 @@ sub process_file {
   #print Dumper( $hash ) . $br;
   my $pretty = JSON -> new -> pretty(1) -> canonical(1) -> encode( $hash );
   print $pretty;
+  
+  open FOUT, "> level${level}.json" || die $! . $br;
+  print FOUT JSON -> new -> pretty(1) -> canonical(1) -> encode( $hash );
+  close FOUT;
   
   return 0;
 }

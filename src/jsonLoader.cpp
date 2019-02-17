@@ -6,6 +6,10 @@
 #include "../deps/json.hpp"
 
 void JsonLoader::loadLevel( int levelNumber ) {
+  
+  std::map <std::string, int> shapeTypesLookup;
+  shapeTypesLookup[ "ARCH" ] = 5;
+  
   std::cout << "loading level " << levelNumber << std::endl;
   
   std::stringstream ss;
@@ -15,6 +19,17 @@ void JsonLoader::loadLevel( int levelNumber ) {
   std::ifstream fin( filename, std::ifstream::binary );
   nlohmann::json j;
   fin >> j;
+  
+  nlohmann::json meshes = j[ "meshes" ];
+  for( nlohmann::json::iterator it1 = meshes.begin(); it1 != meshes.end(); ++it1 ) {
+    nlohmann::json mesh = *it1;
+    std::string meshType = mesh[ "meshType" ];
+    
+    std::cout << "meshType is " << meshType << std::endl;
+    std::cout << "as an int is " << shapeTypesLookup[ meshType ] << std::endl;
+    std::cout << "try again " << shapeTypesLookup[ mesh[ "meshType" ] ] << std::endl;
+    
+  }
   
   nlohmann::json e = j[ "enemies" ];
   for( nlohmann::json::iterator it1 = e.begin(); it1 != e.end(); ++it1 ) {
@@ -46,4 +61,16 @@ struct PhysicsObjectParams {
     
     
   }
+  
+  nlohmann::json scenary = j[ "scenary" ];
+  for( nlohmann::json::iterator it1 = scenary.begin(); it1 != scenary.end(); ++it1 ) {
+    nlohmann::json s = *it1;
+    
+    std::string shapeType   = s[ "shapeType" ];
+    std::string objectType  = s[ "objectType" ];
+    std::string meshType    = s[ "meshType" ];
+    GLfloat timeUntilSpawn  = s[ "timeUntilSpawn" ];
+    
+  }
+  
 }
