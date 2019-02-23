@@ -12,7 +12,7 @@ endif ( CMAKE_COMPILER_IS_GNUCC )
 
 add_executable( exe
   inputHandler.cpp camera.cpp audio.cpp shader.cpp renderer.cpp mesh.cpp meshLoader.cpp movement.cpp
-  gameStateMachine.cpp jsonLoader.cpp playState.cpp
+  gameStateMachine.cpp playState.cpp
   collision.cpp
   physicsObject.cpp ship.cpp scenary.cpp target.cpp floor.cpp projectile.cpp enemy.cpp
   game.cpp main.cpp

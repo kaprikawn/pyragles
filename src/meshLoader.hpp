@@ -33,6 +33,7 @@ class MeshLoader {
     void generateMeshes();
     void setOffsets();
     void addVertex( glm::vec3 position, glm::vec3 colour, int shapeType );
+    void loadLevel( int levelNumber );
     
     GLsizeiptr totalVertexBufferSize();
     GLsizeiptr totalIndexBufferSize();
