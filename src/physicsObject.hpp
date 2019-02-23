@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
+#include <map>
 #include "shader.hpp"
 #include "mesh.hpp"
 #include "collisionData.hpp"

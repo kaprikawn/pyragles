@@ -1,5 +1,9 @@
 #include "meshLoader.hpp"
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include "../deps/json.hpp"
 
 void MeshLoader::addVertex( glm::vec3 position, glm::vec3 colour, int shapeType ) {
   
@@ -185,355 +189,6 @@ void MeshLoader::generateMeshes() {
   }
   indices.clear();
   
-  // enemy pod
-  currentShape  = ENEMY_POD;
-  
-  // object part 001
-  colour   = { 1, 0, 0 }; // red
-  position = { 0.00f, 1.00f, 1.00f };
-  addVertex( position, colour, currentShape );
-  position = { -0.87f, 1.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -0.87f, 1.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 0.00f, 1.00f, -1.00f };
-  addVertex( position, colour, currentShape );
-  position = { 0.87f, 1.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 0.87f, 1.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 0.50f, 0.00f, 0.87f };
-  addVertex( position, colour, currentShape );
-  position = { -1.00f, 0.00f, -0.00f };
-  addVertex( position, colour, currentShape );
-  position = { 0.50f, 0.00f, -0.87f };
-  addVertex( position, colour, currentShape );
-  position = { 0.00f, 1.40f, 0.00f };
-  addVertex( position, colour, currentShape );
-
-  // object part 002
-  colour   = { 1, 1, 1 }; // white
-  position = { 0.00f, 1.00f, 1.00f };
-  addVertex( position, colour, currentShape );
-  position = { -0.87f, 1.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -0.87f, 1.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 0.00f, 1.00f, -1.00f };
-  addVertex( position, colour, currentShape );
-  position = { 0.87f, 1.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 0.87f, 1.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -0.50f, 0.00f, 0.87f };
-  addVertex( position, colour, currentShape );
-  position = { -0.50f, 0.00f, -0.87f };
-  addVertex( position, colour, currentShape );
-  position = { 1.00f, 0.00f, 0.00f };
-  addVertex( position, colour, currentShape );
-  position = { 0.00f, 1.40f, 0.00f };
-  addVertex( position, colour, currentShape );
-
-  // object part 003
-  colour   = { 0, 0, 1 }; // blue
-  position = { 0.00f, 1.00f, 1.00f };
-  addVertex( position, colour, currentShape );
-  position = { -0.87f, 1.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -0.87f, 1.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 0.00f, 1.00f, -1.00f };
-  addVertex( position, colour, currentShape );
-  position = { 0.87f, 1.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 0.87f, 1.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 0.50f, 0.00f, 0.87f };
-  addVertex( position, colour, currentShape );
-  position = { -0.50f, 0.00f, 0.87f };
-  addVertex( position, colour, currentShape );
-  position = { -1.00f, 0.00f, -0.00f };
-  addVertex( position, colour, currentShape );
-  position = { -0.50f, 0.00f, -0.87f };
-  addVertex( position, colour, currentShape );
-  position = { 0.50f, 0.00f, -0.87f };
-  addVertex( position, colour, currentShape );
-  position = { 1.00f, 0.00f, 0.00f };
-  addVertex( position, colour, currentShape );
-  position = { 0.00f, 0.50f, 0.00f };
-  addVertex( position, colour, currentShape );
-
-  indices = {
-      2, 9, 3
-    , 2, 7, 1
-    , 6, 5, 0
-    , 8, 3, 4
-    , 9, 1, 0
-    , 4, 9, 5
-    , 17, 12, 13
-    , 16, 10, 11
-    , 15, 18, 14
-    , 15, 19, 10
-    , 11, 19, 12
-    , 13, 19, 14
-    , 26, 32, 25
-    , 26, 20, 32
-    , 31, 25, 32
-    , 24, 31, 32
-    , 24, 32, 30
-    , 30, 32, 23
-    , 23, 32, 29
-    , 29, 32, 22
-    , 28, 22, 32
-    , 21, 28, 32
-    , 21, 32, 27
-    , 27, 32, 20
-  };
-  indices_[ currentShape ] = indices;
-  
-  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
-    mesh_[ currentShape ].push_back(
-      std::array<glm::vec3, 3> {
-          vertexPositions_[ currentShape ][ indices[ i ] ]
-        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
-        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
-      }
-    );
-    
-    i++;
-    i++;
-  }
-  indices.clear();
-
-  
-  // arch
-  currentShape  = ARCH;
-  colour        = { 1, 0, 0 };
-  
-  // object part 001
-  position = { -3.00f, 3.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, 2.70f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, -0.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -3.00f, -0.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, 4.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -1.60f, 3.10f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, 4.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 1.60f, 3.10f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 3.00f, 3.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, 2.70f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 3.00f, -0.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, -0.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  
-  colour = { 0, 0, 1 };
-  // object part 003
-  position = { 4.00f, -0.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 4.00f, 3.30f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 4.00f, 3.30f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 4.00f, 0.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.70f, 4.70f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.70f, 4.70f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.70f, 4.70f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.70f, 4.70f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -4.00f, 3.30f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -4.00f, 3.30f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -4.00f, 0.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -4.00f, -0.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  
-  colour = { 0.741, 0.741, 0.741 };
-  // object part 005
-  position = { 2.00f, 2.70f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, -0.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, 0.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, 2.70f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 1.60f, 3.10f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 1.60f, 3.10f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -1.60f, 3.10f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -1.60f, 3.10f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, 2.70f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, 2.70f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, 0.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, -0.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  
-  colour = { 0, 1, 0 };
-  // object part 002
-  position = { -3.00f, 3.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -3.00f, -0.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, 4.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, 4.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 3.00f, 3.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 3.00f, -0.00f, 1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 4.00f, 3.30f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 4.00f, -0.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.70f, 4.70f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.70f, 4.70f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -4.00f, 3.30f, 0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -4.00f, -0.00f, 0.50f };
-  addVertex( position, colour, currentShape );
-  
-  colour = { 1, 1, 1 };
-  // object part 004
-  position = { -3.00f, 3.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, 2.70f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, 0.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -3.00f, 0.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.00f, 4.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -1.60f, 3.10f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, 4.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 1.60f, 3.10f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 3.00f, 3.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, 2.70f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 3.00f, 0.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.00f, 0.00f, -1.50f };
-  addVertex( position, colour, currentShape );
-  position = { -4.00f, 0.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -4.00f, 3.30f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { -2.70f, 4.70f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 2.70f, 4.70f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 4.00f, 3.30f, -0.50f };
-  addVertex( position, colour, currentShape );
-  position = { 4.00f, 0.00f, -0.50f };
-  addVertex( position, colour, currentShape );
-
-  indices = {
-      0, 2, 3
-    , 1, 4, 5
-    , 5, 6, 7
-    , 7, 8, 9
-    , 9, 10, 11
-    , 0, 1, 2
-    , 1, 0, 4
-    , 5, 4, 6
-    , 7, 6, 8
-    , 9, 8, 10
-    , 12, 14, 15
-    , 13, 17, 14
-    , 16, 19, 17
-    , 18, 21, 19
-    , 22, 20, 21
-    , 12, 13, 14
-    , 13, 16, 17
-    , 16, 18, 19
-    , 18, 20, 21
-    , 22, 23, 20
-    , 24, 26, 27
-    , 28, 27, 29
-    , 30, 29, 31
-    , 32, 31, 33
-    , 32, 34, 35
-    , 24, 25, 26
-    , 28, 24, 27
-    , 30, 28, 29
-    , 32, 30, 31
-    , 32, 33, 34
-    , 41, 42, 43
-    , 40, 44, 42
-    , 39, 45, 44
-    , 38, 46, 45
-    , 37, 46, 36
-    , 41, 40, 42
-    , 40, 39, 44
-    , 39, 38, 45
-    , 38, 36, 46
-    , 37, 47, 46
-    , 48, 50, 51
-    , 49, 52, 53
-    , 53, 54, 55
-    , 55, 56, 57
-    , 57, 58, 59
-    , 51, 61, 48
-    , 52, 61, 62
-    , 54, 62, 63
-    , 56, 63, 64
-    , 58, 64, 65
-    , 48, 49, 50
-    , 49, 48, 52
-    , 53, 52, 54
-    , 55, 54, 56
-    , 57, 56, 58
-    , 51, 60, 61
-    , 52, 48, 61
-    , 54, 52, 62
-    , 56, 54, 63
-    , 58, 56, 64
-  };
-  indices_[ currentShape ] = indices;
-  
-  for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
-    mesh_[ currentShape ].push_back(
-      std::array<glm::vec3, 3> {
-          vertexPositions_[ currentShape ][ indices[ i ] ]
-        , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
-        , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
-      }
-    );
-    
-    i++;
-    i++;
-  }
-  indices.clear();
-  
   // floor 1
   currentShape = FLOOR1;
   colour = { 0.87f, 0.733f, 0.129f };
@@ -600,7 +255,111 @@ void MeshLoader::generateMeshes() {
   }
   indices.clear();
   
+  MeshLoader::loadLevel( 11 );
+  
   setOffsets();
+}
+
+void MeshLoader::loadLevel( int levelNumber ) {
+  
+  std::map <std::string, int> shapeTypesLookup;
+  std::vector<GLuint> indices;
+  shapeTypesLookup[ "ENEMY_POD" ] = 4;
+  shapeTypesLookup[ "ARCH" ]      = 5;
+  
+  std::map <std::string, int> ObjectTypesLookup;
+  ObjectTypesLookup[ "ENEMY" ]    = 2;
+  
+  std::cout << "loading level " << levelNumber << std::endl;
+  
+  std::stringstream ss;
+  ss << "assets/level" << levelNumber << ".json";
+  std::string filename = ss.str();
+  
+  std::ifstream fin( filename, std::ifstream::binary );
+  nlohmann::json j;
+  fin >> j;
+  
+  nlohmann::json meshes = j[ "meshes" ];
+  for( nlohmann::json::iterator it1 = meshes.begin(); it1 != meshes.end(); ++it1 ) {
+    nlohmann::json meshContainer = *it1;
+    int shapeType     = shapeTypesLookup[ meshContainer[ "shapeType" ] ];
+    int currentShape  = shapeType;
+    
+    std::cout << "currentShape is " << currentShape << std::endl;
+    
+    nlohmann::json indicesRoot  = meshContainer[ "indices" ];
+    nlohmann::json meshRoot     = meshContainer[ "mesh" ];
+    
+    
+    for( nlohmann::json::iterator meshObj = meshRoot.begin(); meshObj != meshRoot.end(); ++meshObj ) {
+      
+      nlohmann::json mesh             = *meshObj;
+      nlohmann::json meshObjColour    = mesh[ "colour" ];
+      nlohmann::json meshObjVertices  = mesh[ "vertices" ];
+      
+      GLfloat r = meshObjColour[ 0 ];
+      GLfloat g = meshObjColour[ 1 ];
+      GLfloat b = meshObjColour[ 2 ];
+      
+      glm::vec3 colour = { r, g, b };
+      
+      for( nlohmann::json::iterator vertexRoot = meshObjVertices.begin(); vertexRoot != meshObjVertices.end(); ++vertexRoot ) {
+        nlohmann::json vertex = *vertexRoot;
+        
+        GLfloat x = vertex[ 0 ];
+        GLfloat y = vertex[ 1 ];
+        GLfloat z = vertex[ 2 ];
+        
+        glm::vec3 position = { x, y, z };
+        
+        MeshLoader::addVertex( position, colour, shapeType );
+      }
+      
+    }
+    
+    for( nlohmann::json::iterator indexRoot = indicesRoot.begin(); indexRoot != indicesRoot.end(); ++indexRoot ) {
+      nlohmann::json index = *indexRoot;
+      
+      indices.push_back( index );
+    }
+    
+    indices_[ currentShape ] = indices;
+
+    for( unsigned int i = 0; i < indices.size() - 2; i++ ) {
+      mesh_[ currentShape ].push_back(
+        std::array<glm::vec3, 3> {
+            vertexPositions_[ currentShape ][ indices[ i ] ]
+          , vertexPositions_[ currentShape ][ indices[ i + 1 ] ]
+          , vertexPositions_[ currentShape ][ indices[ i + 2 ] ]
+        }
+      );
+      
+      i++;
+      i++;
+    }
+    indices.clear();
+  }
+  
+  /*
+  nlohmann::json e = j[ "enemies" ];
+  for( nlohmann::json::iterator it1 = e.begin(); it1 != e.end(); ++it1 ) {
+    nlohmann::json enemy = *it1;
+    
+    PhysicsObjectParams newEnemy;
+    newEnemy.shapeType      = shapeTypesLookup[ enemy[ "shapeType" ] ];
+    newEnemy.objectType     = ObjectTypesLookup[ enemy[ "objectType" ] ];
+    newEnemy.canFire        = enemy[ "canFire" ];
+    newEnemy.damageShip     = enemy[ "damageShip" ];
+    newEnemy.damageEnemy    = enemy[ "damageEnemy" ];
+    newEnemy.velMultiplier  = enemy[ "velMultiplier" ];
+    newEnemy.timeUntilSpawn = enemy[ "timeUntilSpawn" ];
+    newEnemy.initPosition.x = enemy[ "initPosition" ][ "x" ];
+    newEnemy.initPosition.y = enemy[ "initPosition" ][ "y" ];
+    newEnemy.initPosition.z = enemy[ "initPosition" ][ "z" ];
+  }
+  */
+  
 }
 
 void MeshLoader::setOffsets() {
