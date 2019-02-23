@@ -153,6 +153,7 @@ void PlayState::update( GLfloat dt ) {
     params.shipPosition   = shipPosition_;
     params.damageEnemy    = true;
     params.velMultiplier  = 100.0f;
+    params.spawnerID      = 2;
     
     std::shared_ptr<Projectile> newProjectile = std::make_shared<Projectile>( params, target_ -> position(), false, liveObjects_[ 1 ] -> objectID() );
     PlayState::addPhysicsObject( newProjectile, true, false );

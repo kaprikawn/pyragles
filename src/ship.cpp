@@ -177,6 +177,9 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
 void Ship::registerCollision( CollisionData collisionData, CollisionProperties collisionProperties ) {
   if( lastCollisionID_ == collisionProperties.objectID )
     return;
+    
+  if( collisionProperties.damageToShip == 0 )
+    return;
   
   lastCollisionID_ = collisionProperties.objectID;
   
