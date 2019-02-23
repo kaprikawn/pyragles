@@ -65,6 +65,21 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   addPhysicsObject( ship_, true, false );
   params = {};
   
+  shapeType = ARCH;
+  params.shapeType      = shapeType;
+  params.objectType     = SCENARY;
+  params.initPosition   = { -3.0f, FLOOR_Y, START_Z - 60 };
+  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+  params.bufferData     = meshLoader_ -> bufferData( params.shapeType );
+  params.mesh           = mesh;
+  params.renderer       = renderer_;
+  params.inputHandler   = inputHandler;
+  params.shipPosition   = shipPosition_;
+  params.timeUntilSpawn = 12.0f;
+  
+  addPhysicsObject( std::make_shared<Scenary>( params ), false, true );
+  params = {};
+  
   shapeType           = ENEMY_POD;
   params.shapeType    = shapeType;
   params.objectType   = ENEMY;

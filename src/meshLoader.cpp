@@ -286,6 +286,8 @@ void MeshLoader::loadLevel( int levelNumber ) {
     int shapeType     = shapeTypesLookup[ meshContainer[ "shapeType" ] ];
     int currentShape  = shapeType;
     
+    std::cout << "currentShape is " << currentShape << std::endl;
+    
     nlohmann::json indicesRoot  = meshContainer[ "indices" ];
     nlohmann::json meshRoot     = meshContainer[ "mesh" ];
     
@@ -339,6 +341,7 @@ void MeshLoader::loadLevel( int levelNumber ) {
     indices.clear();
   }
   
+  /*
   nlohmann::json e = j[ "enemies" ];
   for( nlohmann::json::iterator it1 = e.begin(); it1 != e.end(); ++it1 ) {
     nlohmann::json enemy = *it1;
@@ -355,6 +358,7 @@ void MeshLoader::loadLevel( int levelNumber ) {
     newEnemy.initPosition.y = enemy[ "initPosition" ][ "y" ];
     newEnemy.initPosition.z = enemy[ "initPosition" ][ "z" ];
   }
+  */
   
 }
 
