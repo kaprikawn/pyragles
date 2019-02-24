@@ -188,7 +188,7 @@ void MeshLoader::generateMeshes( nlohmann::json levelJson ) {
     i++;
   }
   indices.clear();
-  
+  /*
   // floor 1
   currentShape = FLOOR1;
   colour = { 0.87f, 0.733f, 0.129f };
@@ -254,7 +254,7 @@ void MeshLoader::generateMeshes( nlohmann::json levelJson ) {
     i++;
   }
   indices.clear();
-  
+  */
   MeshLoader::loadLevel( levelJson );
   
   setOffsets();
@@ -266,9 +266,12 @@ void MeshLoader::loadLevel( nlohmann::json levelJson ) {
   std::vector<GLuint> indices;
   shapeTypesLookup[ "ENEMY_POD" ] = 4;
   shapeTypesLookup[ "ARCH" ]      = 5;
+  shapeTypesLookup[ "FLOOR1" ]    = 6;
+  shapeTypesLookup[ "FLOOR2" ]    = 7;
   
   std::map <std::string, int> ObjectTypesLookup;
   ObjectTypesLookup[ "ENEMY" ]    = 2;
+  ObjectTypesLookup[ "SCENARY" ]  = 3;
   
   nlohmann::json meshes = levelJson[ "meshes" ];
   for( nlohmann::json::iterator it1 = meshes.begin(); it1 != meshes.end(); ++it1 ) {

@@ -43,7 +43,10 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   shapeTypesLookup_[ "ENEMY_POD" ]  = 4;
   shapeTypesLookup_[ "ARCH" ]       = 5;
+  shapeTypesLookup_[ "FLOOR1" ]     = 6;
+  shapeTypesLookup_[ "FLOOR2" ]     = 7;
   objectTypesLookup_[ "ENEMY" ]     = 2;
+  objectTypesLookup_[ "SCENARY" ]   = 3;
   
   int shapeType = TARGET;
   PhysicsObjectParams params;
@@ -76,21 +79,6 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   addPhysicsObject( ship_, true, false );
   params = {};
   
-  shapeType = ARCH;
-  params.shapeType      = shapeType;
-  params.objectType     = SCENARY;
-  params.initPosition   = { -3.0f, FLOOR_Y, START_Z - 60 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-  params.bufferData     = meshLoader_ -> bufferData( params.shapeType );
-  params.mesh           = mesh;
-  params.renderer       = renderer_;
-  params.inputHandler   = inputHandler;
-  params.shipPosition   = shipPosition_;
-  params.timeUntilSpawn = 12.0f;
-  
-  addPhysicsObject( std::make_shared<Scenary>( params ), false, true );
-  params = {};
-  
   nlohmann::json levelObjects = levelJson_[ "levelObjects" ];
   for( nlohmann::json::iterator it1 = levelObjects.begin(); it1 != levelObjects.end(); ++it1 ) {
     nlohmann::json levelObject = *it1;
@@ -111,33 +99,17 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
     switch( objectType ) {
       case ENEMY : addPhysicsObject( std::make_shared<Enemy>( params ), true, false );
       break;
+      case SCENARY : 
+        switch ( shapeType ) {
+          case FLOOR1 : addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false ); break;
+          case FLOOR2 : addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false ); break;
+          default : addPhysicsObject( std::make_shared<Scenary>( params ), false, true ); break;
+        }
       default : break;
     }
     
     params = {};
   }
-  
-  shapeType = FLOOR1;
-  params.shapeType    = shapeType;
-  params.objectType   = SCENARY;
-  params.initPosition = { 0, FLOOR_Y, -10 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
-  params.mesh         = mesh;
-  params.renderer     = renderer_;
-  
-  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false );
-  params = {};
-  
-  shapeType = FLOOR2;
-  params.shapeType    = shapeType;
-  params.objectType   = SCENARY;
-  params.initPosition = { 0, FLOOR_Y - 0.02, -10 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
-  params.mesh         = mesh;
-  params.renderer     = renderer_;
-  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false );
   
   audio_ -> load( "assets/musicLevel01_organic_to_synthetic7.wav" );
   audio_ -> play();
