@@ -19,7 +19,7 @@ class Game {
     int             newState_ = -1;
     bool            running_  = false;
     int             transitionType_;
-  
+    
   public:
     
     Game( bool fullscreen );

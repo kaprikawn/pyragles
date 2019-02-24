@@ -3,7 +3,7 @@
 
 void GameStateMachine::pushState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
   gameStates_.push_back( std::move( state ) );
-  gameStates_.back() -> onEnter( inputHandler, camera );
+  gameStates_.back() -> onEnter( inputHandler, camera, nextLevel_ );
 }
 
 void GameStateMachine::popState() {
@@ -34,7 +34,11 @@ void GameStateMachine::changeState( std::unique_ptr<GameState> state, std::share
   
   gameStates_.push_back( std::move( state ) );
   
-  gameStates_.back() -> onEnter( inputHandler, camera );
+  gameStates_.back() -> onEnter( inputHandler, camera, nextLevel_ );
+  
+  if( gameStates_.back() -> getStateID() == "PLAY" ) {
+    nextLevel_ = gameStates_.back() -> nextLevel();
+  }
   
   std::cout << "finished changing state - stateID is now " << gameStates_.back() -> getStateID() << std::endl;
 }

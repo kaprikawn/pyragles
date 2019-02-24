@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "physicsObject.hpp"
+#include "../deps/json.hpp"
 
 class MeshLoader {
   
@@ -30,10 +31,10 @@ class MeshLoader {
     MeshLoader(){}
     ~MeshLoader(){}
     
-    void generateMeshes();
+    void generateMeshes( nlohmann::json levelJson );
     void setOffsets();
     void addVertex( glm::vec3 position, glm::vec3 colour, int shapeType );
-    void loadLevel( int levelNumber );
+    void loadLevel( nlohmann::json levelJson );
     
     GLsizeiptr totalVertexBufferSize();
     GLsizeiptr totalIndexBufferSize();

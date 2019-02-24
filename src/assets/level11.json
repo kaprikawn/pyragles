@@ -1,7 +1,38 @@
 {
    "levelDetails" : {
-      "level" : "1-1"
+      "level"     : 11,
+      "nextLevel" : 12
    },
+   "levelObjects" : [
+      {
+         "shapeType"       : "ENEMY_POD",
+         "objectType"      : "ENEMY",
+         "initPosition"    : [ 40, 5, -30 ],
+         "canFire"         : true,
+         "timeUntilSpawn"  : 0
+      },
+      {
+         "shapeType"       : "ARCH",
+         "objectType"      : "SCENARY",
+         "initPosition"    : [ -3, 0, -70 ],
+         "canFire"         : false,
+         "timeUntilSpawn"  : 12
+      },
+      {
+         "shapeType"       : "FLOOR1",
+         "objectType"      : "SCENARY",
+         "initPosition"    : [ 0, 0, -10 ],
+         "canFire"         : false,
+         "timeUntilSpawn"  : 0
+      },
+      {
+         "shapeType"       : "FLOOR2",
+         "objectType"      : "SCENARY",
+         "initPosition"    : [ 0, -0.02, -10 ],
+         "canFire"         : false,
+         "timeUntilSpawn"  : 0
+      }
+   ],
    "meshes" : [
       {
          "shapeType" : "ENEMY_POD",
@@ -238,6 +269,42 @@
             , 54, 52, 62
             , 56, 54, 63
             , 58, 56, 64
+         ]
+      },
+      {
+         "shapeType" : "FLOOR1",
+         "mesh" : [
+            {
+               "colour" : [ 0.87, 0.733, 0.129 ],
+               "vertices" : [
+                  [ -1.0,  0.0, -1.0 ],
+                  [ -1.0,  0.0,  1.0 ],
+                  [  1.0,  0.0,  1.0 ],
+                  [  1.0,  0.0, -1.0 ]
+               ]
+            }
+         ],
+         "indices" : [
+              0, 1, 2
+            , 3, 2, 0
+         ]
+      },
+      {
+         "shapeType" : "FLOOR2",
+         "mesh" : [
+            {
+               "colour" : [ 0.87, 0.623, 0.129 ],
+               "vertices" : [
+                  [ -100.0,  0.0, -100.0 ],
+                  [ -100.0,  0.0,  10.0 ],
+                  [  100.0,  0.0,  10.0 ],
+                  [  100.0,  0.0, -100.0 ]
+               ]
+            }
+         ],
+         "indices" : [
+              0, 1, 2
+            , 3, 2, 0
          ]
       }
    ]

@@ -1,5 +1,8 @@
 #include "playState.hpp"
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include "shader.hpp"
 #include "global.hpp"
 #include "projectile.hpp"
@@ -7,7 +10,7 @@
 
 const std::string PlayState::s_playID = "PLAY";
 
-bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
+bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera, int levelNumber ) {
   
   std::shared_ptr<Shader> shader = std::make_shared<Shader>();
   
@@ -17,9 +20,13 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   if( programID == 0 )
     return false;
+    
+  levelJson_ = PlayState::json( levelNumber );
+  
+  nextLevel_ = levelJson_[ "levelDetails" ][ "nextLevel" ];
   
   meshLoader_ = std::make_shared<MeshLoader>();
-  meshLoader_ -> generateMeshes();
+  meshLoader_ -> generateMeshes( levelJson_ );
   
   renderer_ = std::make_shared<Renderer>( programID, camera );
   renderer_   -> generateBuffer( meshLoader_ -> totalVertexBufferSize(), meshLoader_ -> totalIndexBufferSize() );
@@ -33,6 +40,13 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   shipPosition_           = std::make_shared<glm::vec3>();
   GLfloat shipStartZ      = START_Z - 7.0f;
   GLfloat targetDistance  = 15.0f;
+  
+  shapeTypesLookup_[ "ENEMY_POD" ]  = 4;
+  shapeTypesLookup_[ "ARCH" ]       = 5;
+  shapeTypesLookup_[ "FLOOR1" ]     = 6;
+  shapeTypesLookup_[ "FLOOR2" ]     = 7;
+  objectTypesLookup_[ "ENEMY" ]     = 2;
+  objectTypesLookup_[ "SCENARY" ]   = 3;
   
   int shapeType = TARGET;
   PhysicsObjectParams params;
@@ -65,55 +79,37 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   addPhysicsObject( ship_, true, false );
   params = {};
   
-  shapeType = ARCH;
-  params.shapeType      = shapeType;
-  params.objectType     = SCENARY;
-  params.initPosition   = { -3.0f, FLOOR_Y, START_Z - 60 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-  params.bufferData     = meshLoader_ -> bufferData( params.shapeType );
-  params.mesh           = mesh;
-  params.renderer       = renderer_;
-  params.inputHandler   = inputHandler;
-  params.shipPosition   = shipPosition_;
-  params.timeUntilSpawn = 12.0f;
-  
-  addPhysicsObject( std::make_shared<Scenary>( params ), false, true );
-  params = {};
-  
-  shapeType           = ENEMY_POD;
-  params.shapeType    = shapeType;
-  params.objectType   = ENEMY;
-  params.initPosition = { 40.0f, 5, START_Z - 20 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
-  params.mesh         = mesh;
-  params.renderer     = renderer_;
-  params.canFire      = true;
-  
-  addPhysicsObject( std::make_shared<Enemy>( params ), true, false );
-  params = {};
-  
-  shapeType = FLOOR1;
-  params.shapeType    = shapeType;
-  params.objectType   = SCENARY;
-  params.initPosition = { 0, FLOOR_Y, -10 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
-  params.mesh         = mesh;
-  params.renderer     = renderer_;
-  
-  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false );
-  params = {};
-  
-  shapeType = FLOOR2;
-  params.shapeType    = shapeType;
-  params.objectType   = SCENARY;
-  params.initPosition = { 0, FLOOR_Y - 0.02, -10 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
-  params.mesh         = mesh;
-  params.renderer     = renderer_;
-  addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false );
+  nlohmann::json levelObjects = levelJson_[ "levelObjects" ];
+  for( nlohmann::json::iterator it1 = levelObjects.begin(); it1 != levelObjects.end(); ++it1 ) {
+    nlohmann::json levelObject = *it1;
+    shapeType             = shapeTypesLookup_[ levelObject[ "shapeType" ] ];
+    int objectType        = objectTypesLookup_[ levelObject[ "objectType" ] ];
+    params.shapeType      = shapeType;
+    params.objectType     = objectType;
+    params.initPosition.x = levelObject[ "initPosition" ][ 0 ];
+    params.initPosition.y = levelObject[ "initPosition" ][ 1 ];
+    params.initPosition.z = levelObject[ "initPosition" ][ 2 ];
+    mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+    params.bufferData     = meshLoader_ -> bufferData( params.shapeType );
+    params.canFire        = levelObject[ "canFire" ];
+    params.timeUntilSpawn = levelObject[ "timeUntilSpawn" ];
+    params.mesh           = mesh;
+    params.renderer       = renderer_;
+    
+    switch( objectType ) {
+      case ENEMY : addPhysicsObject( std::make_shared<Enemy>( params ), true, false );
+      break;
+      case SCENARY : 
+        switch ( shapeType ) {
+          case FLOOR1 : addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false ); break;
+          case FLOOR2 : addPhysicsObject( std::make_shared<Floor>( params, params.shapeType ), true, false ); break;
+          default : addPhysicsObject( std::make_shared<Scenary>( params ), false, true ); break;
+        }
+      default : break;
+    }
+    
+    params = {};
+  }
   
   audio_ -> load( "assets/musicLevel01_organic_to_synthetic7.wav" );
   audio_ -> play();
@@ -240,4 +236,22 @@ void PlayState::addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, 
 bool PlayState::onExit() {
   
   return true;
+}
+
+nlohmann::json PlayState::json( int levelNumber ) {
+  std::stringstream ss;
+  ss << "assets/level" << levelNumber << ".json";
+  std::string filename = ss.str();
+  
+  std::ifstream fin( filename, std::ifstream::binary );
+  nlohmann::json json;
+  fin >> json;
+  
+  
+  
+  return json;
+}
+
+int PlayState::nextLevel() {
+  return nextLevel_;
 }

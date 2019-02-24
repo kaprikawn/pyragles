@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "../deps/json.hpp"
+
 
 void MeshLoader::addVertex( glm::vec3 position, glm::vec3 colour, int shapeType ) {
   
@@ -19,7 +19,7 @@ void MeshLoader::addVertex( glm::vec3 position, glm::vec3 colour, int shapeType 
     loadMesh_[ shapeType ] = true;
 }
 
-void MeshLoader::generateMeshes() {
+void MeshLoader::generateMeshes( nlohmann::json levelJson ) {
   
   glm::vec3 position;
   glm::vec3 colour;
@@ -188,7 +188,7 @@ void MeshLoader::generateMeshes() {
     i++;
   }
   indices.clear();
-  
+  /*
   // floor 1
   currentShape = FLOOR1;
   colour = { 0.87f, 0.733f, 0.129f };
@@ -254,39 +254,30 @@ void MeshLoader::generateMeshes() {
     i++;
   }
   indices.clear();
-  
-  MeshLoader::loadLevel( 11 );
+  */
+  MeshLoader::loadLevel( levelJson );
   
   setOffsets();
 }
 
-void MeshLoader::loadLevel( int levelNumber ) {
+void MeshLoader::loadLevel( nlohmann::json levelJson ) {
   
   std::map <std::string, int> shapeTypesLookup;
   std::vector<GLuint> indices;
   shapeTypesLookup[ "ENEMY_POD" ] = 4;
   shapeTypesLookup[ "ARCH" ]      = 5;
+  shapeTypesLookup[ "FLOOR1" ]    = 6;
+  shapeTypesLookup[ "FLOOR2" ]    = 7;
   
   std::map <std::string, int> ObjectTypesLookup;
   ObjectTypesLookup[ "ENEMY" ]    = 2;
+  ObjectTypesLookup[ "SCENARY" ]  = 3;
   
-  std::cout << "loading level " << levelNumber << std::endl;
-  
-  std::stringstream ss;
-  ss << "assets/level" << levelNumber << ".json";
-  std::string filename = ss.str();
-  
-  std::ifstream fin( filename, std::ifstream::binary );
-  nlohmann::json j;
-  fin >> j;
-  
-  nlohmann::json meshes = j[ "meshes" ];
+  nlohmann::json meshes = levelJson[ "meshes" ];
   for( nlohmann::json::iterator it1 = meshes.begin(); it1 != meshes.end(); ++it1 ) {
     nlohmann::json meshContainer = *it1;
     int shapeType     = shapeTypesLookup[ meshContainer[ "shapeType" ] ];
     int currentShape  = shapeType;
-    
-    std::cout << "currentShape is " << currentShape << std::endl;
     
     nlohmann::json indicesRoot  = meshContainer[ "indices" ];
     nlohmann::json meshRoot     = meshContainer[ "mesh" ];
