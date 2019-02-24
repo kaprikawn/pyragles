@@ -97,7 +97,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
     params.renderer       = renderer_;
     
     switch( objectType ) {
-      case ENEMY : addPhysicsObject( std::make_shared<Enemy>( params ), true, false );
+      case ENEMY : addPhysicsObject( std::make_shared<Enemy>( params ), false, true );
       break;
       case SCENARY : 
         switch ( shapeType ) {

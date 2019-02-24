@@ -12,6 +12,13 @@
          "timeUntilSpawn"  : 0
       },
       {
+         "shapeType"       : "ENEMY_POD",
+         "objectType"      : "ENEMY",
+         "initPosition"    : [ 40, 5, -30 ],
+         "canFire"         : true,
+         "timeUntilSpawn"  : 6
+      },
+      {
          "shapeType"       : "ARCH",
          "objectType"      : "SCENARY",
          "initPosition"    : [ -3, 0, -70 ],
