@@ -21,6 +21,9 @@ PhysicsObject::PhysicsObject( PhysicsObjectParams physicsObjectParams, bool prin
   rotationMatrix_ = glm::mat4( 1.0f );
   
   mesh_ -> updatePosition( glm::vec3( 0, 0, 0 ), 0.0f, true );
+  
+  shapeTypesLookup[ "ENEMY_POD" ] = 4;
+  shapeTypesLookup[ "ARCH" ]      = 5;
 }
 
 void PhysicsObject::update( GLfloat dt, bool skipMove ) {

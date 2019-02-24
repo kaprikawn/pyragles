@@ -41,6 +41,10 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   GLfloat shipStartZ      = START_Z - 7.0f;
   GLfloat targetDistance  = 15.0f;
   
+  shapeTypesLookup_[ "ENEMY_POD" ]  = 4;
+  shapeTypesLookup_[ "ARCH" ]       = 5;
+  objectTypesLookup_[ "ENEMY" ]     = 2;
+  
   int shapeType = TARGET;
   PhysicsObjectParams params;
   params.shapeType    = shapeType;
@@ -87,18 +91,31 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   addPhysicsObject( std::make_shared<Scenary>( params ), false, true );
   params = {};
   
-  shapeType           = ENEMY_POD;
-  params.shapeType    = shapeType;
-  params.objectType   = ENEMY;
-  params.initPosition = { 40.0f, 5, START_Z - 20 };
-  mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
-  params.bufferData   = meshLoader_ -> bufferData( params.shapeType );
-  params.mesh         = mesh;
-  params.renderer     = renderer_;
-  params.canFire      = true;
-  
-  addPhysicsObject( std::make_shared<Enemy>( params ), true, false );
-  params = {};
+  nlohmann::json levelObjects = levelJson_[ "levelObjects" ];
+  for( nlohmann::json::iterator it1 = levelObjects.begin(); it1 != levelObjects.end(); ++it1 ) {
+    nlohmann::json levelObject = *it1;
+    shapeType             = shapeTypesLookup_[ levelObject[ "shapeType" ] ];
+    int objectType        = objectTypesLookup_[ levelObject[ "objectType" ] ];
+    params.shapeType      = shapeType;
+    params.objectType     = objectType;
+    params.initPosition.x = levelObject[ "initPosition" ][ 0 ];
+    params.initPosition.y = levelObject[ "initPosition" ][ 1 ];
+    params.initPosition.z = levelObject[ "initPosition" ][ 2 ];
+    mesh = std::make_shared<Mesh>( params.initPosition, meshLoader_ -> vertices( params.shapeType ), meshLoader_ -> mesh( params.shapeType ) );
+    params.bufferData     = meshLoader_ -> bufferData( params.shapeType );
+    params.canFire        = levelObject[ "canFire" ];
+    params.timeUntilSpawn = levelObject[ "timeUntilSpawn" ];
+    params.mesh           = mesh;
+    params.renderer       = renderer_;
+    
+    switch( objectType ) {
+      case ENEMY : addPhysicsObject( std::make_shared<Enemy>( params ), true, false );
+      break;
+      default : break;
+    }
+    
+    params = {};
+  }
   
   shapeType = FLOOR1;
   params.shapeType    = shapeType;

@@ -36,7 +36,8 @@ class PlayState : public GameState {
     nlohmann::json              levelJson_;
     
     int                         nextLevel_;
-    
+    std::map <std::string, int> shapeTypesLookup_;
+    std::map <std::string, int> objectTypesLookup_;
     
   public:
     

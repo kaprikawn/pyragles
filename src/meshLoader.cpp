@@ -276,8 +276,6 @@ void MeshLoader::loadLevel( nlohmann::json levelJson ) {
     int shapeType     = shapeTypesLookup[ meshContainer[ "shapeType" ] ];
     int currentShape  = shapeType;
     
-    std::cout << "currentShape is " << currentShape << std::endl;
-    
     nlohmann::json indicesRoot  = meshContainer[ "indices" ];
     nlohmann::json meshRoot     = meshContainer[ "mesh" ];
     

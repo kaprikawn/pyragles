@@ -36,11 +36,8 @@ void GameStateMachine::changeState( std::unique_ptr<GameState> state, std::share
   
   gameStates_.back() -> onEnter( inputHandler, camera, nextLevel_ );
   
-  // change here
-  
   if( gameStates_.back() -> getStateID() == "PLAY" ) {
     nextLevel_ = gameStates_.back() -> nextLevel();
-    std::cout << "gamestate next level is " << nextLevel_ << std::endl;
   }
   
   std::cout << "finished changing state - stateID is now " << gameStates_.back() -> getStateID() << std::endl;

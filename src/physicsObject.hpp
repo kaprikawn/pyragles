@@ -86,6 +86,8 @@ class PhysicsObject {
     
     std::shared_ptr<Mesh>     mesh_;
     std::shared_ptr<Renderer> renderer_;
+    std::map <std::string, int> shapeTypesLookup;
+
     
   public:
     PhysicsObject( PhysicsObjectParams physicsObjectParams, bool print = false );
@@ -141,6 +143,10 @@ class PhysicsObject {
     void changeState( ObjectState state ) {
       objectState_    = state;
       newObjectState_ = state;
+    }
+    
+    int shapeTypeEnum( std::string shapeTypeString ) {
+      return shapeTypesLookup[ shapeTypeString ];
     }
 };
 
