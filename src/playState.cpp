@@ -1,5 +1,8 @@
 #include "playState.hpp"
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include "shader.hpp"
 #include "global.hpp"
 #include "projectile.hpp"
@@ -7,7 +10,7 @@
 
 const std::string PlayState::s_playID = "PLAY";
 
-bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
+bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera, int levelNumber ) {
   
   std::shared_ptr<Shader> shader = std::make_shared<Shader>();
   
@@ -17,9 +20,13 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   if( programID == 0 )
     return false;
+    
+  levelJson_ = PlayState::json( levelNumber );
+  
+  nextLevel_ = levelJson_[ "levelDetails" ][ "nextLevel" ];
   
   meshLoader_ = std::make_shared<MeshLoader>();
-  meshLoader_ -> generateMeshes();
+  meshLoader_ -> generateMeshes( levelJson_ );
   
   renderer_ = std::make_shared<Renderer>( programID, camera );
   renderer_   -> generateBuffer( meshLoader_ -> totalVertexBufferSize(), meshLoader_ -> totalIndexBufferSize() );
@@ -240,4 +247,22 @@ void PlayState::addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, 
 bool PlayState::onExit() {
   
   return true;
+}
+
+nlohmann::json PlayState::json( int levelNumber ) {
+  std::stringstream ss;
+  ss << "assets/level" << levelNumber << ".json";
+  std::string filename = ss.str();
+  
+  std::ifstream fin( filename, std::ifstream::binary );
+  nlohmann::json json;
+  fin >> json;
+  
+  
+  
+  return json;
+}
+
+int PlayState::nextLevel() {
+  return nextLevel_;
 }

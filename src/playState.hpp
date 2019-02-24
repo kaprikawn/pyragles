@@ -11,6 +11,7 @@
 #include "floor.hpp"
 #include "collision.hpp"
 #include "audio.hpp"
+#include "../deps/json.hpp"
 
 class PlayState : public GameState {
   private:
@@ -32,17 +33,24 @@ class PlayState : public GameState {
     
     unsigned int                nextObjectID_ = 1;
     
+    nlohmann::json              levelJson_;
+    
+    int                         nextLevel_;
+    
     
   public:
     
-    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera );
+    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera, int levelNumber );
     virtual void update( GLfloat dt );
     virtual void render();
     virtual bool onExit();
+    virtual int  nextLevel();
     
     void addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, bool init, bool isLoading );
     
     virtual std::string getStateID() const { return s_playID; }
+    
+    nlohmann::json json( int levelNumber );
 
 };
 

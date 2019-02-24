@@ -19,11 +19,14 @@ class GameState {
   public:
     virtual ~GameState() {}
     
-    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) = 0;
+    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera, int levelNumber ) = 0;
     virtual void update ( GLfloat dt ) = 0;
     virtual void render () = 0;
     virtual bool onExit () = 0;
     virtual std::string getStateID() const = 0;
+    
+    virtual int nextLevel() = 0;
+    
 };
 
 #endif //GAMESTATE_HPP

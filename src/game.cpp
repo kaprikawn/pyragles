@@ -86,8 +86,8 @@ void Game::run() {
   
   do {
     
-    previousTime = currentTime;
-    currentTime = SDL_GetTicks();
+    previousTime  = currentTime;
+    currentTime   = SDL_GetTicks();
     dt = ( currentTime - previousTime ) / 1000.0f;
     if( dt > 0.15f )
       dt = 0.15f;

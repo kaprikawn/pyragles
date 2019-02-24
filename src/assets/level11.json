@@ -1,6 +1,7 @@
 {
    "levelDetails" : {
-      "level" : "1-1"
+      "level" : 11,
+      "nextLevel" : 12
    },
    "meshes" : [
       {
