@@ -7,10 +7,13 @@
 #include "global.hpp"
 #include "projectile.hpp"
 #include "enemy.hpp"
+#include "gltf.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
 bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera, int levelNumber ) {
+  
+  Gltf gltf( "arch.glb" );
   
   std::shared_ptr<Shader> shader = std::make_shared<Shader>();
   
