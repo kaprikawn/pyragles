@@ -7,6 +7,9 @@
 	"settings": {
 		"editor.tabSize": 2,
 		"editor.wordWrap": "on",
-		"editor.wordWrapColumn": 120
+		"editor.wordWrapColumn": 120,
+		"files.associations": {
+			"iostream": "cpp"
+		}
 	}
 }

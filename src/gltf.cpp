@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include "../deps/json.hpp"
+#include <GLES2/gl2.h>
+#include <glm/glm.hpp>
 
 Gltf::Gltf( const std::string& filename ) {
   
@@ -39,5 +41,26 @@ Gltf::Gltf( const std::string& filename ) {
   fs.read( ( char* )&chunkType, 4 );
   
   std::cout << "json is\n" << j << std::endl;
+  
+  // bin
+  fs.read( ( char* )&chunkLength, 4 );
+  fs.read( ( char* )&chunkType, 4 );
+  
+  std::cout << std::endl;
+  std::cout << std::endl;
+  std::cout << "chunkLength is " << chunkLength << std::endl;
+  std::cout << "chunkType is " << chunkType << std::endl;
+  
+  // bin content
+  GLfloat myFloat;
+  //fs.read( ( char* )&myFloat, 4 );
+  //std::cout << "myFloat is " << myFloat << std::endl;
+  
+  //glm::vec3 myVec = { 1, 2, 3 };
+  glm::vec3 myVec;
+  fs.read( ( char* )&myVec, 12 );
+  std::cout << "x is " << myVec.x << std::endl;
+  std::cout << "y is " << myVec.y << std::endl;
+  std::cout << "z is " << myVec.z << std::endl;
   
 }
