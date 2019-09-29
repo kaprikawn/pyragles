@@ -1,66 +1,114 @@
 #include "gltf.hpp"
 #include <iostream>
-#include <fstream>
-#include "../deps/json.hpp"
 #include <GLES2/gl2.h>
 #include <glm/glm.hpp>
+#include <map>
+#include <vector>
 
 Gltf::Gltf( const std::string& filename ) {
   
   std::string filepath = "./assets/" + filename;
   
-  std::ifstream fs( filepath, std::ifstream::binary );
+  fs_.open( filepath, std::ifstream::binary );
   
-  uint32_t magic;
-  uint32_t version;
-  uint32_t length;
+  fs_.read( ( char* )&magic_, 4 );
+  fs_.read( ( char* )&version_, 4 );
+  fs_.read( ( char* )&length_, 4 );
   
-  // header
-  fs.read( ( char* )&magic, 4 );
-  fs.read( ( char* )&version, 4 );
-  fs.read( ( char* )&length, 4 );
+  fs_.read( ( char* )&jsonChunkLength_, 4 );
+  fs_.read( ( char* )&jsonChunkType_  , 4 );
   
-  // json
-  uint32_t chunkLength;
-  uint32_t chunkType;
-  fs.read( ( char* )&chunkLength, 4 );
-  fs.read( ( char* )&chunkType, 4 );
+  binStartByte_ = jsonChunkDataStartByte_ = jsonChunkLength_; // start of binary buffer
   
-  char jsonBuffer[ chunkLength ];
+  char jsonBuffer[ jsonChunkLength_ ];
   std::string j;
-  fs.read( ( char* )&jsonBuffer, chunkLength );
+  fs_.read( ( char* )&jsonBuffer, jsonChunkLength_ );
   
-  for( unsigned int i = 0; i < chunkLength; i++ ) {
+  for( unsigned int i = 0; i < jsonChunkLength_; i++ ) {
     j += jsonBuffer[ i ];
   }
   
-  nlohmann::json json = nlohmann::json::parse( j );
+  json_ = nlohmann::json::parse( j );
   
   // binary data
-  fs.read( ( char* )&chunkLength, 4 );
-  fs.read( ( char* )&chunkType, 4 );
+  fs_.read( ( char* )&binChunkLength_ , 4 );
+  fs_.read( ( char* )&binChunkType_   , 4 );
   
-  std::cout << "json is\n" << j << std::endl;
+  //std::cout << "json is\n" << j << std::endl;
+
+  binChunkDataStartByte_ = binStartByte_ + 4 + 4; // start of the actual binary data
   
-  // bin
-  fs.read( ( char* )&chunkLength, 4 );
-  fs.read( ( char* )&chunkType, 4 );
+  Gltf::dataDumpBinary();
+}
+
+std::vector<GLfloat> Gltf::floats( uint32_t byteOffset, uint32_t byteLength ) {
   
-  std::cout << std::endl;
-  std::cout << std::endl;
-  std::cout << "chunkLength is " << chunkLength << std::endl;
-  std::cout << "chunkType is " << chunkType << std::endl;
+  std::vector<GLfloat> myFloats;
   
-  // bin content
-  GLfloat myFloat;
-  //fs.read( ( char* )&myFloat, 4 );
-  //std::cout << "myFloat is " << myFloat << std::endl;
+  uint32_t bytesLeft = byteLength;
   
-  //glm::vec3 myVec = { 1, 2, 3 };
-  glm::vec3 myVec;
-  fs.read( ( char* )&myVec, 12 );
-  std::cout << "x is " << myVec.x << std::endl;
-  std::cout << "y is " << myVec.y << std::endl;
-  std::cout << "z is " << myVec.z << std::endl;
+  uint32_t startPosition = binStartByte_ + byteOffset;
+  fs_.seekg( startPosition );
   
+  do {
+    GLfloat myFloat;
+    fs_.read( ( char* )&myFloat , 4 );
+    
+    myFloats.push_back( myFloat );
+    
+    bytesLeft -= 4;
+  } while( bytesLeft > 0 );
+  
+  return myFloats;
+}
+
+void Gltf::dataDumpBinary() {
+  
+  std::vector<std::map<std::string, uint>> bufferViews;
+  
+  nlohmann::json jsonBufferViews = json_[ "bufferViews" ];
+  for( nlohmann::json::iterator it1 = jsonBufferViews.begin(); it1 != jsonBufferViews.end(); ++it1 ) {
+    nlohmann::json jsonBufferView = *it1;
+    
+    std::map<std::string, uint> newBufferView;
+    newBufferView[ "buffer" ]     = jsonBufferView[ "buffer" ];
+    newBufferView[ "byteLength" ] = jsonBufferView[ "byteLength" ];
+    newBufferView[ "byteOffset" ] = jsonBufferView[ "byteOffset" ];
+    
+    bufferViews.push_back( newBufferView );
+  }
+  
+  std::map<uint, std::string> componentTypeLookup;
+  
+  componentTypeLookup[ 5120 ] = "BYTE";
+  componentTypeLookup[ 5121 ] = "UNSIGNED_BYTE";
+  componentTypeLookup[ 5122 ] = "SHORT";
+  componentTypeLookup[ 5123 ] = "UNSIGNED_SHORT";
+  componentTypeLookup[ 5125 ] = "UNSIGNED_INT";
+  componentTypeLookup[ 5126 ] = "FLOAT";
+  
+  nlohmann::json accessors = json_[ "accessors" ];
+  
+  for( nlohmann::json::iterator it1 = accessors.begin(); it1 != accessors.end(); ++it1 ) {
+    nlohmann::json accessor = *it1;
+    
+    uint bufferView     = accessor[ "bufferView" ];
+    uint componentType  = accessor[ "componentType" ];
+    std::string type    = accessor[ "type" ];
+    uint count          = accessor[ "count" ];
+    
+    uint byteOffset     = bufferViews[ bufferView ][ "byteOffset" ];
+    uint byteLength     = bufferViews[ bufferView ][ "byteLength" ];
+    
+    std::cout << "type is " << componentTypeLookup[ componentType ] << " for " << type << std::endl;
+    //std::cout << "byteOffset is " << bufferViews[ bufferView ][ "byteOffset" ] << std::endl;
+    
+    if( componentTypeLookup[ componentType ] == "FLOAT" ) {
+      std::vector<GLfloat> myFloats = Gltf::floats( byteOffset, byteLength );
+      for( uint32_t i = 0; i < myFloats.size(); i++ ) {
+        std::cout << "float is " << myFloats[ i ] << std::endl;
+      }
+    }
+  }
+
 }
