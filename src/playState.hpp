@@ -12,6 +12,7 @@
 #include "collision.hpp"
 #include "audio.hpp"
 #include "../deps/json.hpp"
+#include "gltf.hpp"
 
 class PlayState : public GameState {
   private:
@@ -20,6 +21,8 @@ class PlayState : public GameState {
     std::shared_ptr<Renderer>   renderer_;
     std::shared_ptr<MeshLoader> meshLoader_;
     std::shared_ptr<Camera>     camera_;
+    
+    std::vector<std::vector<GltfNode>> gltfObjects_;
     
     glm::mat4                   viewProjectionMatrix_;
     
@@ -48,6 +51,7 @@ class PlayState : public GameState {
     virtual int  nextLevel();
     
     void addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, bool init, bool isLoading );
+    void loadMeshes();
     
     virtual std::string getStateID() const { return s_playID; }
     

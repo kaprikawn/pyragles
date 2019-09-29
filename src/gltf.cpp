@@ -1,5 +1,6 @@
 #include "gltf.hpp"
 #include <iostream>
+#include <regex>
 
 Gltf::Gltf( const std::string& filename ) {
   
@@ -30,7 +31,7 @@ Gltf::Gltf( const std::string& filename ) {
   fs_.read( ( char* )&binChunkLength_ , 4 );
   fs_.read( ( char* )&binChunkType_   , 4 );
   
-  //std::cout << "json is\n" << j << std::endl;
+  // std::cout << "json is\n" << j << std::endl;
 
   binChunkDataStartByte_ = binStartByte_ + 4 + 4; // start of the actual binary data
   
@@ -73,7 +74,7 @@ std::vector<glm::vec3> Gltf::positions( int positionIndex ) {
     
     myVecs.push_back( myVec );
     
-    count -= 3;
+    count--;
     
   } while( count > 0 );
   
@@ -111,6 +112,47 @@ std::vector<GLuint> Gltf::indices( int indicesIndex ) {
 
 }
 
+glm::vec3 colour( std::string nodeName ) {
+  
+  // regex is c++ is rubbish
+  
+  glm::vec3 colour = { 1, 0, 0 }; // default red
+  
+  std::regex regexRed( "r([0-9]*[.])?[0-9]+" );
+  std::smatch matches;
+  std::regex_search( nodeName, matches, regexRed );
+  
+  if( matches.empty() )
+    return colour;
+  
+  std::string::size_type sz;     // alias of size_t
+  std::regex char_replace( "[a-z]" );
+  
+  std::string red = std::regex_replace( matches.str( 0 ), char_replace, "" );
+  //std::cout << "red is " << red << std::endl;
+  float r = std::stof( red, &sz );
+  
+  std::regex regexGreen( "g([0-9]*[.])?[0-9]+" );
+  std::regex_search( nodeName, matches, regexGreen );
+  if( matches.empty() )
+    return colour;
+  std::string green = std::regex_replace( matches.str( 0 ), char_replace, "" );
+  float g = std::stof( green, &sz );
+  
+  std::regex regexBlue( "b([0-9]*[.])?[0-9]+" );
+  std::regex_search( nodeName, matches, regexBlue );
+  if( matches.empty() )
+    return colour;
+  std::string blue = std::regex_replace( matches.str( 0 ), char_replace, "" );
+  float b = std::stof( blue, &sz );
+  
+  colour.r = r;
+  colour.g = g;
+  colour.b = b;
+  
+  return colour;
+}
+
 GltfNode Gltf::gltfNode( int mesh, std::string name ) {
   GltfNode gltfNode;
   
@@ -124,9 +166,7 @@ GltfNode Gltf::gltfNode( int mesh, std::string name ) {
   gltfNode.positions  = Gltf::positions( gltfNode.positionIndex );
   gltfNode.indices    = Gltf::indices( gltfNode.indicesIndex );
   
-  gltfNode.colour = { 1, 0, 0 }; // hardcoding red for the time being
-  
-  //std::cout << "indicesIndex is " << gltfNode.indicesIndex << std::endl;
+  gltfNode.colour = colour( name );
   
   return gltfNode;
 }

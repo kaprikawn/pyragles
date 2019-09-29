@@ -61,6 +61,8 @@ class Gltf {
     void dataDumpBinary();
     std::vector<GLfloat> floats( uint32_t byteOffset, uint32_t byteLength );
     std::vector<GLushort> ushorts( uint32_t byteOffset, uint32_t byteLength );
+    
+    std::vector<GltfNode> gltfNodes() { return gltfNodes_; }
 };
 
 #endif //GLTF_HPP
