@@ -1,9 +1,5 @@
 #include "gltf.hpp"
 #include <iostream>
-#include <GLES2/gl2.h>
-#include <glm/glm.hpp>
-#include <map>
-#include <vector>
 
 Gltf::Gltf( const std::string& filename ) {
   
@@ -34,11 +30,105 @@ Gltf::Gltf( const std::string& filename ) {
   fs_.read( ( char* )&binChunkLength_ , 4 );
   fs_.read( ( char* )&binChunkType_   , 4 );
   
-  std::cout << "json is\n" << j << std::endl;
+  //std::cout << "json is\n" << j << std::endl;
 
   binChunkDataStartByte_ = binStartByte_ + 4 + 4; // start of the actual binary data
   
-  Gltf::dataDumpBinary();
+  nlohmann::json nodes = json_[ "nodes" ];
+  for( nlohmann::json::iterator it1 = nodes.begin(); it1 != nodes.end(); ++it1 ) {
+    nlohmann::json node = *it1;
+    
+    if( node.contains( "mesh" ) && node.contains( "name" ) ) {
+      int mesh          = node[ "mesh" ];
+      std::string name  = node[ "name" ];
+      
+      gltfNodes_.push_back( gltfNode( mesh, name ) );
+    }
+  }
+}
+
+std::vector<glm::vec3> Gltf::positions( int positionIndex ) {
+  
+  std::vector<glm::vec3> myVecs;
+  
+  nlohmann::json accessor = json_[ "accessors" ][ positionIndex ];
+  int bufferViewIndex     = accessor[ "bufferView" ];
+  int count               = accessor[ "count" ];
+  
+  nlohmann::json bufferView = json_[ "bufferViews" ][ bufferViewIndex ];
+  
+  int byteOffset  = bufferView[ "byteOffset" ];
+  //int byteLength  = bufferView[ "byteLength" ];
+  //int buffer      = bufferView[ "buffer" ];
+  
+  uint32_t startPosition = binChunkDataStartByte_ + byteOffset;
+  fs_.seekg( startPosition );
+  
+  do {
+    glm::vec3 myVec = { 0.0f, 0.0f, 0.0f };
+    
+    fs_.read( ( char* )&myVec.x , 4 );
+    fs_.read( ( char* )&myVec.y , 4 );
+    fs_.read( ( char* )&myVec.z , 4 );
+    
+    myVecs.push_back( myVec );
+    
+    count -= 3;
+    
+  } while( count > 0 );
+  
+  return myVecs;
+}
+
+std::vector<GLuint> Gltf::indices( int indicesIndex ) {
+  
+  std::vector<GLuint> myVec;
+  
+  nlohmann::json accessor = json_[ "accessors" ][ indicesIndex ];
+  int bufferViewIndex     = accessor[ "bufferView" ];
+  int count               = accessor[ "count" ];
+  
+  nlohmann::json bufferView = json_[ "bufferViews" ][ bufferViewIndex ];
+  
+  int byteOffset  = bufferView[ "byteOffset" ];
+  //int byteLength  = bufferView[ "byteLength" ];
+  //int buffer      = bufferView[ "buffer" ];
+  
+  uint32_t startPosition = binChunkDataStartByte_ + byteOffset;
+  fs_.seekg( startPosition );
+  
+  do {
+    GLuint myIndex;
+    fs_.read( ( char* )&myIndex, 2 );
+    
+    myVec.push_back( myIndex );
+    
+    count --;
+    
+  } while( count > 0 );
+  
+  return myVec;
+
+}
+
+GltfNode Gltf::gltfNode( int mesh, std::string name ) {
+  GltfNode gltfNode;
+  
+  gltfNode.mesh = mesh;
+  gltfNode.name = name;
+  gltfNode.positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
+  gltfNode.normalIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "NORMAL" ];
+  gltfNode.texcoord_0Index = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "TEXCOORD_0" ];
+  gltfNode.indicesIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
+  
+  gltfNode.positions  = Gltf::positions( gltfNode.positionIndex );
+  gltfNode.indices    = Gltf::indices( gltfNode.indicesIndex );
+  
+  gltfNode.colour = { 1, 0, 0 }; // hardcoding red for the time being
+  
+  //std::cout << "indicesIndex is " << gltfNode.indicesIndex << std::endl;
+  
+  return gltfNode;
 }
 
 std::vector<GLfloat> Gltf::floats( uint32_t byteOffset, uint32_t byteLength ) {
@@ -116,7 +206,7 @@ void Gltf::dataDumpBinary() {
     uint bufferView     = accessor[ "bufferView" ];
     uint componentType  = accessor[ "componentType" ];
     std::string type    = accessor[ "type" ];
-    uint count          = accessor[ "count" ];
+    //uint count          = accessor[ "count" ];
     
     uint byteOffset     = bufferViews[ bufferView ][ "byteOffset" ];
     uint byteLength     = bufferViews[ bufferView ][ "byteLength" ];

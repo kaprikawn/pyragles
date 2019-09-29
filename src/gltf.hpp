@@ -3,8 +3,24 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 #include <GLES2/gl2.h>
+#include <glm/glm.hpp>
 #include "../deps/json.hpp"
+
+struct GltfNode {
+  std::string             name;
+  int                     mesh;
+  int                     positionIndex;
+  int                     normalIndex;
+  int                     texcoord_0Index;
+  int                     indicesIndex;
+  std::vector<glm::vec3>  positions;
+  std::vector<glm::vec3>  normals;
+  std::vector<glm::vec2>  texcoord_0s;
+  std::vector<GLuint>     indices;
+  glm::vec3               colour;
+};
 
 class Gltf {
   private:
@@ -31,10 +47,16 @@ class Gltf {
     std::ifstream   fs_;
     nlohmann::json  json_;
     
+    std::vector<GltfNode> gltfNodes_;
+    
   public:
     
     Gltf( const std::string& filename );
     ~Gltf(){}
+    
+    GltfNode                gltfNode( int mesh, std::string name );
+    std::vector<glm::vec3>  positions( int positionIndex );
+    std::vector<GLuint>     indices( int indicesIndex );
     
     void dataDumpBinary();
     std::vector<GLfloat> floats( uint32_t byteOffset, uint32_t byteLength );
