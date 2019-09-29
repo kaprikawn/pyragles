@@ -18,7 +18,7 @@ Gltf::Gltf( const std::string& filename ) {
   fs_.read( ( char* )&jsonChunkLength_, 4 );
   fs_.read( ( char* )&jsonChunkType_  , 4 );
   
-  binStartByte_ = jsonChunkDataStartByte_ = jsonChunkLength_; // start of binary buffer
+  binStartByte_ = jsonChunkDataStartByte_ + jsonChunkLength_; // start of binary buffer
   
   char jsonBuffer[ jsonChunkLength_ ];
   std::string j;
@@ -34,7 +34,7 @@ Gltf::Gltf( const std::string& filename ) {
   fs_.read( ( char* )&binChunkLength_ , 4 );
   fs_.read( ( char* )&binChunkType_   , 4 );
   
-  //std::cout << "json is\n" << j << std::endl;
+  std::cout << "json is\n" << j << std::endl;
 
   binChunkDataStartByte_ = binStartByte_ + 4 + 4; // start of the actual binary data
   
@@ -47,7 +47,7 @@ std::vector<GLfloat> Gltf::floats( uint32_t byteOffset, uint32_t byteLength ) {
   
   uint32_t bytesLeft = byteLength;
   
-  uint32_t startPosition = binStartByte_ + byteOffset;
+  uint32_t startPosition = binChunkDataStartByte_ + byteOffset;
   fs_.seekg( startPosition );
   
   do {
@@ -60,6 +60,27 @@ std::vector<GLfloat> Gltf::floats( uint32_t byteOffset, uint32_t byteLength ) {
   } while( bytesLeft > 0 );
   
   return myFloats;
+}
+
+std::vector<GLushort> Gltf::ushorts( uint32_t byteOffset, uint32_t byteLength ) {
+  
+  std::vector<GLushort> myUshorts;
+  
+  uint32_t bytesLeft = byteLength;
+  
+  uint32_t startPosition = binChunkDataStartByte_ + byteOffset;
+  fs_.seekg( startPosition );
+  
+  do {
+    GLushort myUshort;
+    fs_.read( ( char* )&myUshort , 2 );
+    
+    myUshorts.push_back( myUshort );
+    
+    bytesLeft -= 2;
+  } while( bytesLeft > 0 );
+  
+  return myUshorts;
 }
 
 void Gltf::dataDumpBinary() {
@@ -100,14 +121,24 @@ void Gltf::dataDumpBinary() {
     uint byteOffset     = bufferViews[ bufferView ][ "byteOffset" ];
     uint byteLength     = bufferViews[ bufferView ][ "byteLength" ];
     
-    std::cout << "type is " << componentTypeLookup[ componentType ] << " for " << type << std::endl;
+    //std::cout << "type is " << componentTypeLookup[ componentType ] << " for " << type << std::endl;
     //std::cout << "byteOffset is " << bufferViews[ bufferView ][ "byteOffset" ] << std::endl;
     
     if( componentTypeLookup[ componentType ] == "FLOAT" ) {
+      std::cout << "######## FLOATS " << type << "##########\n";
       std::vector<GLfloat> myFloats = Gltf::floats( byteOffset, byteLength );
       for( uint32_t i = 0; i < myFloats.size(); i++ ) {
         std::cout << "float is " << myFloats[ i ] << std::endl;
       }
+    } else if( componentTypeLookup[ componentType ] == "UNSIGNED_SHORT" ) {
+      std::cout << "######## SHORTS " << type << "##########\n";
+      std::vector<GLushort> myUshorts = Gltf::ushorts( byteOffset, byteLength );
+      for( uint32_t i = 0; i < myUshorts.size(); i++ ) {
+        std::cout << "ushort is " << myUshorts[ i ] << std::endl;
+      }
+
+    } else {
+      std::cout << "type is " << componentTypeLookup[ componentType ] << " for " << type << std::endl;
     }
   }
 
