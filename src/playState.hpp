@@ -48,6 +48,7 @@ class PlayState : public GameState {
     virtual int  nextLevel();
     
     void addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, bool init, bool isLoading );
+    void loadMeshes();
     
     virtual std::string getStateID() const { return s_playID; }
     

@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-
+#include "gltf.hpp"
 
 void MeshLoader::addVertex( glm::vec3 position, glm::vec3 colour, int shapeType ) {
   
@@ -188,6 +188,24 @@ void MeshLoader::generateMeshes( nlohmann::json levelJson ) {
     i++;
   }
   indices.clear();
+  
+  currentShape  = ARCH;
+  Gltf gltfArch( "arch.glb" );
+  std::vector<GltfNode> gltfNodes = gltfArch.gltfNodes();
+  for( uint32_t i = 0; i < gltfNodes.size(); i++ ) {
+    glm::vec3 thisColour = gltfNodes[ i ].colour;
+    std::string thisName = gltfNodes[ i ].name;
+    for( uint32_t j = 0; j < gltfNodes[ i ].positions.size(); j++ ) {
+      glm::vec3 thisPosition = gltfNodes[ i ].positions[ j ];
+      addVertex( thisPosition, thisColour, currentShape );
+    }
+    for( uint32_t k = 0; k < gltfNodes[ i ].indices.size(); k++ ) {
+      GLuint thisIndex = gltfNodes[ i ].indices[ k ];
+      indices.push_back( thisIndex );
+    }
+  }
+  indices_[ currentShape ] = indices;
+  
   /*
   // floor 1
   currentShape = FLOOR1;
@@ -255,6 +273,7 @@ void MeshLoader::generateMeshes( nlohmann::json levelJson ) {
   }
   indices.clear();
   */
+  
   MeshLoader::loadLevel( levelJson );
   
   setOffsets();

@@ -297,3 +297,5 @@ Makefile
 CMakeFiles/
 *.mtl
 
+archold.glb
+zzold*
