@@ -31,7 +31,7 @@ Gltf::Gltf( const std::string& filename ) {
   fs_.read( ( char* )&binChunkLength_ , 4 );
   fs_.read( ( char* )&binChunkType_   , 4 );
   
-  // std::cout << "json is\n" << j << std::endl;
+  //std::cout << "json is\n" << j << std::endl;
 
   binChunkDataStartByte_ = binStartByte_ + 4 + 4; // start of the actual binary data
   
@@ -81,7 +81,7 @@ std::vector<glm::vec3> Gltf::positions( int positionIndex ) {
   return myVecs;
 }
 
-std::vector<GLuint> Gltf::indices( int indicesIndex ) {
+std::vector<GLuint> Gltf::indices( int indicesIndex, GLuint starting_index ) {
   
   std::vector<GLuint> myVec;
   
@@ -101,6 +101,8 @@ std::vector<GLuint> Gltf::indices( int indicesIndex ) {
   do {
     GLuint myIndex;
     fs_.read( ( char* )&myIndex, 2 );
+    
+    myIndex += starting_index;
     
     myVec.push_back( myIndex );
     
@@ -153,18 +155,42 @@ glm::vec3 colour( std::string nodeName ) {
   return colour;
 }
 
+uint32_t get_starting_index( std::vector<GltfNode> gltfNodes ) {
+  
+  // if the object is split into multiple nodes, want to start the
+  // indices at the last max + 1, yes, I know this is janky
+  
+  if( gltfNodes.empty() )
+    return 0;
+  
+  GLuint max = 0;
+  
+  for( uint32_t i = 0; i < gltfNodes.size(); i++ ) {
+    for( uint32_t j = 0; j < gltfNodes[ i ].indices.size(); j++ ) {
+      GLuint thisIndex = gltfNodes[ i ].indices[ j ];
+      if( thisIndex >= max )
+        max = thisIndex;
+    }
+  }
+  
+  max++;
+  return max;
+}
+
 GltfNode Gltf::gltfNode( int mesh, std::string name ) {
   GltfNode gltfNode;
   
-  gltfNode.mesh = mesh;
-  gltfNode.name = name;
-  gltfNode.positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
-  gltfNode.normalIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "NORMAL" ];
-  gltfNode.texcoord_0Index = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "TEXCOORD_0" ];
-  gltfNode.indicesIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
+  GLuint starting_index = get_starting_index( gltfNodes_ );
+  
+  gltfNode.mesh             = mesh;
+  gltfNode.name             = name;
+  gltfNode.positionIndex    = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
+  gltfNode.normalIndex      = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "NORMAL" ];
+  gltfNode.texcoord_0Index  = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "TEXCOORD_0" ];
+  gltfNode.indicesIndex     = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
   
   gltfNode.positions  = Gltf::positions( gltfNode.positionIndex );
-  gltfNode.indices    = Gltf::indices( gltfNode.indicesIndex );
+  gltfNode.indices    = Gltf::indices( gltfNode.indicesIndex, starting_index );
   
   gltfNode.colour = colour( name );
   

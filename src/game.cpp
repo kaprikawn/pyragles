@@ -71,7 +71,7 @@ bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int win
   Game::changeGameState( PLAY, 0 );
   
   running_ = true;
-  running_ = false;
+  //running_ = false;
   
   return true;
 }

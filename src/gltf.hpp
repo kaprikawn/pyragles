@@ -56,7 +56,7 @@ class Gltf {
     
     GltfNode                gltfNode( int mesh, std::string name );
     std::vector<glm::vec3>  positions( int positionIndex );
-    std::vector<GLuint>     indices( int indicesIndex );
+    std::vector<GLuint>     indices( int indicesIndex, GLuint starting_index );
     
     void dataDumpBinary();
     std::vector<GLfloat> floats( uint32_t byteOffset, uint32_t byteLength );
