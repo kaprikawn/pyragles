@@ -195,8 +195,6 @@ void MeshLoader::generateMeshes( nlohmann::json levelJson ) {
   for( uint32_t i = 0; i < gltfNodes.size(); i++ ) {
     glm::vec3 thisColour = gltfNodes[ i ].colour;
     std::string thisName = gltfNodes[ i ].name;
-    if( thisName == "frontTop" )
-      thisColour = { 0, 1, 0 };
     for( uint32_t j = 0; j < gltfNodes[ i ].positions.size(); j++ ) {
       glm::vec3 thisPosition = gltfNodes[ i ].positions[ j ];
       addVertex( thisPosition, thisColour, currentShape );
@@ -207,22 +205,6 @@ void MeshLoader::generateMeshes( nlohmann::json levelJson ) {
     }
   }
   indices_[ currentShape ] = indices;
-  
-  
-//   struct GltfNode {
-//   std::string             name;
-//   int                     mesh;
-//   int                     positionIndex;
-//   int                     normalIndex;
-//   int                     texcoord_0Index;
-//   int                     indicesIndex;
-//   std::vector<glm::vec3>  positions;
-//   std::vector<glm::vec3>  normals;
-//   std::vector<glm::vec2>  texcoord_0s;
-//   std::vector<GLuint>     indices;
-//   glm::vec3               colour;
-// };
-
   
   /*
   // floor 1
