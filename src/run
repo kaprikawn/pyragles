@@ -1,13 +1,38 @@
-#!/bin/bash
+#!/bin/sh
 
 let cores=`grep -c ^processor /proc/cpuinfo`
 
-useHUD=1
-fullscreen=0
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd $SCRIPT_DIR/..
+PROJECT_DIR=$PWD
+
+cd $PROJECT_DIR || exit 1
+
+if [[ $# -gt 0 ]]; then
+  if [[ $1 == "clean" ]]; then
+    if [[ -d build ]]; then
+      rm -rf build
+    fi
+  fi
+fi
+
+if [[ ! -d build ]]; then
+  mkdir build
+fi
+
+cd build || exit 1
+
+# copy the assets into the build directory
+if [[ -d $PROJECT_DIR/src/res ]]; then
+  cp -R $PROJECT_DIR/src/res/ ./
+fi
+if [[ -d $PROJECT_DIR/src/assets ]]; then
+  cp -R  $PROJECT_DIR/src/assets ./
+fi
 
 clear
 
-cmake . || exit 1
+cmake .. || exit 1
 
 if [[ $cores -gt 1 ]]
 then
@@ -33,3 +58,4 @@ fi
 eval $command
 
 exit 0
+
