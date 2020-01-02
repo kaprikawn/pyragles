@@ -23,11 +23,15 @@ fi
 cd build || exit 1
 
 # copy the assets into the build directory
+
+
 if [[ -d $PROJECT_DIR/src/res ]]; then
-  cp -R $PROJECT_DIR/src/res/ ./
+  rsync -rav $PROJECT_DIR/src/res $PROJECT_DIR/build
+  #cp -R $PROJECT_DIR/src/res/ ./
 fi
 if [[ -d $PROJECT_DIR/src/assets ]]; then
-  cp -R  $PROJECT_DIR/src/assets ./
+  rsync -rav $PROJECT_DIR/src/assets $PROJECT_DIR/build
+  #cp -R  $PROJECT_DIR/src/assets ./
 fi
 
 clear
