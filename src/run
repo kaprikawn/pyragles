@@ -1,5 +1,8 @@
 #!/bin/sh
 
+useHUD=1
+fullscreen=0
+
 let cores=`grep -c ^processor /proc/cpuinfo`
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -23,8 +26,6 @@ fi
 cd build || exit 1
 
 # copy the assets into the build directory
-
-
 if [[ -d $PROJECT_DIR/src/res ]]; then
   rsync -rav $PROJECT_DIR/src/res $PROJECT_DIR/build
   #cp -R $PROJECT_DIR/src/res/ ./
