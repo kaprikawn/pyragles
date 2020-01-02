@@ -13,4 +13,3 @@ if ( CMAKE_COMPILER_IS_GNUCC )
 endif ( CMAKE_COMPILER_IS_GNUCC )
 
 add_subdirectory( src )
-

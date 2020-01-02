@@ -1,4 +1,4 @@
-add_executable( exe
+add_executable( ${PROJECT_NAME}
   inputHandler.cpp camera.cpp audio.cpp shader.cpp renderer.cpp mesh.cpp meshLoader.cpp movement.cpp
   gameStateMachine.cpp playState.cpp
   collision.cpp gltf.cpp
@@ -18,9 +18,14 @@ include_directories(
   ${GLESv2_INCLUDE_DIRS}
 )
 
-target_link_libraries( exe
+target_link_libraries( ${PROJECT_NAME}
   ${SDL2_LIBRARIES}
   ${SDL2_MIXER_LIBRARIES}
   ${GLESv2_LIBRARIES}
 )
 
+add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${CMAKE_SOURCE_DIR}/src/assets/ $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets
+                  )
+                  
