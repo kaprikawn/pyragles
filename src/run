@@ -25,16 +25,6 @@ fi
 
 cd build || exit 1
 
-# copy the assets into the build directory
-if [[ -d $PROJECT_DIR/src/res ]]; then
-  rsync -rav $PROJECT_DIR/src/res $PROJECT_DIR/build
-  #cp -R $PROJECT_DIR/src/res/ ./
-fi
-if [[ -d $PROJECT_DIR/src/assets ]]; then
-  rsync -rav $PROJECT_DIR/src/assets $PROJECT_DIR/build
-  #cp -R  $PROJECT_DIR/src/assets ./
-fi
-
 clear
 
 cmake .. || exit 1
@@ -53,7 +43,7 @@ then
   command+='GALLIUM_HUD=".dfps;cpu0+cpu1+cpu2+cpu3;GPU-load;VRAM-usage" '
 fi
 
-command+='./exe'
+command+='./pyragles'
 
 if [[ fullscreen -eq 1 ]]
 then
