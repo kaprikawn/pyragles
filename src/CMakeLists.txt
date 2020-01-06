@@ -1,8 +1,9 @@
 add_executable( ${PROJECT_NAME}
-  inputHandler.cpp camera.cpp audio.cpp shader.cpp renderer.cpp mesh.cpp meshLoader.cpp movement.cpp
+  inputHandler.cpp camera.cpp renderer.cpp
+  texture.cpp indexBuffer.cpp vertexBuffer.cpp shader.cpp
+  gameObject.cpp
   gameStateMachine.cpp playState.cpp
-  collision.cpp gltf.cpp
-  physicsObject.cpp ship.cpp scenary.cpp target.cpp floor.cpp projectile.cpp enemy.cpp
+  gltf.cpp
   game.cpp main.cpp
 )
 
