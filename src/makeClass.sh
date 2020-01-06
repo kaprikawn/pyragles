@@ -1,6 +1,7 @@
 #!/bin/bash
 
 className=$1
+classIdentifer=${className^l}
 
 if [[ -z $className ]]; then
   echo "No class provided"
@@ -10,27 +11,33 @@ fi
 cat <<EOF > ${className}.hpp
 #ifndef ${className^^}_HPP
 #define ${className^^}_HPP
-class $className {
+
+class $classIdentifer {
   
   private :
     
   public :
-    ${className}();
-    ~${className}();
+    ${classIdentifer}();
+    ~${classIdentifer}();
     
     
 };
     
 #endif //${className^^}_HPP
 EOF
+
 cat <<EOF > ${className}.cpp
 #include "${className}.hpp"
-${className}::${className}() {
+#include <iostream>
+
+${classIdentifer}::${classIdentifer}() {
   
 }
-${className}::~${className}() {
+
+${classIdentifer}::~${classIdentifer}() {
   
 }
+
 EOF
 
 exit 0

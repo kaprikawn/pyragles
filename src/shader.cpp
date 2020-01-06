@@ -11,7 +11,7 @@ Shader::Shader() {
 
 void Shader::init( const std::string& filename ) {
   
-  filepath_   = "./res/shaders/" + filename;
+  filepath_   = "./assets/" + filename;
   rendererID_ = 0;
   
   ShaderProgramSource source = parseShader( filepath_ );

@@ -64,7 +64,7 @@ bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int win
   
   gameStateMachine_ = std::make_unique<GameStateMachine>();
   inputHandler_     = std::make_shared<InputHandler>();
-  camera_ = std::make_shared<Camera>( windowWidth, windowHeight );
+  camera_           = std::make_shared<Camera>( windowWidth, windowHeight );
   
   inputHandler_ -> initialiseGamepads();
   

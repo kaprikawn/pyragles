@@ -9,8 +9,11 @@ const std::string PlayState::s_playID = "PLAY";
 
 bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera, int levelNumber ) {
   
-  myBox_ = std::make_shared<gameObject>();
+  renderer_ = std::make_shared<Renderer>();
   
+  myBox_ = std::make_shared<GameObject>();
+  
+  myBox_ -> loadGltf( "numbox.glb" );
   
   return true;
 }
@@ -20,7 +23,7 @@ void PlayState::update( GLfloat dt ) {
 }
 
 void PlayState::render() {
-  
+  myBox_ -> draw( renderer_ );
 }
 
 void PlayState::addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, bool init, bool isLoading ) {

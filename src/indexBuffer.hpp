@@ -11,7 +11,7 @@ class IndexBuffer {
     IndexBuffer();
     ~IndexBuffer();
 
-    void init( const unsigned int* data, unsigned int count );
+    void init( const void* data, unsigned int count );
     void bind() const;
     void unbind() const;
 

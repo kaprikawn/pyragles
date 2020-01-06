@@ -48,6 +48,10 @@ class Gltf {
     nlohmann::json  json_;
     
     std::vector<GltfNode> gltfNodes_;
+    unsigned int gltfNodeCount_ = 0;
+    
+    unsigned int    vertexBufferSize_ = 0; // bytes
+    unsigned int    indexCount_       = 0;
     
   public:
     
@@ -56,13 +60,19 @@ class Gltf {
     
     GltfNode                gltfNode( int mesh, std::string name );
     std::vector<glm::vec3>  positions( int positionIndex );
-    std::vector<GLuint>     indices( int indicesIndex, GLuint starting_index );
+    std::vector<GLuint>     indices( int indicesIndex );
     
     void dataDumpBinary();
     std::vector<GLfloat> floats( uint32_t byteOffset, uint32_t byteLength );
     std::vector<GLushort> ushorts( uint32_t byteOffset, uint32_t byteLength );
     
     std::vector<GltfNode> gltfNodes() { return gltfNodes_; }
+    
+    const void* vertexData() const { return &gltfNodes_[0].positions; }
+    unsigned int vertexBufferSize() const { return vertexBufferSize_; }
+    const void* indexBufferData() const { return &gltfNodes_[0].indices; }
+    unsigned int indexBufferCount() const { return gltfNodes_[0].indices.size(); }
+        
 };
 
 #endif //GLTF_HPP

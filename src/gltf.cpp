@@ -44,6 +44,7 @@ Gltf::Gltf( const std::string& filename ) {
       std::string name  = node[ "name" ];
       
       gltfNodes_.push_back( gltfNode( mesh, name ) );
+      gltfNodeCount_++;
     }
   }
 }
@@ -72,16 +73,20 @@ std::vector<glm::vec3> Gltf::positions( int positionIndex ) {
     fs_.read( ( char* )&myVec.y , 4 );
     fs_.read( ( char* )&myVec.z , 4 );
     
+    //std::cout << "x = " << myVec.x << " y = " << myVec.y << " z = " << myVec.z << std::endl;
+    
     myVecs.push_back( myVec );
     
     count--;
+    
+    vertexBufferSize_ += sizeof( myVec );
     
   } while( count > 0 );
   
   return myVecs;
 }
 
-std::vector<GLuint> Gltf::indices( int indicesIndex, GLuint starting_index ) {
+std::vector<GLuint> Gltf::indices( int indicesIndex ) {
   
   std::vector<GLuint> myVec;
   
@@ -102,11 +107,9 @@ std::vector<GLuint> Gltf::indices( int indicesIndex, GLuint starting_index ) {
     GLuint myIndex;
     fs_.read( ( char* )&myIndex, 2 );
     
-    myIndex += starting_index;
-    
     myVec.push_back( myIndex );
     
-    count --;
+    count--;
     
   } while( count > 0 );
   
@@ -114,73 +117,8 @@ std::vector<GLuint> Gltf::indices( int indicesIndex, GLuint starting_index ) {
 
 }
 
-glm::vec3 colour( std::string nodeName ) {
-  
-  // regex is c++ is rubbish
-  
-  glm::vec3 colour = { 1, 0, 0 }; // default red
-  
-  std::regex regexRed( "r([0-9]*[.])?[0-9]+" );
-  std::smatch matches;
-  std::regex_search( nodeName, matches, regexRed );
-  
-  if( matches.empty() )
-    return colour;
-  
-  std::string::size_type sz;     // alias of size_t
-  std::regex char_replace( "[a-z]" );
-  
-  std::string red = std::regex_replace( matches.str( 0 ), char_replace, "" );
-  //std::cout << "red is " << red << std::endl;
-  float r = std::stof( red, &sz );
-  
-  std::regex regexGreen( "g([0-9]*[.])?[0-9]+" );
-  std::regex_search( nodeName, matches, regexGreen );
-  if( matches.empty() )
-    return colour;
-  std::string green = std::regex_replace( matches.str( 0 ), char_replace, "" );
-  float g = std::stof( green, &sz );
-  
-  std::regex regexBlue( "b([0-9]*[.])?[0-9]+" );
-  std::regex_search( nodeName, matches, regexBlue );
-  if( matches.empty() )
-    return colour;
-  std::string blue = std::regex_replace( matches.str( 0 ), char_replace, "" );
-  float b = std::stof( blue, &sz );
-  
-  colour.r = r;
-  colour.g = g;
-  colour.b = b;
-  
-  return colour;
-}
-
-uint32_t get_starting_index( std::vector<GltfNode> gltfNodes ) {
-  
-  // if the object is split into multiple nodes, want to start the
-  // indices at the last max + 1, yes, I know this is janky
-  
-  if( gltfNodes.empty() )
-    return 0;
-  
-  GLuint max = 0;
-  
-  for( uint32_t i = 0; i < gltfNodes.size(); i++ ) {
-    for( uint32_t j = 0; j < gltfNodes[ i ].indices.size(); j++ ) {
-      GLuint thisIndex = gltfNodes[ i ].indices[ j ];
-      if( thisIndex >= max )
-        max = thisIndex;
-    }
-  }
-  
-  max++;
-  return max;
-}
-
 GltfNode Gltf::gltfNode( int mesh, std::string name ) {
   GltfNode gltfNode;
-  
-  GLuint starting_index = get_starting_index( gltfNodes_ );
   
   gltfNode.mesh             = mesh;
   gltfNode.name             = name;
@@ -190,9 +128,7 @@ GltfNode Gltf::gltfNode( int mesh, std::string name ) {
   gltfNode.indicesIndex     = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
   
   gltfNode.positions  = Gltf::positions( gltfNode.positionIndex );
-  gltfNode.indices    = Gltf::indices( gltfNode.indicesIndex, starting_index );
-  
-  gltfNode.colour = colour( name );
+  gltfNode.indices    = Gltf::indices( gltfNode.indicesIndex );
   
   return gltfNode;
 }

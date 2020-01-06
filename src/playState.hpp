@@ -5,12 +5,14 @@
 #include "inputHandler.hpp"
 #include "gameObject.hpp"
 #include "../deps/json.hpp"
+#include "renderer.hpp"
 
 class PlayState : public GameState {
   private:
     static const std::string  s_playID;
     
     std::shared_ptr<Camera>     camera_;
+    std::shared_ptr<Renderer>   renderer_;
     
     glm::mat4                   viewProjectionMatrix_;
     
@@ -18,7 +20,7 @@ class PlayState : public GameState {
     
     int                         nextLevel_;
     
-    std::shared_ptr<gameObject> myBox_;
+    std::shared_ptr<GameObject> myBox_;
     
   public:
     
