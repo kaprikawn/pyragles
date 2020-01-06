@@ -1,59 +1,28 @@
 #include "renderer.hpp"
 #include <iostream>
-#include "camera.hpp"
-#include "global.hpp"
 
-Renderer::Renderer( GLuint programID, std::shared_ptr<Camera> camera ) {
-  
-  glUseProgram( programID );
-  glViewport( 0, 0, camera -> windowWidth(), camera -> windowHeight() );
-  
-  positionID_ = glGetAttribLocation( programID,  "aPosition" );
-  colourID_   = glGetAttribLocation( programID,  "aColour" );
-  mvpID_      = glGetUniformLocation( programID, "uMVP" );
-  
-  camera_     = camera;
-  
-  glEnableVertexAttribArray( positionID_ );
-  glEnableVertexAttribArray( colourID_ );
+void GLClearError() {
+  while( glGetError() != GL_NO_ERROR );
 }
 
-void Renderer::generateBuffer( GLsizeiptr vertexBufferSize, GLsizeiptr indexBufferSize, GLenum usage ) {
-  
-  glGenBuffers( 1, &vbo_ );
-  glBindBuffer( GL_ARRAY_BUFFER, vbo_ );
-  glBufferData( GL_ARRAY_BUFFER, vertexBufferSize, 0, GL_STATIC_DRAW );
-  
-  glGenBuffers( 1, &ibo_ );
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo_ );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexBufferSize, 0, GL_STATIC_DRAW );
-}
-
-void Renderer::addBufferData( std::shared_ptr<MeshLoader> meshLoader ) {
-  
-  for( unsigned int i = 0; i < MAX_SHAPE; i++ ) {
-    if( meshLoader -> loadShape( i ) ) {
-      
-      GLintptr offset = meshLoader -> vertexOffset( i );
-      GLsizeiptr size = meshLoader -> vertexSize( i );
-      
-      glBufferSubData( GL_ARRAY_BUFFER, offset, size, meshLoader -> vertexData( i ) );
-      
-      offset        = meshLoader -> indexOffset( i );
-      size          = meshLoader -> indexSize( i );
-      
-      glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, offset, size, meshLoader -> indexData( i ) );
-    }
+bool GLLogCall( const char* function, const char* file, int line ) {
+  while( GLenum error = glGetError() ) {
+    std::cout << "[OpenGL error] (" << error << ")\n" << function << "\n" << file << "\n" << line << std::endl;
+    return false;
   }
+  return true;
 }
 
-void Renderer::renderObject( GLsizeiptr vertexOffset, GLsizeiptr indexOffset, GLsizei numIndices, glm::mat4 mvp ) {
+void Renderer::clear() const {
+  glClear( GL_COLOR_BUFFER_BIT );
+}
+
+void Renderer::draw( const VertexBuffer& vb, const IndexBuffer& ib, const Shader& shader ) const {
+  shader.bind();
+  //shader.setUniform4f( "u_Colour", glm::vec4{ r, 0.3f, 0.8f, 1.0f } ); // this isn't part of the vao code
+  vb.bind();
+  glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 2, 0 );
+  ib.bind();
   
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), (GLvoid*)vertexOffset );
-  
-  glVertexAttribPointer( colourID_, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), (GLvoid*)( vertexOffset + sizeof( GLfloat ) * 3 ) );
-  
-  glUniformMatrix4fv( mvpID_, 1, GL_FALSE, &mvp[0][0] );
-  
-  glDrawElements( GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, (void*)indexOffset );
+  GLCall( glDrawElements( GL_TRIANGLES, ib.getCount(), GL_UNSIGNED_INT, nullptr ) );
 }
