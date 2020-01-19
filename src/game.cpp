@@ -1,7 +1,6 @@
 #include "game.hpp"
 #include <iostream>
 #include <GLES2/gl2.h>
-#include "global.hpp"
 #include "gameStateMachine.hpp"
 
 Game::Game( bool fullscreen ) {

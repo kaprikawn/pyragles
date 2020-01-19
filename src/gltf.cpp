@@ -1,16 +1,21 @@
 #include "gltf.hpp"
 #include <iostream>
 #include <regex>
+#include "../deps/stb_image.h"
 
-Gltf::Gltf( const std::string& filename ) {
+Gltf::Gltf() {
+  
+}
+
+void Gltf::init( const std::string& filename ) {
   
   std::string filepath = "./assets/" + filename;
   
   fs_.open( filepath, std::ifstream::binary );
   
-  fs_.read( ( char* )&magic_, 4 );
+  fs_.read( ( char* )&magic_  , 4 );
   fs_.read( ( char* )&version_, 4 );
-  fs_.read( ( char* )&length_, 4 );
+  fs_.read( ( char* )&length_ , 4 );
   
   fs_.read( ( char* )&jsonChunkLength_, 4 );
   fs_.read( ( char* )&jsonChunkType_  , 4 );
@@ -43,12 +48,72 @@ Gltf::Gltf( const std::string& filename ) {
       int mesh          = node[ "mesh" ];
       std::string name  = node[ "name" ];
       
-      gltfNodes_.push_back( gltfNode( mesh, name ) );
+      mesh_             = mesh;
+      name_             = name;
+      
+      unsigned int positionIndex    = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
+      //unsigned int normalIndex      = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "NORMAL" ];
+      unsigned int texcoord_0Index  = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "TEXCOORD_0" ];
+      unsigned int indicesIndex     = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
+      
+      unsigned int positionCount;
+      unsigned int uvCount;
+      
+      positions_        = Gltf::positions( positionIndex, positionCount );
+      texcoord_0s_      = Gltf::texcoord_0s( texcoord_0Index, uvCount );
+      indices_          = Gltf::indices( indicesIndex );
+      //colour_           = Gltf::colour( name );
+      
+      if( positionCount == uvCount && positionCount > 0 ) {
+        useUvData_ = true;
+        for( unsigned int i = 0; i < positionCount; i++ ) {
+          vertexData_.push_back( positions_[i][0] );
+          vertexData_.push_back( positions_[i][1] );
+          vertexData_.push_back( positions_[i][2] );
+          vertexData_.push_back( texcoord_0s_[i][0] );
+          vertexData_.push_back( texcoord_0s_[i][1] );
+          
+          vertexDataSize_ += ( sizeof( float ) * 5 );
+        }
+      } else {
+        for( unsigned int i = 0; i < positionCount; i++ ) {
+          vertexData_.push_back( positions_[i][0] );
+          vertexData_.push_back( positions_[i][1] );
+          vertexData_.push_back( positions_[i][2] );
+          
+          vertexDataSize_ += ( sizeof( float ) * 3 );
+        }
+      }
     }
   }
+  
+  Gltf::loadTexture();
 }
 
-std::vector<glm::vec3> Gltf::positions( int positionIndex ) {
+void Gltf::loadTexture() {
+  auto images_found = json_.find( "images" );
+  if( images_found == json_.end() )
+    return;
+  
+  // dirty workaround until I find how to load directly from glb
+  //stbi_set_flip_vertically_on_load( 1 );
+  //textureData_ = stbi_load( "./res/models/wood_texture.jpg", &textureWidth_, &textureHeight_, &textureBpp_, 4 );
+  
+  unsigned int imageBufferView = json_[ "images" ][ 0 ][ "bufferView" ];
+  unsigned int imageByteOffset = json_[ "bufferViews" ][ imageBufferView ][ "byteOffset" ];
+  unsigned int imagebyteLength = json_[ "bufferViews" ][ imageBufferView ][ "byteLength" ];
+  
+  fs_.seekg( binChunkDataStartByte_ + imageByteOffset );
+  unsigned char pngbuf[ imagebyteLength ];
+  fs_.read( ( char* )&pngbuf, imagebyteLength );
+  
+  //unsigned char stbi_uc;
+  
+  textureData_ = stbi_load_from_memory( pngbuf, imagebyteLength, &textureWidth_, &textureHeight_, &textureBpp_, 4 );
+  
+}
+
+std::vector<glm::vec3> Gltf::positions( unsigned int positionIndex, unsigned int &positionCount ) {
   
   std::vector<glm::vec3> myVecs;
   
@@ -56,13 +121,15 @@ std::vector<glm::vec3> Gltf::positions( int positionIndex ) {
   int bufferViewIndex     = accessor[ "bufferView" ];
   int count               = accessor[ "count" ];
   
+  positionCount = ( unsigned int )count;
+  
   nlohmann::json bufferView = json_[ "bufferViews" ][ bufferViewIndex ];
   
   int byteOffset  = bufferView[ "byteOffset" ];
   //int byteLength  = bufferView[ "byteLength" ];
   //int buffer      = bufferView[ "buffer" ];
   
-  uint32_t startPosition = binChunkDataStartByte_ + byteOffset;
+  unsigned int startPosition = binChunkDataStartByte_ + byteOffset;
   fs_.seekg( startPosition );
   
   do {
@@ -81,7 +148,38 @@ std::vector<glm::vec3> Gltf::positions( int positionIndex ) {
   return myVecs;
 }
 
-std::vector<GLuint> Gltf::indices( int indicesIndex, GLuint starting_index ) {
+std::vector<glm::vec2> Gltf::texcoord_0s( unsigned int texcoord_0Index, unsigned int &uvCount ) {
+  
+  std::vector<glm::vec2> myVecs;
+  
+  nlohmann::json accessor       = json_[ "accessors" ][ texcoord_0Index ];
+  unsigned int bufferViewIndex  = accessor[ "bufferView" ];
+  unsigned int count            = accessor[ "count" ];
+  
+  uvCount = count;
+  
+  nlohmann::json bufferView     = json_[ "bufferViews" ][ bufferViewIndex ];
+  
+  unsigned int byteOffset       = bufferView[ "byteOffset" ];
+  unsigned int startPosition    = binChunkDataStartByte_ + byteOffset;
+  fs_.seekg( startPosition );
+  
+  do {
+    glm::vec2 myVec = { 0, 0 };
+    
+    fs_.read( ( char* )&myVec[ 0 ], 4 );
+    fs_.read( ( char* )&myVec[ 1 ], 4 );
+    
+    myVecs.push_back( myVec );
+    
+    count--;
+    
+  } while( count > 0 );
+  
+  return myVecs;
+}
+
+std::vector<GLuint> Gltf::indices( unsigned int indicesIndex ) {
   
   std::vector<GLuint> myVec;
   
@@ -95,14 +193,12 @@ std::vector<GLuint> Gltf::indices( int indicesIndex, GLuint starting_index ) {
   //int byteLength  = bufferView[ "byteLength" ];
   //int buffer      = bufferView[ "buffer" ];
   
-  uint32_t startPosition = binChunkDataStartByte_ + byteOffset;
+  unsigned int startPosition = binChunkDataStartByte_ + byteOffset;
   fs_.seekg( startPosition );
   
   do {
     GLuint myIndex;
     fs_.read( ( char* )&myIndex, 2 );
-    
-    myIndex += starting_index;
     
     myVec.push_back( myIndex );
     
@@ -155,55 +251,13 @@ glm::vec3 colour( std::string nodeName ) {
   return colour;
 }
 
-uint32_t get_starting_index( std::vector<GltfNode> gltfNodes ) {
-  
-  // if the object is split into multiple nodes, want to start the
-  // indices at the last max + 1, yes, I know this is janky
-  
-  if( gltfNodes.empty() )
-    return 0;
-  
-  GLuint max = 0;
-  
-  for( uint32_t i = 0; i < gltfNodes.size(); i++ ) {
-    for( uint32_t j = 0; j < gltfNodes[ i ].indices.size(); j++ ) {
-      GLuint thisIndex = gltfNodes[ i ].indices[ j ];
-      if( thisIndex >= max )
-        max = thisIndex;
-    }
-  }
-  
-  max++;
-  return max;
-}
-
-GltfNode Gltf::gltfNode( int mesh, std::string name ) {
-  GltfNode gltfNode;
-  
-  GLuint starting_index = get_starting_index( gltfNodes_ );
-  
-  gltfNode.mesh             = mesh;
-  gltfNode.name             = name;
-  gltfNode.positionIndex    = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
-  gltfNode.normalIndex      = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "NORMAL" ];
-  gltfNode.texcoord_0Index  = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "TEXCOORD_0" ];
-  gltfNode.indicesIndex     = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
-  
-  gltfNode.positions  = Gltf::positions( gltfNode.positionIndex );
-  gltfNode.indices    = Gltf::indices( gltfNode.indicesIndex, starting_index );
-  
-  gltfNode.colour = colour( name );
-  
-  return gltfNode;
-}
-
-std::vector<GLfloat> Gltf::floats( uint32_t byteOffset, uint32_t byteLength ) {
+std::vector<GLfloat> Gltf::floats( unsigned int byteOffset, unsigned int byteLength ) {
   
   std::vector<GLfloat> myFloats;
   
-  uint32_t bytesLeft = byteLength;
+  unsigned int bytesLeft = byteLength;
   
-  uint32_t startPosition = binChunkDataStartByte_ + byteOffset;
+  unsigned int startPosition = binChunkDataStartByte_ + byteOffset;
   fs_.seekg( startPosition );
   
   do {
@@ -218,13 +272,13 @@ std::vector<GLfloat> Gltf::floats( uint32_t byteOffset, uint32_t byteLength ) {
   return myFloats;
 }
 
-std::vector<GLushort> Gltf::ushorts( uint32_t byteOffset, uint32_t byteLength ) {
+std::vector<GLushort> Gltf::ushorts( unsigned int byteOffset, unsigned int byteLength ) {
   
   std::vector<GLushort> myUshorts;
   
-  uint32_t bytesLeft = byteLength;
+  unsigned int bytesLeft = byteLength;
   
-  uint32_t startPosition = binChunkDataStartByte_ + byteOffset;
+  unsigned int startPosition = binChunkDataStartByte_ + byteOffset;
   fs_.seekg( startPosition );
   
   do {
@@ -239,63 +293,9 @@ std::vector<GLushort> Gltf::ushorts( uint32_t byteOffset, uint32_t byteLength ) 
   return myUshorts;
 }
 
-void Gltf::dataDumpBinary() {
+Gltf::~Gltf() {
+  if( textureData_ )
+    delete textureData_;
   
-  std::vector<std::map<std::string, uint>> bufferViews;
-  
-  nlohmann::json jsonBufferViews = json_[ "bufferViews" ];
-  for( nlohmann::json::iterator it1 = jsonBufferViews.begin(); it1 != jsonBufferViews.end(); ++it1 ) {
-    nlohmann::json jsonBufferView = *it1;
-    
-    std::map<std::string, uint> newBufferView;
-    newBufferView[ "buffer" ]     = jsonBufferView[ "buffer" ];
-    newBufferView[ "byteLength" ] = jsonBufferView[ "byteLength" ];
-    newBufferView[ "byteOffset" ] = jsonBufferView[ "byteOffset" ];
-    
-    bufferViews.push_back( newBufferView );
-  }
-  
-  std::map<uint, std::string> componentTypeLookup;
-  
-  componentTypeLookup[ 5120 ] = "BYTE";
-  componentTypeLookup[ 5121 ] = "UNSIGNED_BYTE";
-  componentTypeLookup[ 5122 ] = "SHORT";
-  componentTypeLookup[ 5123 ] = "UNSIGNED_SHORT";
-  componentTypeLookup[ 5125 ] = "UNSIGNED_INT";
-  componentTypeLookup[ 5126 ] = "FLOAT";
-  
-  nlohmann::json accessors = json_[ "accessors" ];
-  
-  for( nlohmann::json::iterator it1 = accessors.begin(); it1 != accessors.end(); ++it1 ) {
-    nlohmann::json accessor = *it1;
-    
-    uint bufferView     = accessor[ "bufferView" ];
-    uint componentType  = accessor[ "componentType" ];
-    std::string type    = accessor[ "type" ];
-    //uint count          = accessor[ "count" ];
-    
-    uint byteOffset     = bufferViews[ bufferView ][ "byteOffset" ];
-    uint byteLength     = bufferViews[ bufferView ][ "byteLength" ];
-    
-    //std::cout << "type is " << componentTypeLookup[ componentType ] << " for " << type << std::endl;
-    //std::cout << "byteOffset is " << bufferViews[ bufferView ][ "byteOffset" ] << std::endl;
-    
-    if( componentTypeLookup[ componentType ] == "FLOAT" ) {
-      std::cout << "######## FLOATS " << type << "##########\n";
-      std::vector<GLfloat> myFloats = Gltf::floats( byteOffset, byteLength );
-      for( uint32_t i = 0; i < myFloats.size(); i++ ) {
-        std::cout << "float is " << myFloats[ i ] << std::endl;
-      }
-    } else if( componentTypeLookup[ componentType ] == "UNSIGNED_SHORT" ) {
-      std::cout << "######## SHORTS " << type << "##########\n";
-      std::vector<GLushort> myUshorts = Gltf::ushorts( byteOffset, byteLength );
-      for( uint32_t i = 0; i < myUshorts.size(); i++ ) {
-        std::cout << "ushort is " << myUshorts[ i ] << std::endl;
-      }
-
-    } else {
-      std::cout << "type is " << componentTypeLookup[ componentType ] << " for " << type << std::endl;
-    }
-  }
-
+  textureData_ = nullptr;
 }
