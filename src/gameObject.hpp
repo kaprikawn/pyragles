@@ -25,7 +25,10 @@ class GameObject {
     int  texCoordID_;
     int  mvpID_;
     
+    float yAngle_ = 0;
+    
     glm::mat4     modelMatrix_;
+    glm::mat4     rotationMatrix_;
     glm::mat4     mvp_;
     
   public:
@@ -34,7 +37,7 @@ class GameObject {
     ~GameObject();
     
     void init( std::string modelName, std::shared_ptr<Camera> camera );
-    void update();
+    void update( float dt );
     void render( glm::mat4 viewProjectionMatrix );
     
     void loadVertexData( const void* data, unsigned int size );

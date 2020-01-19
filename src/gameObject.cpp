@@ -17,6 +17,8 @@ void GameObject::loadIndexData( const unsigned int* data, unsigned int count ) {
 }
 
 void GameObject::loadShader( const std::string& filename ) {
+  shader_ = Shader();
+  shader_.init( filename );
   
 }
 
@@ -26,8 +28,8 @@ void GameObject::init( std::string modelName, std::shared_ptr<Camera> camera ) {
   gltf_ -> init( modelName );
   
   loadVertexData( gltf_ -> vertexData(), gltf_ -> vertexDataSize() );
-  
   loadIndexData( gltf_ -> indexData(), gltf_ -> indexCount() );
+  loadShader( "basic.glsl" );
   
   shader_ = Shader();
   shader_.init( "basic.glsl" );
@@ -45,7 +47,15 @@ void GameObject::init( std::string modelName, std::shared_ptr<Camera> camera ) {
   
 }
 
-void GameObject::update() {
+void GameObject::update( float dt ) {
+  
+  yAngle_ += dt * 100;
+  if( yAngle_ > 360 )
+    yAngle_ -= 360;
+    
+  rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+  modelMatrix_ = glm::mat4( 1.0f );
+  modelMatrix_ *= rotationMatrix_;
   
 }
 

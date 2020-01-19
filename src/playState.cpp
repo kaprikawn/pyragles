@@ -8,20 +8,21 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   camera_ = camera;
   viewProjectionMatrix_ = camera_ -> viewProjectionMatrix();
   
-  box_ = std::make_unique<GameObject>();
-  box_ -> init( "numbox.glb", camera_ );
+  ship_ = std::make_unique<GameObject>();
+  ship_ -> init( "ship.glb", camera_ );
   
   return true;
 }
 
 void PlayState::update( GLfloat dt ) {
   
+  ship_ -> update( dt );
 
 }
 
 void PlayState::render() {
   
-  box_ -> render( viewProjectionMatrix_ );
+  ship_ -> render( viewProjectionMatrix_ );
 
 }
 

@@ -20,7 +20,7 @@ class PlayState : public GameState {
     
     glm::mat4                   viewProjectionMatrix_;
     
-    std::unique_ptr<GameObject> box_;
+    std::unique_ptr<GameObject> ship_;
     
   public:
     

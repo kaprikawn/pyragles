@@ -36,7 +36,7 @@ void Gltf::init( const std::string& filename ) {
   fs_.read( ( char* )&binChunkLength_ , 4 );
   fs_.read( ( char* )&binChunkType_   , 4 );
   
-  std::cout << "json is\n" << j << std::endl;
+  //std::cout << "json is\n" << j << std::endl;
 
   binChunkDataStartByte_ = binStartByte_ + 4 + 4; // start of the actual binary data
   
