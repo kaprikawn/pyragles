@@ -12,6 +12,10 @@ class GameObject {
   
   private :
   
+    glm::mat4                     modelMatrix_;
+    glm::mat4                     viewProjectionMatrix_;
+    glm::mat4                     mvp_;
+    
     std::unique_ptr<Gltf>         gltf_;
     std::shared_ptr<VertexBuffer> vb_;
     std::shared_ptr<IndexBuffer>  ib_;
@@ -21,8 +25,13 @@ class GameObject {
     GameObject();
     ~GameObject();
     
+    void loadVertexData( const void* data, unsigned int size );
+    void loadIndexData( const void* data, unsigned int count );
+    void loadShader( const std::string& filename );
+    
     void loadGltf( const std::string filename );
-    void draw( std::shared_ptr<Renderer> renderer );
+    void update( float dt );
+    void render( glm::mat4 viewProjectionMatrix );
     
 };
     

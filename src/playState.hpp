@@ -30,9 +30,6 @@ class PlayState : public GameState {
     virtual bool onExit();
     virtual int  nextLevel();
     
-    void addPhysicsObject( std::shared_ptr<PhysicsObject> physicsObject, bool init, bool isLoading );
-    void loadMeshes();
-    
     virtual std::string getStateID() const { return s_playID; }
     
     nlohmann::json json( int levelNumber );

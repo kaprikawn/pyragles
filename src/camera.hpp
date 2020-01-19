@@ -20,7 +20,7 @@ class Camera {
     Camera( int windowWidth, int windowHeight );
     ~Camera(){}
     
-    void update( std::shared_ptr<glm::vec3> shipPosition, GLfloat dt );
+    void update( GLfloat dt );
   
     glm::mat4 viewProjectionMatrix() {
       return projection_ * view_;

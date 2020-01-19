@@ -21,17 +21,11 @@ Camera::Camera( int windowWidth, int windowHeight ) {
   );
 }
 
-void Camera::update( std::shared_ptr<glm::vec3> shipPosition, GLfloat dt ) {
-  glm::vec3 velocity;
-  velocity.x = shipPosition -> x - position_.x;
-  velocity.y = shipPosition -> y - position_.y;
-  velocity.z = 0;
-  
-  position_ += velocity * dt * 2.0f;
+void Camera::update( GLfloat dt ) {
   
   view_ = glm::lookAt(
       position_
-    , glm::vec3( position_.x, position_.y, -50.0f )
+    , glm::vec3( 0, 0, -50.0f )
     , glm::vec3( 0, 1, 0 )
   );
 }
