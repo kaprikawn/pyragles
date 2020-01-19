@@ -1,38 +1,46 @@
 #ifndef GAMEOBJECT_HPP
 #define GAMEOBJECT_HPP
 
-#include <memory>
-#include "gltf.hpp"
+
 #include "vertexBuffer.hpp"
 #include "indexBuffer.hpp"
 #include "shader.hpp"
-#include "renderer.hpp"
+#include "texture.hpp"
+#include "gltf.hpp"
+#include "camera.hpp"
+#include <glm/glm.hpp>
+#include <memory>
+#include <string>
 
 class GameObject {
+  private:
   
-  private :
-  
-    glm::mat4                     modelMatrix_;
-    glm::mat4                     viewProjectionMatrix_;
-    glm::mat4                     mvp_;
+    VertexBuffer  vb_;
+    IndexBuffer   ib_;
+    Shader        shader_;
+    Texture       texture_;
+    std::unique_ptr<Gltf> gltf_;
     
-    std::unique_ptr<Gltf>         gltf_;
-    std::shared_ptr<VertexBuffer> vb_;
-    std::shared_ptr<IndexBuffer>  ib_;
-    std::shared_ptr<Shader>       shader_;
+    int  positionID_;
+    int  texCoordID_;
+    int  mvpID_;
     
-  public :
+    glm::mat4     modelMatrix_;
+    glm::mat4     mvp_;
+    
+  public:
+    
     GameObject();
     ~GameObject();
     
-    void loadVertexData( const void* data, unsigned int size );
-    void loadIndexData( const void* data, unsigned int count );
-    void loadShader( const std::string& filename );
-    
-    void loadGltf( const std::string filename );
-    void update( float dt );
+    void init( std::string modelName, std::shared_ptr<Camera> camera );
+    void update();
     void render( glm::mat4 viewProjectionMatrix );
     
-};
+    void loadVertexData( const void* data, unsigned int size );
+    void loadIndexData( const unsigned int* data, unsigned int count );
+    void loadShader( const std::string& filename );
     
+};
+
 #endif //GAMEOBJECT_HPP

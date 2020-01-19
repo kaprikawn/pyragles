@@ -1,7 +1,6 @@
 #include <iostream>
 #include <memory>
 #include "game.hpp"
-#include "global.hpp"
 
 int main( int argc, char* argv[] ) {
   

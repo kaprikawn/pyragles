@@ -1,5 +1,6 @@
 #include "texture.hpp"
 #include "renderer.hpp"
+#include "../deps/stb_image.h"
 #include <iostream>
 
 Texture::Texture() {
@@ -22,7 +23,7 @@ void Texture::init( unsigned char* textureData, int width, int height ) {
   
   // https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
   
-  //glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+  glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
   
   GLCall( glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData ) );
   GLCall( glBindTexture( GL_TEXTURE_2D, 0 ) );

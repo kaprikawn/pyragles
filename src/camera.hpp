@@ -16,11 +16,14 @@ class Camera {
     GLsizei windowWidth_;
     GLsizei windowHeight_;
     
+    float   windowWidthF_;
+    float   windowHeightF_;
+    
   public:
     Camera( int windowWidth, int windowHeight );
     ~Camera(){}
     
-    void update( GLfloat dt );
+    void update( std::shared_ptr<glm::vec3> shipPosition, GLfloat dt );
   
     glm::mat4 viewProjectionMatrix() {
       return projection_ * view_;
@@ -28,6 +31,10 @@ class Camera {
     
     GLsizei windowWidth()   { return windowWidth_; }
     GLsizei windowHeight()  { return windowHeight_; }
+    
+    float windowWidthF()    { return windowWidthF_; }
+    float windowHeightF()   { return windowHeightF_; }
+    
 };
 
 #endif //CAMERA_HPP

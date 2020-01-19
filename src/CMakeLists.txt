@@ -1,5 +1,5 @@
 add_executable( ${PROJECT_NAME}
-  inputHandler.cpp camera.cpp renderer.cpp
+  inputHandler.cpp camera.cpp renderer.cpp stb_image.cpp
   texture.cpp indexBuffer.cpp vertexBuffer.cpp shader.cpp
   gameObject.cpp
   gameStateMachine.cpp playState.cpp

@@ -2,10 +2,10 @@
 #include "renderer.hpp"
 
 IndexBuffer::IndexBuffer() {
-
+  
 }
 
-void IndexBuffer::init( const void* data, unsigned int count ) {
+void IndexBuffer::init( const unsigned int* data, unsigned int count ) {
   count_ = count;
   GLCall( glGenBuffers( 1, &rendererID_ ) );
   GLCall( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, rendererID_ ) );

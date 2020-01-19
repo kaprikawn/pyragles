@@ -6,21 +6,8 @@
 #include <vector>
 #include <GLES2/gl2.h>
 #include <glm/glm.hpp>
+#include <memory>
 #include "../deps/json.hpp"
-
-struct GltfNode {
-  std::string             name;
-  int                     mesh;
-  int                     positionIndex;
-  int                     normalIndex;
-  int                     texcoord_0Index;
-  int                     indicesIndex;
-  std::vector<glm::vec3>  positions;
-  std::vector<glm::vec3>  normals;
-  std::vector<glm::vec2>  texcoord_0s;
-  std::vector<GLuint>     indices;
-  glm::vec3               colour;
-};
 
 class Gltf {
   private:
@@ -28,51 +15,78 @@ class Gltf {
     // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#binary-gltf-layout
     
     // header
-    uint32_t  magic_;
-    uint32_t  version_;
-    uint32_t  length_;
+    unsigned int        magic_;
+    unsigned int        version_;
+    unsigned int        length_;
     
     // json
-    uint32_t        jsonStartByte_          = 12;
-    uint32_t        jsonChunkDataStartByte_ = 20;
-    uint32_t        jsonChunkLength_;
-    uint32_t        jsonChunkType_;
+    unsigned int        jsonStartByte_          = 12;
+    unsigned int        jsonChunkDataStartByte_ = 20;
+    unsigned int        jsonChunkLength_;
+    unsigned int        jsonChunkType_;
     
     // binary data
-    uint32_t        binStartByte_;
-    uint32_t        binChunkDataStartByte_;
-    uint32_t        binChunkLength_;
-    uint32_t        binChunkType_;
+    unsigned int        binStartByte_;
+    unsigned int        binChunkDataStartByte_;
+    unsigned int        binChunkLength_;
+    unsigned int        binChunkType_;
     
-    std::ifstream   fs_;
-    nlohmann::json  json_;
+    unsigned int        vertexDataSize_ = 0;
     
-    std::vector<GltfNode> gltfNodes_;
-    unsigned int gltfNodeCount_ = 0;
+    std::string               name_;
+    int                       mesh_;
+    std::vector<glm::vec3>    positions_;
+    std::vector<glm::vec3>    normals_;
+    std::vector<glm::vec2>    texcoord_0s_;
+    std::vector<unsigned int> indices_;
+    //glm::vec3                 colour_;
     
-    unsigned int    vertexBufferSize_ = 0; // bytes
-    unsigned int    indexCount_       = 0;
+    bool                      useUvData_ = false;
+    std::vector<float>        vertexData_;
+    
+    std::ifstream           fs_;
+    nlohmann::json          json_;
+    
+    unsigned char*          textureData_;
+    
+    int                     textureWidth_;
+    int                     textureHeight_;
+    int                     textureBpp_;
     
   public:
     
-    Gltf( const std::string& filename );
-    ~Gltf(){}
+    Gltf();
+    ~Gltf();
     
-    GltfNode                gltfNode( int mesh, std::string name );
-    std::vector<glm::vec3>  positions( int positionIndex );
-    std::vector<GLuint>     indices( int indicesIndex );
+    void init( const std::string& filename );
     
-    void dataDumpBinary();
-    std::vector<GLfloat> floats( uint32_t byteOffset, uint32_t byteLength );
-    std::vector<GLushort> ushorts( uint32_t byteOffset, uint32_t byteLength );
+    std::vector<glm::vec3>  positions( unsigned int positionIndex, unsigned int &positionsCount );
+    std::vector<glm::vec2>  texcoord_0s( unsigned int texcoord_0Index, unsigned int &uvCount );
+    std::vector<GLuint>     indices( unsigned int indicesIndex );
+    glm::vec3               colour( std::string nodeName );
+    void                    loadTexture();
     
-    std::vector<GltfNode> gltfNodes() { return gltfNodes_; }
+    std::vector<GLfloat> floats( unsigned int byteOffset, unsigned int byteLength );
+    std::vector<GLushort> ushorts( unsigned int byteOffset, unsigned int byteLength );
     
-    const void* vertexData() const { return &gltfNodes_[0].positions; }
-    unsigned int vertexBufferSize() const { return vertexBufferSize_; }
-    const void* indexBufferData() const { return &gltfNodes_[0].indices; }
-    unsigned int indexBufferCount() const { return gltfNodes_[0].indices.size(); }
-        
+    unsigned char*      textureData() { return textureData_; }
+    
+    const void*         vertexData() {
+      if( useUvData_ ) {
+        return ( const void* )&vertexData_[0];
+      } else {
+        return ( const void* )&positions_[ 0 ][ 0 ];
+      }
+    }
+    const unsigned int* indexData()       { return ( const unsigned int* )&indices_[ 0 ]; }
+    unsigned char*      textureCoord_0()  { return ( unsigned char* )&texcoord_0s_; }
+    
+    unsigned int        vertexDataSize()      { return vertexDataSize_; }
+    unsigned int        indexCount()          { return indices_.size(); }
+    unsigned int        textureCoord_0Count() { return sizeof( glm::vec2 ) * texcoord_0s_.size(); }
+    
+    int                 textureWidth() { return textureWidth_; }
+    int                 textureHeight() { return textureHeight_; }
 };
 
 #endif //GLTF_HPP

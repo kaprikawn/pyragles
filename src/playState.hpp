@@ -2,25 +2,25 @@
 #define PLAYSTATE_HPP
 
 #include "gameState.hpp"
-#include "inputHandler.hpp"
-#include "gameObject.hpp"
-#include "../deps/json.hpp"
 #include "renderer.hpp"
+#include "inputHandler.hpp"
+#include "indexBuffer.hpp"
+#include "vertexBuffer.hpp"
+#include "shader.hpp"
+#include "gameObject.hpp"
+#include <memory>
 
 class PlayState : public GameState {
   private:
-    static const std::string  s_playID;
-    
-    std::shared_ptr<Camera>     camera_;
-    std::shared_ptr<Renderer>   renderer_;
-    
-    glm::mat4                   viewProjectionMatrix_;
-    
-    nlohmann::json              levelJson_;
+    static const std::string    s_playID;
     
     int                         nextLevel_;
     
-    std::shared_ptr<GameObject> myBox_;
+    std::shared_ptr<Camera>     camera_;
+    
+    glm::mat4                   viewProjectionMatrix_;
+    
+    std::unique_ptr<GameObject> box_;
     
   public:
     
@@ -31,8 +31,6 @@ class PlayState : public GameState {
     virtual int  nextLevel();
     
     virtual std::string getStateID() const { return s_playID; }
-    
-    nlohmann::json json( int levelNumber );
 
 };
 
