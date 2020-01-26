@@ -36,7 +36,7 @@ class GameObject {
     GameObject();
     ~GameObject();
     
-    void init( std::string modelName, std::shared_ptr<Camera> camera );
+    bool init( std::string modelName, std::shared_ptr<Camera> camera );
     void update( float dt );
     void render( glm::mat4 viewProjectionMatrix );
     

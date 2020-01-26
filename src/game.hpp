@@ -31,7 +31,7 @@ class Game {
     void render();
     
     void setNewState( int newState, int transitionType );
-    void changeGameState( int newState, int transitionType );
+    bool changeGameState( int newState, int transitionType );
 };
 
 #endif //GAME_HPP

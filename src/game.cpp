@@ -67,7 +67,9 @@ bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int win
   
   inputHandler_ -> initialiseGamepads();
   
-  Game::changeGameState( PLAY, 0 );
+  bool loadSuccessful = Game::changeGameState( PLAY, 0 );
+  if( !loadSuccessful )
+    return false;
   
   running_ = true;
   //running_ = false;
@@ -122,10 +124,13 @@ void Game::setNewState( int newState, int transitionType = 0 ) {
   transitionType_ = transitionType;
 }
 
-void Game::changeGameState( int newState, int transitionType ) {
+bool Game::changeGameState( int newState, int transitionType ) {
   if( newState == PLAY ) {
     std::unique_ptr<GameState> playState ( std::make_unique<PlayState>() );
-    gameStateMachine_ -> changeState( std::move( playState ), inputHandler_, camera_ );
+    bool changeSuccessful = gameStateMachine_ -> changeState( std::move( playState ), inputHandler_, camera_ );
+    if( !changeSuccessful )
+      return false;
   }
   newState_ = -1;
+  return true;
 }
