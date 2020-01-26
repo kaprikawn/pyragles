@@ -23,8 +23,6 @@ class Gltf {
     // binary data
     unsigned int        binStartByte_;
     unsigned int        binChunkDataStartByte_;
-    unsigned int        binChunkLength_;
-    unsigned int        binChunkType_;
     
     unsigned int        vertexDataSize_ = 0;
     
@@ -34,7 +32,6 @@ class Gltf {
     std::vector<glm::vec3>    normals_;
     std::vector<glm::vec2>    texcoord_0s_;
     std::vector<unsigned int> indices_;
-    //glm::vec3                 colour_;
     
     bool                      useUvData_ = false;
     std::vector<float>        vertexData_;
@@ -58,7 +55,6 @@ class Gltf {
     std::vector<glm::vec3>  positions( unsigned int positionIndex, unsigned int &positionsCount );
     std::vector<glm::vec2>  texcoord_0s( unsigned int texcoord_0Index, unsigned int &uvCount );
     std::vector<GLuint>     indices( unsigned int indicesIndex );
-    glm::vec3               colour( std::string nodeName );
     void                    loadTexture();
     
     std::vector<GLfloat> floats( unsigned int byteOffset, unsigned int byteLength );

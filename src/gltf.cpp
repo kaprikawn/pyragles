@@ -13,9 +13,9 @@ bool Gltf::init( const std::string& filename ) {
   
   fs_.open( filepath, std::ifstream::binary );
   
-  unsigned int        magic;
-  unsigned int        version;
-  unsigned int        length;
+  unsigned int magic;
+  unsigned int version;
+  unsigned int length;
   
   fs_.read( ( char* )&magic  , 4 );
   fs_.read( ( char* )&version, 4 );
@@ -25,7 +25,6 @@ bool Gltf::init( const std::string& filename ) {
     std::cout << "Error : " << filename << " does not appear to be a glb file" << std::endl;
     return false;
   }
-    
   
   fs_.read( ( char* )&jsonChunkLength_, 4 );
   fs_.read( ( char* )&jsonChunkType_  , 4 );
@@ -42,9 +41,12 @@ bool Gltf::init( const std::string& filename ) {
   
   json_ = nlohmann::json::parse( j );
   
+  unsigned int binChunkLength;
+  unsigned int binChunkType;
+  
   // binary data
-  fs_.read( ( char* )&binChunkLength_ , 4 );
-  fs_.read( ( char* )&binChunkType_   , 4 );
+  fs_.read( ( char* )&binChunkLength , 4 );
+  fs_.read( ( char* )&binChunkType   , 4 );
   
   //std::cout << "json is\n" << j << std::endl;
 
@@ -72,7 +74,6 @@ bool Gltf::init( const std::string& filename ) {
       positions_        = Gltf::positions( positionIndex, positionCount );
       texcoord_0s_      = Gltf::texcoord_0s( texcoord_0Index, uvCount );
       indices_          = Gltf::indices( indicesIndex );
-      //colour_           = Gltf::colour( name );
       
       if( positionCount == uvCount && positionCount > 0 ) {
         useUvData_ = true;
@@ -107,10 +108,6 @@ void Gltf::loadTexture() {
   if( images_found == json_.end() )
     return;
   
-  // dirty workaround until I find how to load directly from glb
-  //stbi_set_flip_vertically_on_load( 1 );
-  //textureData_ = stbi_load( "./res/models/wood_texture.jpg", &textureWidth_, &textureHeight_, &textureBpp_, 4 );
-  
   unsigned int imageBufferView = json_[ "images" ][ 0 ][ "bufferView" ];
   unsigned int imageByteOffset = json_[ "bufferViews" ][ imageBufferView ][ "byteOffset" ];
   unsigned int imagebyteLength = json_[ "bufferViews" ][ imageBufferView ][ "byteLength" ];
@@ -118,8 +115,6 @@ void Gltf::loadTexture() {
   fs_.seekg( binChunkDataStartByte_ + imageByteOffset );
   unsigned char pngbuf[ imagebyteLength ];
   fs_.read( ( char* )&pngbuf, imagebyteLength );
-  
-  //unsigned char stbi_uc;
   
   textureData_ = stbi_load_from_memory( pngbuf, imagebyteLength, &textureWidth_, &textureHeight_, &textureBpp_, 4 );
   
@@ -220,47 +215,6 @@ std::vector<GLuint> Gltf::indices( unsigned int indicesIndex ) {
   
   return myVec;
 
-}
-
-glm::vec3 colour( std::string nodeName ) {
-  
-  // regex is c++ is rubbish
-  
-  glm::vec3 colour = { 1, 0, 0 }; // default red
-  
-  std::regex regexRed( "r([0-9]*[.])?[0-9]+" );
-  std::smatch matches;
-  std::regex_search( nodeName, matches, regexRed );
-  
-  if( matches.empty() )
-    return colour;
-  
-  std::string::size_type sz;     // alias of size_t
-  std::regex char_replace( "[a-z]" );
-  
-  std::string red = std::regex_replace( matches.str( 0 ), char_replace, "" );
-  //std::cout << "red is " << red << std::endl;
-  float r = std::stof( red, &sz );
-  
-  std::regex regexGreen( "g([0-9]*[.])?[0-9]+" );
-  std::regex_search( nodeName, matches, regexGreen );
-  if( matches.empty() )
-    return colour;
-  std::string green = std::regex_replace( matches.str( 0 ), char_replace, "" );
-  float g = std::stof( green, &sz );
-  
-  std::regex regexBlue( "b([0-9]*[.])?[0-9]+" );
-  std::regex_search( nodeName, matches, regexBlue );
-  if( matches.empty() )
-    return colour;
-  std::string blue = std::regex_replace( matches.str( 0 ), char_replace, "" );
-  float b = std::stof( blue, &sz );
-  
-  colour.r = r;
-  colour.g = g;
-  colour.b = b;
-  
-  return colour;
 }
 
 std::vector<GLfloat> Gltf::floats( unsigned int byteOffset, unsigned int byteLength ) {
