@@ -2,6 +2,7 @@
 #version 100
 
 attribute vec3  aPosition;
+attribute vec3  aNormal;
 attribute vec2  aTexCoord;
 varying   vec2  vTexCoord;
 uniform   mat4  uMVP;
