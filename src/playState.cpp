@@ -9,7 +9,9 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   viewProjectionMatrix_ = camera_ -> viewProjectionMatrix();
   
   ship_ = std::make_unique<GameObject>();
-  ship_ -> init( "ship.glb", camera_ );
+  bool loadSuccessful = ship_ -> init( "ship.glb", camera_ );
+  if( !loadSuccessful )
+    return false;
   
   return true;
 }

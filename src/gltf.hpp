@@ -14,11 +14,6 @@ class Gltf {
     
     // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#binary-gltf-layout
     
-    // header
-    unsigned int        magic_;
-    unsigned int        version_;
-    unsigned int        length_;
-    
     // json
     unsigned int        jsonStartByte_          = 12;
     unsigned int        jsonChunkDataStartByte_ = 20;
@@ -58,7 +53,7 @@ class Gltf {
     Gltf();
     ~Gltf();
     
-    void init( const std::string& filename );
+    bool init( const std::string& filename );
     
     std::vector<glm::vec3>  positions( unsigned int positionIndex, unsigned int &positionsCount );
     std::vector<glm::vec2>  texcoord_0s( unsigned int texcoord_0Index, unsigned int &uvCount );

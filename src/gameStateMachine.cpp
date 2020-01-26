@@ -1,9 +1,13 @@
 #include <iostream>
 #include "gameStateMachine.hpp"
 
-void GameStateMachine::pushState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
+bool GameStateMachine::pushState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
   gameStates_.push_back( std::move( state ) );
-  gameStates_.back() -> onEnter( inputHandler, camera, nextLevel_ );
+  bool loadSuccessful = gameStates_.back() -> onEnter( inputHandler, camera, nextLevel_ );
+  if( !loadSuccessful )
+    return false;
+  
+  return true;
 }
 
 void GameStateMachine::popState() {
@@ -21,26 +25,27 @@ std::string GameStateMachine::getCurrentGameStateID() {
   return NULL;
 }
 
-void GameStateMachine::changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
+bool GameStateMachine::changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera ) {
   std::cout << "Changing game state to " << state -> getStateID() << std::endl;
   if( !gameStates_.empty() ) {
-    if( gameStates_.back() -> getStateID() == state -> getStateID() ) {
-      return;
-    }
-    if( gameStates_.back() -> onExit() ) {
+    if( gameStates_.back() -> getStateID() == state -> getStateID() )
+      return true;
+    if( gameStates_.back() -> onExit() )
       gameStates_.pop_back();
-    }
   }
   
   gameStates_.push_back( std::move( state ) );
   
-  gameStates_.back() -> onEnter( inputHandler, camera, nextLevel_ );
+  bool changeSuccessful = gameStates_.back() -> onEnter( inputHandler, camera, nextLevel_ );
+  if( !changeSuccessful )
+    return false;
   
   if( gameStates_.back() -> getStateID() == "PLAY" ) {
     nextLevel_ = gameStates_.back() -> nextLevel();
   }
   
   std::cout << "finished changing state - stateID is now " << gameStates_.back() -> getStateID() << std::endl;
+  return true;
 }
 
 void GameStateMachine::update( float dt ) {

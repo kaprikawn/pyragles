@@ -22,10 +22,12 @@ void GameObject::loadShader( const std::string& filename ) {
   
 }
 
-void GameObject::init( std::string modelName, std::shared_ptr<Camera> camera ) {
+bool GameObject::init( std::string modelName, std::shared_ptr<Camera> camera ) {
   
   gltf_ = std::make_unique<Gltf>();
-  gltf_ -> init( modelName );
+  bool gltfLoaded = gltf_ -> init( modelName );
+  if( !gltfLoaded )
+    return false;
   
   loadVertexData( gltf_ -> vertexData(), gltf_ -> vertexDataSize() );
   loadIndexData( gltf_ -> indexData(), gltf_ -> indexCount() );
@@ -45,6 +47,7 @@ void GameObject::init( std::string modelName, std::shared_ptr<Camera> camera ) {
   glEnableVertexAttribArray( positionID_ );
   glEnableVertexAttribArray( texCoordID_ );
   
+  return true;
 }
 
 void GameObject::update( float dt ) {

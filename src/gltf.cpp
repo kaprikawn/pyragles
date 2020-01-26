@@ -7,15 +7,25 @@ Gltf::Gltf() {
   
 }
 
-void Gltf::init( const std::string& filename ) {
+bool Gltf::init( const std::string& filename ) {
   
   std::string filepath = "./assets/" + filename;
   
   fs_.open( filepath, std::ifstream::binary );
   
-  fs_.read( ( char* )&magic_  , 4 );
-  fs_.read( ( char* )&version_, 4 );
-  fs_.read( ( char* )&length_ , 4 );
+  unsigned int        magic;
+  unsigned int        version;
+  unsigned int        length;
+  
+  fs_.read( ( char* )&magic  , 4 );
+  fs_.read( ( char* )&version, 4 );
+  fs_.read( ( char* )&length , 4 );
+  
+  if( magic != 1179937895 ) {
+    std::cout << "Error : " << filename << " does not appear to be a glb file" << std::endl;
+    return false;
+  }
+    
   
   fs_.read( ( char* )&jsonChunkLength_, 4 );
   fs_.read( ( char* )&jsonChunkType_  , 4 );
@@ -88,6 +98,8 @@ void Gltf::init( const std::string& filename ) {
   }
   
   Gltf::loadTexture();
+  
+  return true;
 }
 
 void Gltf::loadTexture() {
