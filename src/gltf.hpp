@@ -52,8 +52,9 @@ class Gltf {
     
     bool init( const std::string& filename );
     
-    std::vector<glm::vec3>  positions( unsigned int positionIndex, unsigned int &positionsCount );
-    std::vector<glm::vec2>  texcoord_0s( unsigned int texcoord_0Index, unsigned int &uvCount );
+    std::vector<glm::vec3>  positions( unsigned int positionIndex     , unsigned int &positionsCount );
+    std::vector<glm::vec3>  normals( unsigned int normalIndex         , unsigned int &normalsCount );
+    std::vector<glm::vec2>  texcoord_0s( unsigned int texcoord_0Index , unsigned int &uvCount );
     std::vector<GLuint>     indices( unsigned int indicesIndex );
     void                    loadTexture();
     

@@ -64,30 +64,35 @@ bool Gltf::init( const std::string& filename ) {
       name_             = name;
       
       unsigned int positionIndex    = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
-      //unsigned int normalIndex      = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "NORMAL" ];
+      unsigned int normalIndex      = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "NORMAL" ];
       unsigned int texcoord_0Index  = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "TEXCOORD_0" ];
       unsigned int indicesIndex     = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
       
-      unsigned int positionCount;
+      unsigned int positionsCount;
+      unsigned int normalsCount;
       unsigned int uvCount;
       
-      positions_        = Gltf::positions( positionIndex, positionCount );
+      positions_        = Gltf::positions( positionIndex, positionsCount );
+      normals_          = Gltf::normals( normalIndex, normalsCount );
       texcoord_0s_      = Gltf::texcoord_0s( texcoord_0Index, uvCount );
       indices_          = Gltf::indices( indicesIndex );
       
-      if( positionCount == uvCount && positionCount > 0 ) {
+      if( positionsCount == uvCount && positionsCount > 0 ) {
         useUvData_ = true;
-        for( unsigned int i = 0; i < positionCount; i++ ) {
+        for( unsigned int i = 0; i < positionsCount; i++ ) {
           vertexData_.push_back( positions_[i][0] );
           vertexData_.push_back( positions_[i][1] );
           vertexData_.push_back( positions_[i][2] );
+          vertexData_.push_back( normals_[i][0] );
+          vertexData_.push_back( normals_[i][1] );
+          vertexData_.push_back( normals_[i][2] );
           vertexData_.push_back( texcoord_0s_[i][0] );
           vertexData_.push_back( texcoord_0s_[i][1] );
           
-          vertexDataSize_ += ( sizeof( float ) * 5 );
+          vertexDataSize_ += ( sizeof( float ) * 8 );
         }
       } else {
-        for( unsigned int i = 0; i < positionCount; i++ ) {
+        for( unsigned int i = 0; i < positionsCount; i++ ) {
           vertexData_.push_back( positions_[i][0] );
           vertexData_.push_back( positions_[i][1] );
           vertexData_.push_back( positions_[i][2] );
@@ -120,7 +125,7 @@ void Gltf::loadTexture() {
   
 }
 
-std::vector<glm::vec3> Gltf::positions( unsigned int positionIndex, unsigned int &positionCount ) {
+std::vector<glm::vec3> Gltf::positions( unsigned int positionIndex, unsigned int &positionsCount ) {
   
   std::vector<glm::vec3> myVecs;
   
@@ -128,7 +133,7 @@ std::vector<glm::vec3> Gltf::positions( unsigned int positionIndex, unsigned int
   int bufferViewIndex     = accessor[ "bufferView" ];
   int count               = accessor[ "count" ];
   
-  positionCount = ( unsigned int )count;
+  positionsCount = ( unsigned int )count;
   
   nlohmann::json bufferView = json_[ "bufferViews" ][ bufferViewIndex ];
   
@@ -138,6 +143,41 @@ std::vector<glm::vec3> Gltf::positions( unsigned int positionIndex, unsigned int
   
   unsigned int startPosition = binChunkDataStartByte_ + byteOffset;
   fs_.seekg( startPosition );
+  
+  do {
+    glm::vec3 myVec = { 0.0f, 0.0f, 0.0f };
+    
+    fs_.read( ( char* )&myVec.x , 4 );
+    fs_.read( ( char* )&myVec.y , 4 );
+    fs_.read( ( char* )&myVec.z , 4 );
+    
+    myVecs.push_back( myVec );
+    
+    count--;
+    
+  } while( count > 0 );
+  
+  return myVecs;
+}
+
+std::vector<glm::vec3> Gltf::normals( unsigned int normalIndex, unsigned int &normalCount ) {
+  
+  std::vector<glm::vec3> myVecs;
+  
+  nlohmann::json accessor = json_[ "accessors" ][ normalIndex ];
+  int bufferViewIndex     = accessor[ "bufferView" ];
+  int count               = accessor[ "count" ];
+  
+  normalCount = ( unsigned int )count;
+  
+  nlohmann::json bufferView = json_[ "bufferViews" ][ bufferViewIndex ];
+  
+  int byteOffset  = bufferView[ "byteOffset" ];
+  //int byteLength  = bufferView[ "byteLength" ];
+  //int buffer      = bufferView[ "buffer" ];
+  
+  unsigned int startnormal = binChunkDataStartByte_ + byteOffset;
+  fs_.seekg( startnormal );
   
   do {
     glm::vec3 myVec = { 0.0f, 0.0f, 0.0f };

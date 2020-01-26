@@ -22,6 +22,7 @@ class GameObject {
     std::unique_ptr<Gltf> gltf_;
     
     int  positionID_;
+    int  normalID_;
     int  texCoordID_;
     int  mvpID_;
     

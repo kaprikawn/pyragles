@@ -41,10 +41,12 @@ bool GameObject::init( std::string modelName, std::shared_ptr<Camera> camera ) {
   texture_.init( gltf_ -> textureData(), gltf_ -> textureWidth(), gltf_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
+  normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
   texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
   mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
   
   glEnableVertexAttribArray( positionID_ );
+  glEnableVertexAttribArray( normalID_ );
   glEnableVertexAttribArray( texCoordID_ );
   
   return true;
@@ -72,8 +74,9 @@ void GameObject::render( glm::mat4 viewProjectionMatrix ) {
   
   vb_.bind();
   texture_.bind();
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 5, ( GLvoid* ) 0 );
-  glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 5, ( GLvoid* )( sizeof( float ) * 3 ) );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 );
+  glVertexAttribPointer( normalID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) );
+  glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) );
   ib_.bind();
     
   glDrawElements( GL_TRIANGLES, gltf_ -> indexCount(), GL_UNSIGNED_INT, 0 );
