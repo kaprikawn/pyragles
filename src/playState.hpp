@@ -7,7 +7,7 @@
 #include "indexBuffer.hpp"
 #include "vertexBuffer.hpp"
 #include "shader.hpp"
-#include "gameObject.hpp"
+#include "ship.hpp"
 #include <memory>
 
 class PlayState : public GameState {
@@ -20,7 +20,7 @@ class PlayState : public GameState {
     
     glm::mat4                   viewProjectionMatrix_;
     
-    std::unique_ptr<GameObject> ship_;
+    std::unique_ptr<Ship>       ship_;
     
   public:
     

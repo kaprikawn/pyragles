@@ -13,7 +13,7 @@
 #include <string>
 
 class GameObject {
-  private:
+  protected:
   
     VertexBuffer  vb_;
     IndexBuffer   ib_;
@@ -37,13 +37,13 @@ class GameObject {
     GameObject();
     ~GameObject();
     
-    bool init( std::string modelName, std::shared_ptr<Camera> camera );
-    void update( float dt );
-    void render( glm::mat4 viewProjectionMatrix );
+    virtual bool init( std::string modelName, std::shared_ptr<Camera> camera );
+    virtual void update( float dt );
+    virtual void render( glm::mat4 viewProjectionMatrix );
     
-    void loadVertexData( const void* data, unsigned int size );
-    void loadIndexData( const unsigned int* data, unsigned int count );
-    void loadShader( const std::string& filename );
+    virtual void loadVertexData( const void* data, unsigned int size );
+    virtual void loadIndexData( const unsigned int* data, unsigned int count );
+    virtual void loadShader( const std::string& filename );
     
 };
 
