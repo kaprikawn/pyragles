@@ -15,10 +15,10 @@ bool Ship::init( std::string modelName, std::shared_ptr<Camera> camera ) {
   
   loadVertexData( gltf_ -> vertexData(), gltf_ -> vertexDataSize() );
   loadIndexData( gltf_ -> indexData(), gltf_ -> indexCount() );
-  loadShader( "basic.glsl" );
+  loadShader( "shaderBasic.glsl" );
   
   shader_ = Shader();
-  shader_.init( "basic.glsl" );
+  shader_.init( "shaderBasic.glsl" );
   
   // https://www.raywenderlich.com/3047-opengl-es-2-0-for-iphone-tutorial-part-2-textures
   texture_ = Texture();

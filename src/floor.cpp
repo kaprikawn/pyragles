@@ -18,7 +18,7 @@ Floor::Floor() {
   ib_ = IndexBuffer();
   ib_.init( indices, 6 );
   
-  Floor::loadShader( "shVertexColours.glsl" );
+  Floor::loadShader( "shaderVertexColours.glsl" );
 
 }
 
