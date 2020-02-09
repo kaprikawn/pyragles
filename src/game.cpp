@@ -72,7 +72,7 @@ bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int win
     return false;
   
   running_ = true;
-  //running_ = false;
+  running_ = false;
   
   return true;
 }

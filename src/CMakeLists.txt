@@ -4,7 +4,7 @@ add_executable( ${PROJECT_NAME}
   gameObject.cpp
   gameStateMachine.cpp playState.cpp
   gltf.cpp
-  ship.cpp
+  ship.cpp floor.cpp
   game.cpp main.cpp
 )
 

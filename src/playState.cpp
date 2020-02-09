@@ -13,6 +13,8 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   if( !loadSuccessful )
     return false;
   
+  floor_ = std::make_unique<Floor>();
+  
   return true;
 }
 
