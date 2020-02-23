@@ -16,11 +16,18 @@ cd $PROJECT_DIR || exit 1
 clear
 
 if [[ $# -gt 0 ]]; then
-  if [[ $1 == "clean" ]]; then
-    if [[ -d build ]]; then
-      rm -rfv build
+  for var in "$@"
+  do
+    if [[ $var == "--fullscreen" ]]; then
+      fullscreen=1
     fi
-  fi
+    
+    if [[ $var == "clean" || $var == "--clean" ]]; then
+      if [[ -d build ]]; then
+        rm -rfv build
+      fi
+    fi
+  done
 else
   # make sure all the assets dir files are correct in the build dir
   if [[ -d $ASSETS_DIR_DEV && -d $ASSETS_DIR_BUILD ]]; then
@@ -72,6 +79,7 @@ then
   command+=' --fullscreen'
 fi
 
+echo "running $command"
 eval $command
 
 exit 0

@@ -3,14 +3,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 GameObject::GameObject() {
-  std::cout << "calling gameobject constructor\n";
   modelMatrix_  = glm::mat4( 1.0f );
-  vb_ = VertexBuffer();
-  ib_ = IndexBuffer();
-  shader_ = Shader();
-  model_ = std::make_unique<Model>();
-  texture_ = Texture();
-  
+  vb_           = VertexBuffer();
+  ib_           = IndexBuffer();
+  shader_       = Shader();
+  model_        = std::make_unique<Model>();
+  texture_      = Texture();
 }
 
 void GameObject::loadVertexData( const void* data, unsigned int size ) {

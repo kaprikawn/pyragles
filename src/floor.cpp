@@ -125,16 +125,8 @@ Floor::Floor() {
 
 
 void Floor::update( float dt ) {
-  // yAngle_ += dt * 100;
-  // if( yAngle_ > 360 )
-  //   yAngle_ -= 360;
-    
-  // rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-  // modelMatrix_ = glm::mat4( 1.0f );
-  // modelMatrix_ *= rotationMatrix_;
-  
   modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, zPos_ ) );
-  zPos_ += dt * 10;
+  zPos_ += dt * 20;
   while( zPos_ > 4 )
     zPos_ -= 4;
 }
