@@ -47,6 +47,7 @@ class GameObject {
     void loadVertexData( const void* data, unsigned int size );
     void loadIndexData( const unsigned int* data, unsigned int count );
     void loadShader( const std::string& filename );
+    void loadTexture( unsigned char* textureData, int width, int height );
     
     unsigned int indexCount() const { return indexCount_; }
     

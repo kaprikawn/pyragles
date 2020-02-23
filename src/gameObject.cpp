@@ -9,7 +9,7 @@ GameObject::GameObject() {
   ib_ = IndexBuffer();
   shader_ = Shader();
   model_ = std::make_unique<Model>();
-  
+  texture_ = Texture();
   
 }
 
@@ -26,6 +26,11 @@ void GameObject::loadShader( const std::string& filename ) {
   shader_.init( filename );
 }
 
+void GameObject::loadTexture( unsigned char* textureData, int width, int height ) {
+  // https://www.raywenderlich.com/3047-opengl-es-2-0-for-iphone-tutorial-part-2-textures
+  texture_.init( textureData, width, height );
+}
+
 bool GameObject::loadModelFromGltf( std::string modelName ) {
   
   bool modelLoaded = model_ -> loadFromGltf( modelName );
@@ -37,13 +42,7 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
   loadIndexData( model_ -> indexData(), indexCount_ );
   loadShader( "shaderBasic.glsl" );
-  
-  shader_ = Shader();
-  shader_.init( "shaderBasic.glsl" );
-  
-  // https://www.raywenderlich.com/3047-opengl-es-2-0-for-iphone-tutorial-part-2-textures
-  texture_ = Texture();
-  texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
+  loadTexture( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
   normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
