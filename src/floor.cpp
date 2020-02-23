@@ -4,26 +4,67 @@
 
 Floor::Floor() {
   
-  float vertices[] = {
-      -0.5f, 0.0f, -0.5f, 0.87f, 0.733f, 0.129f, 1.0f
-    ,  0.5f, 0.0f, -0.5f, 0.87f, 0.733f, 0.129f, 1.0f 
-    ,  0.5f, 0.0f,  0.5f, 0.87f, 0.733f, 0.129f, 1.0f
-    , -0.5f, 0.0f,  0.5f, 0.87f, 0.733f, 0.129f, 1.0f
+  std::vector<float> vertices = {
+      -100.0f, -0.01f, -100.0f, 0.87f, 0.87f, 0.623f, 0.129f
+    , -100.0f, -0.01f,   10.0f, 0.87f, 0.87f, 0.623f, 0.129f 
+    ,  100.0f, -0.01f,   10.0f, 0.87f, 0.87f, 0.623f, 0.129f
+    ,  100.0f, -0.01f, -100.0f, 0.87f, 0.87f, 0.623f, 0.129f
   };
   
-  const unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
+  std::vector<int> indices = {
+      0, 1, 2 , 2 , 3 , 0
+  };
   
-  // float vertices[] = {
-  //     -100.0f, 0.0f, -100.0f, 0.87f, 0.733f, 0.129f, 1.0f
-  //   , -100.0f, 0.0f,   10.0f, 0.87f, 0.733f, 0.129f, 1.0f 
-  //   ,  100.0f, 0.0f,   10.0f, 0.87f, 0.733f, 0.129f, 1.0f
-  //   ,  100.0f, 0.0f, -100.0f, 0.87f, 0.733f, 0.129f, 1.0f
-  // };
+  unsigned int indicesOffset = 4;
   
-  // const unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
+  for( int x = -3; x < 10; x += 4 ) {
+    
+    vertices.push_back( ( float )x );
+    vertices.push_back( 0.0f );
+    vertices.push_back( -1.0f );
+    vertices.push_back( 0.87f );
+    vertices.push_back( 0.733f );
+    vertices.push_back( 0.129f );
+    vertices.push_back( 1.0f );
+    
+    vertices.push_back( ( float )x );
+    vertices.push_back( 0.0f );
+    vertices.push_back( 1.0f );
+    vertices.push_back( 0.87f );
+    vertices.push_back( 0.733f );
+    vertices.push_back( 0.129f );
+    vertices.push_back( 1.0f );
+    
+    vertices.push_back( ( float )( x + 2 ) );
+    vertices.push_back( 0.0f );
+    vertices.push_back( 1.0f );
+    vertices.push_back( 0.87f );
+    vertices.push_back( 0.733f );
+    vertices.push_back( 0.129f );
+    vertices.push_back( 1.0f );
+    
+    vertices.push_back( ( float )( x + 2 ) );
+    vertices.push_back( 0.0f );
+    vertices.push_back( -1.0f );
+    vertices.push_back( 0.87f );
+    vertices.push_back( 0.733f );
+    vertices.push_back( 0.129f );
+    vertices.push_back( 1.0f );
+    
+    indices.push_back( indicesOffset );
+    indices.push_back( ( indicesOffset + 1 ) );
+    indices.push_back( ( indicesOffset + 2 ) );
+    indices.push_back( ( indicesOffset + 2 ) );
+    indices.push_back( ( indicesOffset + 3 ) );
+    indices.push_back( indicesOffset );
+    
+    indicesOffset += 4;
+  }
   
-  loadVertexData( ( const void* )vertices, sizeof( vertices ) );
-  loadIndexData( indices, 6 );
+  unsigned int sizeOfVertices = sizeof( vertices[0] ) * vertices.size();
+  
+  loadVertexData( ( const void* )&vertices[0], sizeOfVertices );
+  loadIndexData( ( const void* )&indices[0], indices.size() );
   loadShader( "shaderVertexColours.glsl" );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );

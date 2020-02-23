@@ -17,7 +17,7 @@ void GameObject::loadVertexData( const void* data, unsigned int size ) {
   vb_.init( data, size );
 }
 
-void GameObject::loadIndexData( const unsigned int* data, unsigned int count ) {
+void GameObject::loadIndexData( const void* data, unsigned int count ) {
   ib_.init( data, count );
   indexCount_ = count;
 }

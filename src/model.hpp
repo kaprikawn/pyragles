@@ -71,15 +71,13 @@ class Model {
         return ( const void* )&positions_[ 0 ][ 0 ];
       }
     }
-    const unsigned int* indexData()       { return ( const unsigned int* )&indices_[ 0 ]; }
-    unsigned char*      textureCoord_0()  { return ( unsigned char* )&texcoord_0s_; }
-    
-    unsigned int        vertexDataSize()      { return vertexDataSize_; }
-    unsigned int        indexCount()          { return indexCount_; }
-    unsigned int        textureCoord_0Count() { return sizeof( glm::vec2 ) * texcoord_0s_.size(); }
-    
-    int                 textureWidth() { return textureWidth_; }
-    int                 textureHeight() { return textureHeight_; }
+    const void*     indexData()           { return ( const void* )&indices_[ 0 ]; }
+    unsigned char*  textureCoord_0()      { return ( unsigned char* )&texcoord_0s_; }
+    unsigned int    vertexDataSize()      { return vertexDataSize_; }
+    unsigned int    indexCount()          { return indexCount_; }
+    unsigned int    textureCoord_0Count() { return sizeof( glm::vec2 ) * texcoord_0s_.size(); }
+    int             textureWidth()        { return textureWidth_; }
+    int             textureHeight()       { return textureHeight_; }
     
 };
 

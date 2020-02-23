@@ -45,7 +45,7 @@ class GameObject {
     virtual void render( glm::mat4 viewProjectionMatrix );
     
     void loadVertexData( const void* data, unsigned int size );
-    void loadIndexData( const unsigned int* data, unsigned int count );
+    void loadIndexData( const void* data, unsigned int count );
     void loadShader( const std::string& filename );
     void loadTexture( unsigned char* textureData, int width, int height );
     
