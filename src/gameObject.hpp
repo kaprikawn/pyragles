@@ -24,6 +24,7 @@ class GameObject {
     int  positionID_;
     int  normalID_;
     int  texCoordID_;
+    int  colourID_;
     int  mvpID_;
     
     float yAngle_ = 0;
@@ -37,13 +38,13 @@ class GameObject {
     GameObject();
     ~GameObject();
     
-    virtual bool init( std::string modelName, std::shared_ptr<Camera> camera );
+    virtual bool init( std::string modelName );
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
     
-    virtual void loadVertexData( const void* data, unsigned int size );
-    virtual void loadIndexData( const unsigned int* data, unsigned int count );
-    virtual void loadShader( const std::string& filename );
+    void loadVertexData( const void* data, unsigned int size );
+    void loadIndexData( const unsigned int* data, unsigned int count );
+    void loadShader( const std::string& filename );
     
 };
 

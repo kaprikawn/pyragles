@@ -8,24 +8,46 @@ let cores=`grep -c ^processor /proc/cpuinfo`
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $SCRIPT_DIR/..
 PROJECT_DIR=$PWD
+ASSETS_DIR_DEV=$PROJECT_DIR/src/assets
+ASSETS_DIR_BUILD=$PROJECT_DIR/build/assets
 
 cd $PROJECT_DIR || exit 1
+
+clear
 
 if [[ $# -gt 0 ]]; then
   if [[ $1 == "clean" ]]; then
     if [[ -d build ]]; then
-      rm -rf build
+      rm -rfv build
     fi
+  fi
+else
+  # make sure all the assets dir files are correct in the build dir
+  if [[ -d $ASSETS_DIR_DEV && -d $ASSETS_DIR_BUILD ]]; then
+    for f in $ASSETS_DIR_DEV/*.*
+    do
+      file=$(basename $f)
+      if [[ -e $ASSETS_DIR_BUILD/$file ]]; then
+        md5HashSrc=( $(md5sum $ASSETS_DIR_DEV/$file | cut -d ' ' -f 1 ) )
+        md5HashDest=( $(md5sum $ASSETS_DIR_BUILD/$file | cut -d ' ' -f 1 ) )
+        
+        if [[ $md5HashSrc != $md5HashDest ]]; then
+          echo $file is different - updating
+          if [[ -e $ASSETS_DIR_BUILD/$file ]]; then
+            rm -f $ASSETS_DIR_BUILD/$file
+          fi
+          cp -v $ASSETS_DIR_DEV/$file $ASSETS_DIR_BUILD/$file
+        fi
+      fi
+    done
   fi
 fi
 
 if [[ ! -d build ]]; then
-  mkdir build
+  mkdir -v build
 fi
 
 cd build || exit 1
-
-clear
 
 cmake .. || exit 1
 
@@ -40,7 +62,7 @@ command=""
 
 if [[ $useHUD -eq 1 ]]
 then
-  command+='GALLIUM_HUD=".dfps;cpu0+cpu1+cpu2+cpu3;GPU-load;VRAM-usage" '
+  command+='GALLIUM_HUD=".dfps;cpu0+cpu1+cpu2+cpu3+cpu4+cpu5+cpu6+cpu7;GPU-load;VRAM-usage" '
 fi
 
 command+='./pyragles'

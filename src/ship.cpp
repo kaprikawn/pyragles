@@ -6,7 +6,7 @@ Ship::Ship() {
   
 }
 
-bool Ship::init( std::string modelName, std::shared_ptr<Camera> camera ) {
+bool Ship::init( std::string modelName ) {
   
   gltf_ = std::make_unique<Gltf>();
   bool gltfLoaded = gltf_ -> init( modelName );
@@ -17,11 +17,8 @@ bool Ship::init( std::string modelName, std::shared_ptr<Camera> camera ) {
   loadIndexData( gltf_ -> indexData(), gltf_ -> indexCount() );
   loadShader( "shaderBasic.glsl" );
   
-  shader_ = Shader();
-  shader_.init( "shaderBasic.glsl" );
-  
   // https://www.raywenderlich.com/3047-opengl-es-2-0-for-iphone-tutorial-part-2-textures
-  texture_ = Texture();
+  texture_ = Texture(); // TODO : replace this with a loadTextureData function
   texture_.init( gltf_ -> textureData(), gltf_ -> textureWidth(), gltf_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
@@ -65,21 +62,6 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
     
   glDrawElements( GL_TRIANGLES, gltf_ -> indexCount(), GL_UNSIGNED_INT, 0 );
   
-}
-
-void Ship::loadVertexData( const void* data, unsigned int size ) {
-  vb_ = VertexBuffer();
-  vb_.init( data, size );
-}
-
-void Ship::loadIndexData( const unsigned int* data, unsigned int count ) {
-  ib_ = IndexBuffer();
-  ib_.init( data, count );
-}
-
-void Ship::loadShader( const std::string& filename ) {
-  shader_ = Shader();
-  shader_.init( filename );
 }
 
 Ship::~Ship() {

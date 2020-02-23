@@ -19,10 +19,9 @@ void GameObject::loadIndexData( const unsigned int* data, unsigned int count ) {
 void GameObject::loadShader( const std::string& filename ) {
   shader_ = Shader();
   shader_.init( filename );
-  
 }
 
-bool GameObject::init( std::string modelName, std::shared_ptr<Camera> camera ) {
+bool GameObject::init( std::string modelName ) {
   
   gltf_ = std::make_unique<Gltf>();
   bool gltfLoaded = gltf_ -> init( modelName );

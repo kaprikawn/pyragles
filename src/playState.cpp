@@ -8,25 +8,30 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   camera_ = camera;
   viewProjectionMatrix_ = camera_ -> viewProjectionMatrix();
   
-  ship_ = std::make_unique<Ship>();
-  bool loadSuccessful = ship_ -> init( "ship.glb", camera_ );
-  if( !loadSuccessful )
-    return false;
+  // ship_ = std::make_unique<Ship>();
+  // bool loadSuccessful = ship_ -> init( "ship.glb" );
+  // if( !loadSuccessful )
+  //   return false;
   
   floor_ = std::make_unique<Floor>();
+  bool loadSuccessful = floor_ -> init( "ship.glb" );
+  if( !loadSuccessful )
+    return false;
   
   return true;
 }
 
 void PlayState::update( GLfloat dt ) {
   
-  ship_ -> update( dt );
+  //ship_ -> update( dt );
+  floor_ -> update( dt );
 
 }
 
 void PlayState::render() {
   
-  ship_ -> render( viewProjectionMatrix_ );
+  //ship_ -> render( viewProjectionMatrix_ );
+  floor_ -> render( viewProjectionMatrix_ );
 
 }
 
