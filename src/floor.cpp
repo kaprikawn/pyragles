@@ -17,48 +17,96 @@ Floor::Floor() {
   
   unsigned int indicesOffset = 4;
   
-  for( int x = -3; x < 10; x += 4 ) {
-    
-    vertices.push_back( ( float )x );
-    vertices.push_back( 0.0f );
-    vertices.push_back( -1.0f );
-    vertices.push_back( 0.87f );
-    vertices.push_back( 0.733f );
-    vertices.push_back( 0.129f );
-    vertices.push_back( 1.0f );
-    
-    vertices.push_back( ( float )x );
-    vertices.push_back( 0.0f );
-    vertices.push_back( 1.0f );
-    vertices.push_back( 0.87f );
-    vertices.push_back( 0.733f );
-    vertices.push_back( 0.129f );
-    vertices.push_back( 1.0f );
-    
-    vertices.push_back( ( float )( x + 2 ) );
-    vertices.push_back( 0.0f );
-    vertices.push_back( 1.0f );
-    vertices.push_back( 0.87f );
-    vertices.push_back( 0.733f );
-    vertices.push_back( 0.129f );
-    vertices.push_back( 1.0f );
-    
-    vertices.push_back( ( float )( x + 2 ) );
-    vertices.push_back( 0.0f );
-    vertices.push_back( -1.0f );
-    vertices.push_back( 0.87f );
-    vertices.push_back( 0.733f );
-    vertices.push_back( 0.129f );
-    vertices.push_back( 1.0f );
-    
-    indices.push_back( indicesOffset );
-    indices.push_back( ( indicesOffset + 1 ) );
-    indices.push_back( ( indicesOffset + 2 ) );
-    indices.push_back( ( indicesOffset + 2 ) );
-    indices.push_back( ( indicesOffset + 3 ) );
-    indices.push_back( indicesOffset );
-    
-    indicesOffset += 4;
+  for( int x = -100; x < 100; x += 4 ) {
+    for( int z = -100; z < 10; z += 4 ) {
+      vertices.push_back( ( float )x );
+      vertices.push_back( 0.0f );
+      vertices.push_back( ( float )z );
+      vertices.push_back( 0.87f );
+      vertices.push_back( 0.733f );
+      vertices.push_back( 0.129f );
+      vertices.push_back( 1.0f );
+      
+      vertices.push_back( ( float )x );
+      vertices.push_back( 0.0f );
+      vertices.push_back( ( float )( z + 2 ) );
+      vertices.push_back( 0.87f );
+      vertices.push_back( 0.733f );
+      vertices.push_back( 0.129f );
+      vertices.push_back( 1.0f );
+      
+      vertices.push_back( ( float )( x + 2 ) );
+      vertices.push_back( 0.0f );
+      vertices.push_back( ( float )( z + 2 ) );
+      vertices.push_back( 0.87f );
+      vertices.push_back( 0.733f );
+      vertices.push_back( 0.129f );
+      vertices.push_back( 1.0f );
+      
+      vertices.push_back( ( float )( x + 2 ) );
+      vertices.push_back( 0.0f );
+      vertices.push_back( ( float )z );
+      vertices.push_back( 0.87f );
+      vertices.push_back( 0.733f );
+      vertices.push_back( 0.129f );
+      vertices.push_back( 1.0f );
+      
+      indices.push_back( indicesOffset );
+      indices.push_back( ( indicesOffset + 1 ) );
+      indices.push_back( ( indicesOffset + 2 ) );
+      indices.push_back( ( indicesOffset + 2 ) );
+      indices.push_back( ( indicesOffset + 3 ) );
+      indices.push_back( indicesOffset );
+      
+      indicesOffset += 4;
+      
+    }
+  }
+  
+  for( int x = -102; x < 100; x += 4 ) {
+    for( int z = -102; z < 10; z += 4 ) {
+      vertices.push_back( ( float )x );
+      vertices.push_back( 0.0f );
+      vertices.push_back( ( float )z );
+      vertices.push_back( 0.87f );
+      vertices.push_back( 0.733f );
+      vertices.push_back( 0.129f );
+      vertices.push_back( 1.0f );
+      
+      vertices.push_back( ( float )x );
+      vertices.push_back( 0.0f );
+      vertices.push_back( ( float )( z + 2 ) );
+      vertices.push_back( 0.87f );
+      vertices.push_back( 0.733f );
+      vertices.push_back( 0.129f );
+      vertices.push_back( 1.0f );
+      
+      vertices.push_back( ( float )( x + 2 ) );
+      vertices.push_back( 0.0f );
+      vertices.push_back( ( float )( z + 2 ) );
+      vertices.push_back( 0.87f );
+      vertices.push_back( 0.733f );
+      vertices.push_back( 0.129f );
+      vertices.push_back( 1.0f );
+      
+      vertices.push_back( ( float )( x + 2 ) );
+      vertices.push_back( 0.0f );
+      vertices.push_back( ( float )z );
+      vertices.push_back( 0.87f );
+      vertices.push_back( 0.733f );
+      vertices.push_back( 0.129f );
+      vertices.push_back( 1.0f );
+      
+      indices.push_back( indicesOffset );
+      indices.push_back( ( indicesOffset + 1 ) );
+      indices.push_back( ( indicesOffset + 2 ) );
+      indices.push_back( ( indicesOffset + 2 ) );
+      indices.push_back( ( indicesOffset + 3 ) );
+      indices.push_back( indicesOffset );
+      
+      indicesOffset += 4;
+      
+    }
   }
   
   unsigned int sizeOfVertices = sizeof( vertices[0] ) * vertices.size();
@@ -84,6 +132,11 @@ void Floor::update( float dt ) {
   // rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   // modelMatrix_ = glm::mat4( 1.0f );
   // modelMatrix_ *= rotationMatrix_;
+  
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, zPos_ ) );
+  zPos_ += dt * 10;
+  while( zPos_ > 4 )
+    zPos_ -= 4;
 }
 
 void Floor::render( glm::mat4 viewProjectionMatrix ) {

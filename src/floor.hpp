@@ -6,6 +6,8 @@
 class Floor : public GameObject {
   
   private :
+  
+    float zPos_ = 0;
     
   public :
     Floor();
