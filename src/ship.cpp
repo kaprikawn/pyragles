@@ -1,46 +1,25 @@
-#include "gameObject.hpp"
+#include "ship.hpp"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
-GameObject::GameObject() {
-  modelMatrix_  = glm::mat4( 1.0f );
-  vb_           = VertexBuffer();
-  ib_           = IndexBuffer();
-  shader_       = Shader();
-  model_        = std::make_unique<Model>();
-  texture_      = Texture();
-}
-
-void GameObject::loadVertexData( const void* data, unsigned int size ) {
-  vb_.init( data, size );
-}
-
-void GameObject::loadIndexData( const void* data, unsigned int count ) {
-  ib_.init( data, count );
-  indexCount_ = count;
-}
-
-void GameObject::loadShader( const std::string& filename ) {
-  shader_.init( filename );
-}
-
-void GameObject::loadTexture( unsigned char* textureData, int width, int height ) {
-  // https://www.raywenderlich.com/3047-opengl-es-2-0-for-iphone-tutorial-part-2-textures
-  texture_.init( textureData, width, height );
-}
-
-bool GameObject::loadModelFromGltf( std::string modelName ) {
+Ship::Ship() {
   
-  bool modelLoaded = model_ -> loadFromGltf( modelName );
-  if( !modelLoaded )
+}
+
+bool Ship::init( std::string modelName ) {
+  
+  //model_ = std::make_unique<Model>();
+  bool gltfLoaded = loadModelFromGltf( modelName );
+  if( !gltfLoaded )
     return false;
   
-  indexCount_ = model_ -> indexCount();
-  
   loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
-  loadIndexData( model_ -> indexData(), indexCount_ );
+  loadIndexData( model_ -> indexData(), model_ -> indexCount() );
   loadShader( "shaderBasic.glsl" );
-  loadTexture( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
+  
+  // https://www.raywenderlich.com/3047-opengl-es-2-0-for-iphone-tutorial-part-2-textures
+  texture_ = Texture();
+  texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
   normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
@@ -54,7 +33,7 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   return true;
 }
 
-void GameObject::update( float dt ) {
+void Ship::update( float dt ) {
   
   yAngle_ += dt * 100;
   if( yAngle_ > 360 )
@@ -66,7 +45,7 @@ void GameObject::update( float dt ) {
   
 }
 
-void GameObject::render( glm::mat4 viewProjectionMatrix ) {
+void Ship::render( glm::mat4 viewProjectionMatrix ) {
   
   mvp_ = viewProjectionMatrix * modelMatrix_;
   
@@ -85,6 +64,7 @@ void GameObject::render( glm::mat4 viewProjectionMatrix ) {
   
 }
 
-GameObject::~GameObject() {
+Ship::~Ship() {
   
 }
+

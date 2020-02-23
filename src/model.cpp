@@ -1,13 +1,9 @@
-#include "gltf.hpp"
+#include "model.hpp"
 #include <iostream>
 #include <regex>
 #include "../deps/stb_image.h"
 
-Gltf::Gltf() {
-  
-}
-
-bool Gltf::init( const std::string& filename ) {
+bool Model::loadFromGltf( const std::string& filename ) {
   
   std::string filepath = "./assets/" + filename;
   
@@ -72,10 +68,11 @@ bool Gltf::init( const std::string& filename ) {
       unsigned int normalsCount;
       unsigned int uvCount;
       
-      positions_        = Gltf::positions( positionIndex, positionsCount );
-      normals_          = Gltf::normals( normalIndex, normalsCount );
-      texcoord_0s_      = Gltf::texcoord_0s( texcoord_0Index, uvCount );
-      indices_          = Gltf::indices( indicesIndex );
+      positions_        = Model::positions( positionIndex, positionsCount );
+      normals_          = Model::normals( normalIndex, normalsCount );
+      texcoord_0s_      = Model::texcoord_0s( texcoord_0Index, uvCount );
+      indices_          = Model::indices( indicesIndex );
+      indexCount_     = indices_.size();
       
       if( positionsCount == uvCount && positionsCount > 0 ) {
         useUvData_ = true;
@@ -103,12 +100,12 @@ bool Gltf::init( const std::string& filename ) {
     }
   }
   
-  Gltf::loadTexture();
+  Model::loadTexture();
   
   return true;
 }
 
-void Gltf::loadTexture() {
+void Model::loadTexture() {
   auto images_found = json_.find( "images" );
   if( images_found == json_.end() )
     return;
@@ -125,7 +122,7 @@ void Gltf::loadTexture() {
   
 }
 
-std::vector<glm::vec3> Gltf::positions( unsigned int positionIndex, unsigned int &positionsCount ) {
+std::vector<glm::vec3> Model::positions( unsigned int positionIndex, unsigned int &positionsCount ) {
   
   std::vector<glm::vec3> myVecs;
   
@@ -160,7 +157,7 @@ std::vector<glm::vec3> Gltf::positions( unsigned int positionIndex, unsigned int
   return myVecs;
 }
 
-std::vector<glm::vec3> Gltf::normals( unsigned int normalIndex, unsigned int &normalCount ) {
+std::vector<glm::vec3> Model::normals( unsigned int normalIndex, unsigned int &normalCount ) {
   
   std::vector<glm::vec3> myVecs;
   
@@ -195,7 +192,7 @@ std::vector<glm::vec3> Gltf::normals( unsigned int normalIndex, unsigned int &no
   return myVecs;
 }
 
-std::vector<glm::vec2> Gltf::texcoord_0s( unsigned int texcoord_0Index, unsigned int &uvCount ) {
+std::vector<glm::vec2> Model::texcoord_0s( unsigned int texcoord_0Index, unsigned int &uvCount ) {
   
   std::vector<glm::vec2> myVecs;
   
@@ -226,7 +223,7 @@ std::vector<glm::vec2> Gltf::texcoord_0s( unsigned int texcoord_0Index, unsigned
   return myVecs;
 }
 
-std::vector<GLuint> Gltf::indices( unsigned int indicesIndex ) {
+std::vector<GLuint> Model::indices( unsigned int indicesIndex ) {
   
   std::vector<GLuint> myVec;
   
@@ -257,7 +254,7 @@ std::vector<GLuint> Gltf::indices( unsigned int indicesIndex ) {
 
 }
 
-std::vector<GLfloat> Gltf::floats( unsigned int byteOffset, unsigned int byteLength ) {
+std::vector<GLfloat> Model::floats( unsigned int byteOffset, unsigned int byteLength ) {
   
   std::vector<GLfloat> myFloats;
   
@@ -278,7 +275,7 @@ std::vector<GLfloat> Gltf::floats( unsigned int byteOffset, unsigned int byteLen
   return myFloats;
 }
 
-std::vector<GLushort> Gltf::ushorts( unsigned int byteOffset, unsigned int byteLength ) {
+std::vector<GLushort> Model::ushorts( unsigned int byteOffset, unsigned int byteLength ) {
   
   std::vector<GLushort> myUshorts;
   
@@ -299,7 +296,7 @@ std::vector<GLushort> Gltf::ushorts( unsigned int byteOffset, unsigned int byteL
   return myUshorts;
 }
 
-Gltf::~Gltf() {
+Model::~Model() {
   if( textureData_ )
     delete textureData_;
   

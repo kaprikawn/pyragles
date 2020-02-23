@@ -1,7 +1,7 @@
 #!/bin/bash
 
 className=$1
-classIdentifer=${className^l}
+classIdentifer=${className^}
 
 if [[ -z $className ]]; then
   echo "No class provided"
