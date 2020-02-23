@@ -5,13 +5,22 @@
 Floor::Floor() {
   
   float vertices[] = {
-      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f 
-    ,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+      -0.5f, 0.0f, -0.5f, 0.87f, 0.733f, 0.129f, 1.0f
+    ,  0.5f, 0.0f, -0.5f, 0.87f, 0.733f, 0.129f, 1.0f 
+    ,  0.5f, 0.0f,  0.5f, 0.87f, 0.733f, 0.129f, 1.0f
+    , -0.5f, 0.0f,  0.5f, 0.87f, 0.733f, 0.129f, 1.0f
   };
   
   const unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
+  
+  // float vertices[] = {
+  //     -100.0f, 0.0f, -100.0f, 0.87f, 0.733f, 0.129f, 1.0f
+  //   , -100.0f, 0.0f,   10.0f, 0.87f, 0.733f, 0.129f, 1.0f 
+  //   ,  100.0f, 0.0f,   10.0f, 0.87f, 0.733f, 0.129f, 1.0f
+  //   ,  100.0f, 0.0f, -100.0f, 0.87f, 0.733f, 0.129f, 1.0f
+  // };
+  
+  // const unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
   
   loadVertexData( ( const void* )vertices, sizeof( vertices ) );
   loadIndexData( indices, 6 );
@@ -27,13 +36,13 @@ Floor::Floor() {
 
 
 void Floor::update( float dt ) {
-  yAngle_ += dt * 100;
-  if( yAngle_ > 360 )
-    yAngle_ -= 360;
+  // yAngle_ += dt * 100;
+  // if( yAngle_ > 360 )
+  //   yAngle_ -= 360;
     
-  rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-  modelMatrix_ = glm::mat4( 1.0f );
-  modelMatrix_ *= rotationMatrix_;
+  // rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+  // modelMatrix_ = glm::mat4( 1.0f );
+  // modelMatrix_ *= rotationMatrix_;
 }
 
 void Floor::render( glm::mat4 viewProjectionMatrix ) {
