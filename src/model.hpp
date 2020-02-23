@@ -1,5 +1,5 @@
-#ifndef GLTF_HPP
-#define GLTF_HPP
+#ifndef MODEL_HPP
+#define MODEL_HPP
 
 #include <string>
 #include <fstream>
@@ -9,10 +9,10 @@
 #include <memory>
 #include "../deps/json.hpp"
 
-class Gltf {
+class Model {
   private:
     
-    // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#binary-gltf-layout
+    // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#binary-model-layout
     
     // json
     unsigned int        jsonStartByte_          = 12;
@@ -32,6 +32,7 @@ class Gltf {
     std::vector<glm::vec3>    normals_;
     std::vector<glm::vec2>    texcoord_0s_;
     std::vector<unsigned int> indices_;
+    unsigned int              indexCount_ = 0;
     
     bool                      useUvData_ = false;
     std::vector<float>        vertexData_;
@@ -47,10 +48,10 @@ class Gltf {
     
   public:
     
-    Gltf();
-    ~Gltf();
+    Model(){};
+    ~Model();
     
-    bool init( const std::string& filename );
+    bool loadFromGltf( const std::string& filename );
     
     std::vector<glm::vec3>  positions( unsigned int positionIndex     , unsigned int &positionsCount );
     std::vector<glm::vec3>  normals( unsigned int normalIndex         , unsigned int &normalsCount );
@@ -74,11 +75,12 @@ class Gltf {
     unsigned char*      textureCoord_0()  { return ( unsigned char* )&texcoord_0s_; }
     
     unsigned int        vertexDataSize()      { return vertexDataSize_; }
-    unsigned int        indexCount()          { return indices_.size(); }
+    unsigned int        indexCount()          { return indexCount_; }
     unsigned int        textureCoord_0Count() { return sizeof( glm::vec2 ) * texcoord_0s_.size(); }
     
     int                 textureWidth() { return textureWidth_; }
     int                 textureHeight() { return textureHeight_; }
+    
 };
 
-#endif //GLTF_HPP
+#endif //MODEL_HPP

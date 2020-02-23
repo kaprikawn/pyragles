@@ -3,7 +3,7 @@ add_executable( ${PROJECT_NAME}
   texture.cpp indexBuffer.cpp vertexBuffer.cpp shader.cpp
   gameObject.cpp
   gameStateMachine.cpp playState.cpp
-  gltf.cpp
+  model.cpp
   ship.cpp floor.cpp
   game.cpp main.cpp
 )

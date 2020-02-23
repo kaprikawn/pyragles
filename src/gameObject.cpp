@@ -3,33 +3,39 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 GameObject::GameObject() {
-  modelMatrix_ = glm::mat4( 1.0f );
+  std::cout << "calling gameobject constructor\n";
+  modelMatrix_  = glm::mat4( 1.0f );
+  vb_ = VertexBuffer();
+  ib_ = IndexBuffer();
+  shader_ = Shader();
+  model_ = std::make_unique<Model>();
+  
+  
 }
 
 void GameObject::loadVertexData( const void* data, unsigned int size ) {
-  vb_ = VertexBuffer();
   vb_.init( data, size );
 }
 
 void GameObject::loadIndexData( const unsigned int* data, unsigned int count ) {
-  ib_ = IndexBuffer();
   ib_.init( data, count );
+  indexCount_ = count;
 }
 
 void GameObject::loadShader( const std::string& filename ) {
-  shader_ = Shader();
   shader_.init( filename );
 }
 
-bool GameObject::init( std::string modelName ) {
+bool GameObject::loadModelFromGltf( std::string modelName ) {
   
-  gltf_ = std::make_unique<Gltf>();
-  bool gltfLoaded = gltf_ -> init( modelName );
-  if( !gltfLoaded )
+  bool modelLoaded = model_ -> loadFromGltf( modelName );
+  if( !modelLoaded )
     return false;
   
-  loadVertexData( gltf_ -> vertexData(), gltf_ -> vertexDataSize() );
-  loadIndexData( gltf_ -> indexData(), gltf_ -> indexCount() );
+  indexCount_ = model_ -> indexCount();
+  
+  loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
+  loadIndexData( model_ -> indexData(), indexCount_ );
   loadShader( "shaderBasic.glsl" );
   
   shader_ = Shader();
@@ -37,7 +43,7 @@ bool GameObject::init( std::string modelName ) {
   
   // https://www.raywenderlich.com/3047-opengl-es-2-0-for-iphone-tutorial-part-2-textures
   texture_ = Texture();
-  texture_.init( gltf_ -> textureData(), gltf_ -> textureWidth(), gltf_ -> textureHeight() );
+  texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
   normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
@@ -78,7 +84,7 @@ void GameObject::render( glm::mat4 viewProjectionMatrix ) {
   glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) );
   ib_.bind();
     
-  glDrawElements( GL_TRIANGLES, gltf_ -> indexCount(), GL_UNSIGNED_INT, 0 );
+  glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
   
 }
 

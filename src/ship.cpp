@@ -8,18 +8,18 @@ Ship::Ship() {
 
 bool Ship::init( std::string modelName ) {
   
-  gltf_ = std::make_unique<Gltf>();
-  bool gltfLoaded = gltf_ -> init( modelName );
+  //model_ = std::make_unique<Model>();
+  bool gltfLoaded = loadModelFromGltf( modelName );
   if( !gltfLoaded )
     return false;
   
-  loadVertexData( gltf_ -> vertexData(), gltf_ -> vertexDataSize() );
-  loadIndexData( gltf_ -> indexData(), gltf_ -> indexCount() );
+  loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
+  loadIndexData( model_ -> indexData(), model_ -> indexCount() );
   loadShader( "shaderBasic.glsl" );
   
   // https://www.raywenderlich.com/3047-opengl-es-2-0-for-iphone-tutorial-part-2-textures
-  texture_ = Texture(); // TODO : replace this with a loadTextureData function
-  texture_.init( gltf_ -> textureData(), gltf_ -> textureWidth(), gltf_ -> textureHeight() );
+  texture_ = Texture();
+  texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
   normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
@@ -60,7 +60,7 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) );
   ib_.bind();
     
-  glDrawElements( GL_TRIANGLES, gltf_ -> indexCount(), GL_UNSIGNED_INT, 0 );
+  glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
   
 }
 

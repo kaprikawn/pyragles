@@ -11,7 +11,7 @@ class Floor : public GameObject {
     Floor();
     ~Floor();
     
-    virtual bool init( std::string modelName );
+    //virtual bool init( std::string modelName );
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
   

@@ -10,8 +10,7 @@ class Ship : public GameObject {
   public :
     Ship();
     ~Ship();
-    
-    virtual bool init( std::string modelName );
+    bool init( std::string modelName );
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
   
