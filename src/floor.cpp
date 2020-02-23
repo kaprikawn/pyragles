@@ -148,4 +148,6 @@ void Floor::render( glm::mat4 viewProjectionMatrix ) {
   
 }
 
-Floor::~Floor() {}
+Floor::~Floor() {
+  
+}

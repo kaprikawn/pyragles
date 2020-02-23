@@ -38,7 +38,7 @@ class GameObject {
   public:
     
     GameObject();
-    ~GameObject();
+    virtual ~GameObject();
     
     bool loadModelFromGltf( std::string modelName );
     virtual void update( float dt );
