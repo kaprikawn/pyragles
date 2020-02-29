@@ -77,6 +77,8 @@ class InputHandler {
     
     bool quit() { return quit_; }
     
+    bool yInverted() { return yInverted_; }
+    
 };
 
 #endif //INPUTHANDLER_HPP

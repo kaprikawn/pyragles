@@ -33,6 +33,10 @@ bool Ship::init( std::string modelName ) {
   return true;
 }
 
+void Ship::handleInput( float dt ) {
+  
+}
+
 void Ship::update( float dt ) {
   
   
