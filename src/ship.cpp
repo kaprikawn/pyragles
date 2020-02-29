@@ -125,7 +125,7 @@ float differenceBetween( float target, float current ) {
 
 void Ship::calculateRotation( float dt ) {
   
-  float maxRotationZ_ = 10.0f; // tilt
+  float maxRotationZ_ = 20.0f; // tilt
   float maxRotationY_ = 25.0f; // turn
   float maxRotationX_ = 10.0f; // up/down pitch
   
