@@ -1,7 +1,6 @@
 #ifndef GAMEOBJECT_HPP
 #define GAMEOBJECT_HPP
 
-
 #include "vertexBuffer.hpp"
 #include "indexBuffer.hpp"
 #include "shader.hpp"
@@ -29,9 +28,12 @@ class GameObject {
     
     float yAngle_ = 0;
     
-    glm::mat4     modelMatrix_;
-    glm::mat4     rotationMatrix_;
-    glm::mat4     mvp_;
+    glm::mat4 modelMatrix_;
+    glm::mat4 rotationMatrix_;
+    glm::mat4 mvp_;
+    glm::vec3 acceleration_;
+    glm::vec3 velocity_;
+    glm::vec3 position_;
     
     unsigned int  indexCount_ = 0;
     
@@ -40,7 +42,8 @@ class GameObject {
     GameObject();
     virtual ~GameObject();
     
-    bool loadModelFromGltf( std::string modelName );
+    bool  loadModelFromGltf( std::string modelName );
+    void  updatePosition( glm::vec3 velocity, float dt, bool skip = false );
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
     

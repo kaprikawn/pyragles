@@ -8,7 +8,7 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   camera_ = camera;
   viewProjectionMatrix_ = camera_ -> viewProjectionMatrix();
   
-  ship_ = std::make_unique<Ship>();
+  ship_ = std::make_unique<Ship>( inputHandler );
   bool loadSuccessful = ship_ -> init( "ship.glb" );
   if( !loadSuccessful )
     return false;

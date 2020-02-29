@@ -32,7 +32,8 @@ class InputHandler {
     int     whichOne_;
     void    onJoystickAxisMove( SDL_Event &event );
     
-    bool    fireJustPressed_ = false;
+    bool    fireJustPressed_  = false;
+    bool    yInverted_        = false;
     
     Uint8   currentHat_   = 0;
     
@@ -41,6 +42,9 @@ class InputHandler {
     bool quit_ = false;
     
   public:
+  
+    InputHandler( bool invertY );
+    ~InputHandler();
     
     void processEvent( SDL_Event& event, Uint32 frameTime );
     void reset();
@@ -56,9 +60,9 @@ class InputHandler {
       return false;
     }
     
-    GLfloat joyAxisX() { return joyAxisX_; }
-    GLfloat joyAxisY( bool invertY ) {
-      if( invertY )
+    float joyAxisX() { return joyAxisX_; }
+    float joyAxisY() {
+      if( yInverted_ )
         return -joyAxisY_;
       
       return joyAxisY_;
@@ -72,6 +76,8 @@ class InputHandler {
     void  onGamepadButtonDown( SDL_Event &event );
     
     bool quit() { return quit_; }
+    
+    bool yInverted() { return yInverted_; }
     
 };
 

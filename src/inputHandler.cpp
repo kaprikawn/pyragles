@@ -1,6 +1,11 @@
 #include "inputHandler.hpp"
 #include <iostream>
 
+InputHandler::InputHandler( bool invertY ) {
+  if( invertY )
+    yInverted_ = true;
+}
+
 void InputHandler::calculateJoyAxis() {
   
   if( keystates_[ SDL_SCANCODE_W ] == 1 ) {
@@ -160,4 +165,8 @@ void InputHandler::processEvent( SDL_Event& event, Uint32 frameTime ) {
 
 void InputHandler::reset() {
   justPressed_[ FIRE ] = false;
+}
+
+InputHandler::~InputHandler() {
+  
 }

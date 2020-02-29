@@ -1,9 +1,12 @@
 #include "ship.hpp"
 #include <iostream>
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Ship::Ship() {
+Ship::Ship( std::shared_ptr<InputHandler> inputHandler ) {
+  inputHandler_ = inputHandler;
   
+  position_.z = -3.0f;
 }
 
 bool Ship::init( std::string modelName ) {
@@ -33,15 +36,177 @@ bool Ship::init( std::string modelName ) {
   return true;
 }
 
+void Ship::handleInput( float dt ) {
+  
+  float multiplier      = 8.0f;
+  float standstillSpeed = 4.0f;
+  
+  // left and right
+  float xMax      = 6.0f;
+  joyAxisX_       = inputHandler_ -> joyAxisX();
+  acceleration_.x = joyAxisX_ * multiplier;
+  
+  if( joyAxisX_ == 0.0f ) {
+    if( velocity_.x > 0.0f ) {
+      acceleration_.x = -standstillSpeed;
+      velocity_.x += acceleration_.x * dt;
+      
+      if( velocity_.x < 0.0f ) {
+        velocity_.x = 0.0f;
+        acceleration_.x = 0.0f;
+      }
+    } else if( velocity_.x < 0.0f ) {
+      acceleration_.x = standstillSpeed;
+      velocity_.x += acceleration_.x * dt;
+      
+      if( velocity_.x > 0.0f ) {
+        velocity_.x = 0.0f;
+        acceleration_.x = 0.0f;
+      }
+    }
+  } else if( ( joyAxisX_ < 0.0f && velocity_.x > 0.0f )
+          || ( joyAxisX_ > 0.0f && velocity_.x < 0.0f ) ) {
+    acceleration_.x *= 3;
+  }
+  
+  velocity_.x += acceleration_.x * dt;
+  
+  if( velocity_.x > xMax )
+    velocity_.x = xMax;
+  
+  if( velocity_.x < -xMax )
+    velocity_.x = -xMax;
+  
+  // up and down
+  float yMax      = 6.0f;
+  joyAxisY_  = inputHandler_ -> joyAxisY();
+  acceleration_.y = joyAxisY_ * multiplier;
+  
+  if( joyAxisY_ == 0.0f ) {
+    if( velocity_.y > 0.0f ) {
+      acceleration_.y = -standstillSpeed;
+      velocity_.y += acceleration_.y * dt;
+      
+      if( velocity_.y < 0.0f ) {
+        velocity_.y = 0.0f;
+        acceleration_.y = 0.0f;
+      }
+    } else if( velocity_.y < 0.0f ) {
+      acceleration_.y = standstillSpeed;
+      velocity_.y += acceleration_.y * dt;
+      
+      if( velocity_.y > 0.0f ) {
+        velocity_.y = 0.0f;
+        acceleration_.y = 0.0f;
+      }
+    }
+  } else if( ( joyAxisY_ < 0.0f && velocity_.y > 0.0f )
+          || ( joyAxisY_ > 0.0f && velocity_.y < 0.0f ) ) {
+    acceleration_.y *= 3;
+  }
+  
+  velocity_.y += acceleration_.y * dt;
+  
+  if( velocity_.y > yMax )
+    velocity_.y = yMax;
+  
+  if( velocity_.y < -yMax )
+    velocity_.y = -yMax;
+}
+
+float differenceBetween( float target, float current ) {
+  float squared = sqrt( pow( target - current, 2.0f ) );
+  
+  if( squared < 0.2 )
+    squared = 0.0f;
+    
+  return squared;
+}
+
+void Ship::calculateRotation( float dt ) {
+  
+  float maxRotationZ_ = 10.0f; // tilt
+  float maxRotationY_ = 25.0f; // turn
+  float maxRotationX_ = 10.0f; // up/down pitch
+  
+  if( joyAxisX_ > 0.0f ) { // right
+    
+    if( zAngle_ > -maxRotationZ_ ) {
+      zAngle_ -= differenceBetween( -maxRotationZ_, zAngle_ ) * 5.0f * dt;
+    }
+    
+    if( yAngle_ > -maxRotationY_ ) {
+      yAngle_ -= differenceBetween( -maxRotationY_, yAngle_ ) * 5.0f * dt;
+    }
+  } else if( joyAxisX_ < 0.0f ) { // left
+    if( zAngle_ < maxRotationZ_ ) {
+      zAngle_ += differenceBetween( maxRotationZ_, zAngle_ ) * 5.0f * dt;
+    }
+    
+    if( yAngle_ < maxRotationY_ ) {
+      yAngle_ += differenceBetween( maxRotationY_, yAngle_ ) * 5.0f * dt;
+    }
+  } else { // neither right nor left
+    if( zAngle_ > -0.3f && zAngle_ < 0.3f ) {
+      zAngle_ = 0.0f;
+    } else if( zAngle_ < 0.0f ) {
+      zAngle_ += differenceBetween( 0.0f, zAngle_ ) * 10.0f * dt;
+    } else if( zAngle_ > 0.0f ) {
+      zAngle_ -= differenceBetween( 0.0f, zAngle_ ) * 10.0f * dt;
+    }
+    
+    if( yAngle_ > -0.3f && yAngle_ < 0.3f ) {
+      yAngle_ = 0.0f;
+    } else if( yAngle_ < 0.0f ) {
+      yAngle_ += differenceBetween( 0.0f, yAngle_ ) * 10.0f * dt;
+    } else if( yAngle_ > 0.0f ) {
+      yAngle_ -= differenceBetween( 0.0f, yAngle_ ) * 10.0f * dt;
+    }
+  }
+  
+  if( joyAxisY_ > 0.0f ) { // going up
+    //xAngle_ = 20.0f;
+    if( xAngle_ < maxRotationX_ )
+      xAngle_ += differenceBetween( -maxRotationX_, xAngle_ ) * 5.0f * dt;
+      
+    if( xAngle_ > maxRotationX_ )
+      xAngle_ = maxRotationX_;
+    
+  } else if( joyAxisY_ < 0.0f ) { // going down
+    
+    if( xAngle_ > -maxRotationX_ )
+      xAngle_ -= differenceBetween( -maxRotationX_, xAngle_ ) * 5.0f * dt;
+      
+    if( xAngle_ < -maxRotationX_ )
+      xAngle_ = -maxRotationX_;
+    
+  } else { // not moving up or down
+  
+    if( xAngle_ > -0.3f && xAngle_ < 0.3f ) {
+      xAngle_ = 0.0f;
+    } else if( xAngle_ < 0.0f ) {
+      xAngle_ += differenceBetween( 0.0f, xAngle_ ) * 10.0f * dt;
+    } else if( xAngle_ > 0.0f ) {
+      xAngle_ -= differenceBetween( 0.0f, xAngle_ ) * 10.0f * dt;
+    }
+  }
+  
+  rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+  rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+  rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+  
+}
+
 void Ship::update( float dt ) {
   
-  yAngle_ += dt * 100;
-  if( yAngle_ > 360 )
-    yAngle_ -= 360;
-    
-  rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-  modelMatrix_ = glm::mat4( 1.0f );
+  handleInput( dt ); // updates velocity
+  calculateRotation( dt );
+  updatePosition( velocity_, dt );
+  
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
   modelMatrix_ *= rotationMatrix_;
+  
+  // update mesh / vertices in mesh
   
 }
 
