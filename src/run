@@ -2,6 +2,7 @@
 
 useHUD=1
 fullscreen=0
+invertY=1
 
 let cores=`grep -c ^processor /proc/cpuinfo`
 
@@ -74,9 +75,14 @@ fi
 
 command+='./pyragles'
 
-if [[ fullscreen -eq 1 ]]
+if [[ $fullscreen -eq 1 ]]
 then
   command+=' --fullscreen'
+fi
+
+if [[ $invertY -eq 1 ]]
+then
+  command+=' --invertY'
 fi
 
 echo "running $command"

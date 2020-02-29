@@ -3,7 +3,7 @@
 #include <GLES2/gl2.h>
 #include "gameStateMachine.hpp"
 
-Game::Game( bool fullscreen ) {
+Game::Game( bool fullscreen, bool invertY ) {
   
   int windowWidth   = 1280;
   int windowHeight  = 720;
@@ -30,14 +30,14 @@ Game::Game( bool fullscreen ) {
     SDL_ShowCursor( SDL_DISABLE );
   }
   
-  bool init = Game::init( "GLES2 Test", windowX, windowY, windowWidth, windowHeight, sdlFlags );
+  bool init = Game::init( "GLES2 Test", windowX, windowY, windowWidth, windowHeight, sdlFlags, invertY );
   
   if( !init )
     std::cout << "Error - game failed to start" << std::endl;
   
 }
 
-bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int windowHeight, int flags ) {
+bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int windowHeight, int flags, bool invertY ) {
   
   if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO ) != 0 ) {
     std::cout << "Failed to load SDL : " << SDL_GetError() << std::endl;
@@ -62,7 +62,7 @@ bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int win
   glDepthFunc( GL_LESS );
   
   gameStateMachine_ = std::make_unique<GameStateMachine>();
-  inputHandler_     = std::make_shared<InputHandler>();
+  inputHandler_ = std::make_shared<InputHandler>( invertY );
   camera_ = std::make_shared<Camera>( windowWidth, windowHeight );
   
   inputHandler_ -> initialiseGamepads();

@@ -22,10 +22,10 @@ class Game {
     
   public:
     
-    Game( bool fullscreen );
+    Game( bool fullscreen, bool invertY );
     ~Game(){}
     
-    bool init( const char* title, int xpos, int ypos, int windowWidth, int windowHeight, int flags );
+    bool init( const char* title, int xpos, int ypos, int windowWidth, int windowHeight, int flags, bool invertY );
     
     void run();
     void render();

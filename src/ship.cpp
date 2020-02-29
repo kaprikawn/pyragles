@@ -2,8 +2,8 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
-Ship::Ship() {
-  
+Ship::Ship( std::shared_ptr<InputHandler> inputHandler ) {
+  inputHandler_ = inputHandler;
 }
 
 bool Ship::init( std::string modelName ) {
@@ -35,13 +35,6 @@ bool Ship::init( std::string modelName ) {
 
 void Ship::update( float dt ) {
   
-  yAngle_ += dt * 100;
-  if( yAngle_ > 360 )
-    yAngle_ -= 360;
-    
-  rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-  modelMatrix_ = glm::mat4( 1.0f );
-  modelMatrix_ *= rotationMatrix_;
   
 }
 
