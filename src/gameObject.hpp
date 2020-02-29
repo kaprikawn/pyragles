@@ -11,13 +11,6 @@
 #include <memory>
 #include <string>
 
-struct Vertex {
-  glm::vec3 position  = { 0.0f, 0.0f, 0.0f };
-  glm::vec4 colour    = { 1.0f, 1.0f, 1.0f, 1.0f };
-  glm::vec2 normal    = { 0.0f, 0.0f };
-  glm::vec2 uvCoords  = { 0.0f, 0.0f };
-};
-
 class GameObject {
   protected:
   
@@ -35,11 +28,12 @@ class GameObject {
     
     float yAngle_ = 0;
     
-    glm::mat4     modelMatrix_;
-    glm::mat4     rotationMatrix_;
-    glm::mat4     mvp_;
-    glm::vec3     acceleration_ = { 0.0f, 0.0f, 0.0f };
-    glm::vec3     velocity_     = { 0.0f, 0.0f, 0.0f };
+    glm::mat4 modelMatrix_;
+    glm::mat4 rotationMatrix_;
+    glm::mat4 mvp_;
+    glm::vec3 acceleration_;
+    glm::vec3 velocity_;
+    glm::vec3 position_;
     
     unsigned int  indexCount_ = 0;
     
@@ -48,7 +42,8 @@ class GameObject {
     GameObject();
     virtual ~GameObject();
     
-    bool loadModelFromGltf( std::string modelName );
+    bool  loadModelFromGltf( std::string modelName );
+    void  updatePosition( glm::vec3 velocity, float dt, bool skip = false );
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
     

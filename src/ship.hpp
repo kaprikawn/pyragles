@@ -9,7 +9,12 @@ class Ship : public GameObject {
   private :
     std::shared_ptr<InputHandler> inputHandler_;
     
-    float zAngle_   = 0.0f;
+    float joyAxisX_ = 0.0f;
+    float joyAxisY_ = 0.0f;
+    
+    float xAngle_ = 0.0f;
+    float yAngle_ = 0.0f;
+    float zAngle_ = 0.0f;
     
   public :
     Ship( std::shared_ptr<InputHandler> inputHandler );
