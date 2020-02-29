@@ -1,7 +1,6 @@
 #ifndef GAMEOBJECT_HPP
 #define GAMEOBJECT_HPP
 
-
 #include "vertexBuffer.hpp"
 #include "indexBuffer.hpp"
 #include "shader.hpp"
@@ -11,6 +10,13 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
+
+struct Vertex {
+  glm::vec3 position  = { 0.0f, 0.0f, 0.0f };
+  glm::vec4 colour    = { 1.0f, 1.0f, 1.0f, 1.0f };
+  glm::vec2 normal    = { 0.0f, 0.0f };
+  glm::vec2 uvCoords  = { 0.0f, 0.0f };
+};
 
 class GameObject {
   protected:
@@ -32,6 +38,8 @@ class GameObject {
     glm::mat4     modelMatrix_;
     glm::mat4     rotationMatrix_;
     glm::mat4     mvp_;
+    glm::vec3     acceleration_ = { 0.0f, 0.0f, 0.0f };
+    glm::vec3     velocity_     = { 0.0f, 0.0f, 0.0f };
     
     unsigned int  indexCount_ = 0;
     

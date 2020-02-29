@@ -35,10 +35,85 @@ bool Ship::init( std::string modelName ) {
 
 void Ship::handleInput( float dt ) {
   
+  float multiplier      = 8.0f;
+  float standstillSpeed = 4.0f;
+  
+  // left and right
+  float xMax      = 6.0f;
+  float joyAxisX  = inputHandler_ -> joyAxisX();
+  acceleration_.x   = joyAxisX * multiplier;
+  
+  if( joyAxisX == 0.0f ) {
+    if( velocity_.x > 0.0f ) {
+      acceleration_.x = -standstillSpeed;
+      velocity_.x += acceleration_.x * dt;
+      
+      if( velocity_.x < 0.0f ) {
+        velocity_.x = 0.0f;
+        acceleration_.x = 0.0f;
+      }
+    } else if( velocity_.x < 0.0f ) {
+      acceleration_.x = standstillSpeed;
+      velocity_.x += acceleration_.x * dt;
+      
+      if( velocity_.x > 0.0f ) {
+        velocity_.x = 0.0f;
+        acceleration_.x = 0.0f;
+      }
+    }
+  } else if( ( joyAxisX < 0.0f && velocity_.x > 0.0f )
+          || ( joyAxisX > 0.0f && velocity_.x < 0.0f ) ) {
+    acceleration_.x *= 3;
+  }
+  
+  velocity_.x += acceleration_.x * dt;
+  
+  if( velocity_.x > xMax )
+    velocity_.x = xMax;
+  
+  if( velocity_.x < -xMax )
+    velocity_.x = -xMax;
+  
+  // up and down
+  float yMax      = 6.0f;
+  float joyAxisY  = inputHandler_ -> joyAxisY();
+  acceleration_.y = joyAxisY * multiplier;
+  
+  if( joyAxisY == 0.0f ) {
+    if( velocity_.y > 0.0f ) {
+      acceleration_.y = -standstillSpeed;
+      velocity_.y += acceleration_.y * dt;
+      
+      if( velocity_.y < 0.0f ) {
+        velocity_.y = 0.0f;
+        acceleration_.y = 0.0f;
+      }
+    } else if( velocity_.y < 0.0f ) {
+      acceleration_.y = standstillSpeed;
+      velocity_.y += acceleration_.y * dt;
+      
+      if( velocity_.y > 0.0f ) {
+        velocity_.y = 0.0f;
+        acceleration_.y = 0.0f;
+      }
+    }
+  } else if( ( joyAxisY < 0.0f && velocity_.y > 0.0f )
+          || ( joyAxisY > 0.0f && velocity_.y < 0.0f ) ) {
+    acceleration_.y *= 3;
+  }
+  
+  velocity_.y += acceleration_.y * dt;
+  
+  if( velocity_.y > yMax )
+    velocity_.y = yMax;
+  
+  if( velocity_.y < -yMax )
+    velocity_.y = -yMax;
 }
 
 void Ship::update( float dt ) {
   
+  handleInput( dt );
   
 }
 

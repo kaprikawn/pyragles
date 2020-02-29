@@ -60,9 +60,9 @@ class InputHandler {
       return false;
     }
     
-    GLfloat joyAxisX() { return joyAxisX_; }
-    GLfloat joyAxisY( bool invertY ) {
-      if( invertY )
+    float joyAxisX() { return joyAxisX_; }
+    float joyAxisY() {
+      if( yInverted_ )
         return -joyAxisY_;
       
       return joyAxisY_;
