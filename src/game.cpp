@@ -58,6 +58,7 @@ bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int win
   SDL_GL_SetSwapInterval( 1 );
   
   glClearColor( 0.0f, 0.65f, 1.0f, 1.0f );
+  glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
   glEnable( GL_DEPTH_TEST );
   glDepthFunc( GL_LESS );
   

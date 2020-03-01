@@ -28,7 +28,10 @@ void Particles::update( float dt ) {
   myPoint_[ 3 ] += 2.0f * dt;
   myPoint_[ 6 ] += 2.0f * dt;
   
-  vb_.loadBufferData( &myPoint_[ 0 ] );
+  unsigned int size = sizeof( myPoint_[ 0 ] ) * 9;
+  size = sizeof( myPoint_[ 0 ] ) * 3;
+  
+  vb_.loadBufferData( &myPoint_[ 0 ], size );
   
 }
 
@@ -42,7 +45,8 @@ void Particles::render( glm::mat4 viewProjectionMatrix ) {
   vb_.bind();
   glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, 0, 0 );
   
-  glDrawArrays( GL_TRIANGLES, 0, 3 );
+  //glDrawArrays( GL_TRIANGLES, 0, 3 );
+  glDrawArrays( GL_POINTS, 0, 1 );
   
 }
 
