@@ -139,7 +139,6 @@ void Floor::render( glm::mat4 viewProjectionMatrix ) {
   shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
   
   vb_.bind();
-  texture_.bind();
   glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( GLvoid* ) 0 );
   glVertexAttribPointer( colourID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( GLvoid* )( sizeof( float ) * 3 ) );
   ib_.bind();

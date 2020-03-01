@@ -2,11 +2,13 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "global.hpp"
 
 Ship::Ship( std::shared_ptr<InputHandler> inputHandler ) {
   inputHandler_ = inputHandler;
   
   position_.z = -3.0f;
+  position_.y = START_Y;
 }
 
 bool Ship::init( std::string modelName ) {
@@ -112,6 +114,12 @@ void Ship::handleInput( float dt ) {
   
   if( velocity_.y < -yMax )
     velocity_.y = -yMax;
+    
+  if( position_.y < FLOOR_Y && velocity_.y < 0.0f )
+    velocity_.y = 0.0f;
+  
+  if( position_.y > CEILING + 2 && velocity_.y > 0.0f )
+    velocity_.y = 0.0f;
 }
 
 float differenceBetween( float target, float current ) {
