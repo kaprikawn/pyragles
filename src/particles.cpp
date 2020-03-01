@@ -24,7 +24,9 @@ Particles::Particles() {
 
 void Particles::update( float dt ) {
   
-  //myPoint_[ 0 ] += 2.0f * dt;
+  myPoint_[ 0 ] += 2.0f * dt;
+  myPoint_[ 3 ] += 2.0f * dt;
+  myPoint_[ 6 ] += 2.0f * dt;
   
   vb_.loadBufferData( &myPoint_[ 0 ] );
   
