@@ -14,6 +14,7 @@ class VertexBuffer {
     
     void init( const void* data, unsigned int size, GLenum usage = GL_STATIC_DRAW );
     void bind() const;
+    void loadBufferData( const void* data ) const;
     void unbind() const;
   
 };

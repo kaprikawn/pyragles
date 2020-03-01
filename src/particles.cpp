@@ -5,23 +5,42 @@
 
 Particles::Particles() {
   
-  GLCall( glGenBuffers( 1, &rendererID_ ) );
-  GLCall( glBindBuffer( GL_ARRAY_BUFFER, rendererID_ ) );
-  GLCall( glBufferData( GL_ARRAY_BUFFER, 1024, nullptr, GL_DYNAMIC_DRAW ) );
+  loadShader( "shaderParticles.glsl" );
+  
+  vb_.init( nullptr, 1024, GL_DYNAMIC_DRAW );
+  
+  positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
+  //colourID_   = glGetAttribLocation( shader_.rendererID(),  "aColour" );
+  mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
+  
+  glEnableVertexAttribArray( positionID_ );
+  //glEnableVertexAttribArray( colourID_ );
+  
+  myPoint_ = { 0.0f, 1.0f, -5.0f, -1.0f, -1.0f, -5.0f, 1.0f, -1.0f, -5.0f };
+  
+  modelMatrix_ = glm::mat4( 1.0f );
   
 }
 
 void Particles::update( float dt ) {
   
-  // for( unsigned int i = 0; i < particlePool_.size(); i++ ) {
-  //   if( particlePool_[ i ].active ) {
-      
-  //   }
-  // }
+  //myPoint_[ 0 ] += 2.0f * dt;
+  
+  vb_.loadBufferData( &myPoint_[ 0 ] );
   
 }
 
 void Particles::render( glm::mat4 viewProjectionMatrix ) {
+  
+  mvp_ = viewProjectionMatrix * modelMatrix_;
+  
+  shader_.bind();
+  shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
+  
+  vb_.bind();
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+  
+  glDrawArrays( GL_TRIANGLES, 0, 3 );
   
 }
 

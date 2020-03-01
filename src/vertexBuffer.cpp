@@ -16,6 +16,12 @@ void VertexBuffer::bind() const {
   glBindBuffer( GL_ARRAY_BUFFER, rendererID_ );
 }
 
+void VertexBuffer::loadBufferData( const void* data ) const {
+  glBindBuffer( GL_ARRAY_BUFFER, rendererID_ );
+  GLCall( glBufferData( GL_ARRAY_BUFFER, sizeof( float ) * 9, data, GL_DYNAMIC_DRAW ) );
+  //glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof( float ) * 3, data );
+}
+
 void VertexBuffer::unbind() const {
   glBindBuffer( GL_ARRAY_BUFFER, 0 );
 }
