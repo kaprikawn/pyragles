@@ -32,39 +32,52 @@ Particles::Particles() {
 void Particles::update( float dt ) {
   
   std::vector<float> bufferData;
+  unsigned int particleCount = 0;
   
   for( unsigned int i = 0; i < PARTICLE_COUNT; i++ ) {
     
-    particles_[ i ].colour.g -= ( 0.4f * dt );
-    if( particles_[ i ].colour.g < 0.0f )
-      particles_[ i ].active = false;
-    
-    if( !particles_[ i ].active )
-      continue;
-    
-    glm::vec3 position = particles_[ i ].position;
-    position += ( particles_[ i ].direction * dt );
-    
-    particles_[ i ].position = position;
-    
-    for( unsigned int j = 0; j < 108; j += 3 ) {
+    if( particles_[ i ].active ) {
       
-      bufferData.push_back( ( cubeVertices_[ j ] * particles_[ i ].scale ) + position.x );
-      bufferData.push_back( ( cubeVertices_[ j + 1 ] * particles_[ i ].scale ) + position.y );
-      bufferData.push_back( ( cubeVertices_[ j + 2 ] * particles_[ i ].scale ) + position.z );
-      bufferData.push_back( particles_[ i ].colour.r );
-      bufferData.push_back( particles_[ i ].colour.g );
-      bufferData.push_back( particles_[ i ].colour.b );
-      bufferData.push_back( particles_[ i ].colour.a );
+      particles_[ i ].colour.g -= ( 0.4f * dt );
+      if( particles_[ i ].colour.g < 0.0f )
+        particles_[ i ].active = false;
+      
+      glm::vec3 position = particles_[ i ].position;
+      position += ( particles_[ i ].direction * dt );
+      
+      particles_[ i ].position = position;
+      
+      for( unsigned int j = 0; j < 108; j += 3 ) {
+        
+        bufferData.push_back( ( cubeVertices_[ j ] * particles_[ i ].scale ) + position.x );
+        bufferData.push_back( ( cubeVertices_[ j + 1 ] * particles_[ i ].scale ) + position.y );
+        bufferData.push_back( ( cubeVertices_[ j + 2 ] * particles_[ i ].scale ) + position.z );
+        bufferData.push_back( particles_[ i ].colour.r );
+        bufferData.push_back( particles_[ i ].colour.g );
+        bufferData.push_back( particles_[ i ].colour.b );
+        bufferData.push_back( particles_[ i ].colour.a );
+        
+      }
+      
+      particles_[ i ].scale += ( particles_[ i ].scaleIncrease * dt );
+      particleCount++;
+    } else {
+      // do not display non active particles
+      for( unsigned int j = 0; j < 108; j += 3 ) {
+        bufferData.push_back( 0.0f );
+        bufferData.push_back( 0.0f );
+        bufferData.push_back( 1000.0f );
+        bufferData.push_back( 1.0f );
+        bufferData.push_back( 1.0f );
+        bufferData.push_back( 1.0f );
+        bufferData.push_back( 1.0f );
+      }
       
     }
     
-    particles_[ i ].scale += ( particles_[ i ].scaleIncrease * dt );
     
   }
-  
   vb_.loadBufferData( &bufferData[ 0 ], sizeof( bufferData[ 0 ] ) * bufferData.size() );
-  
 }
 
 void Particles::render( glm::mat4 viewProjectionMatrix ) {
