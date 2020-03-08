@@ -10,7 +10,7 @@
 
 struct Particle {
   glm::vec3 position      = { 0.0f, 0.0f, 0.0f };
-  glm::vec4 colour        = { 0.0f, 0.0f, 1.0f, 1.0f };
+  glm::vec4 colour        = { 1.0f, 1.0f, 0.0f, 1.0f };
   float     scale         = 0.1f;
   float     scaleIncrease = 0.1f;
   bool      active        = true;

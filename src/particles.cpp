@@ -23,9 +23,6 @@ Particles::Particles() {
     if( i == 1 ) {
       newParticle.direction.x = 2.0f;
       newParticle.direction.y = 0.0f;
-      newParticle.colour.g = 1.0f;
-      newParticle.colour.b = 0.0f;
-      
     }
     particles_[ i ] = newParticle;
   }
@@ -37,6 +34,10 @@ void Particles::update( float dt ) {
   std::vector<float> bufferData;
   
   for( unsigned int i = 0; i < PARTICLE_COUNT; i++ ) {
+    
+    particles_[ i ].colour.g -= ( 0.4f * dt );
+    if( particles_[ i ].colour.g < 0.0f )
+      particles_[ i ].active = false;
     
     if( !particles_[ i ].active )
       continue;
