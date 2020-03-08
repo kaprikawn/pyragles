@@ -31,6 +31,7 @@ class Shader {
     void setUniform4f( const std::string& name, glm::vec4 values );
     void setUniform4fv( const std::string& name, const float* mat4 );
     void setUniform1i( const std::string& name, int value );
+    void setUniform3f( const std::string& name, float x, float y, float z );
     
     unsigned int rendererID(){ return rendererID_; }
     

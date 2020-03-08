@@ -7,14 +7,14 @@ Particles::Particles() {
   
   loadShader( "shaderParticles.glsl" );
   
-  vb_.init( nullptr, 1024, GL_DYNAMIC_DRAW );
+  vb_.init( nullptr, 10340, GL_DYNAMIC_DRAW );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
-  //colourID_   = glGetAttribLocation( shader_.rendererID(),  "aColour" );
+  colourID_   = glGetAttribLocation( shader_.rendererID(),  "aColour" );
   mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
   
   glEnableVertexAttribArray( positionID_ );
-  //glEnableVertexAttribArray( colourID_ );
+  glEnableVertexAttribArray( colourID_ );
   
   modelMatrix_ = glm::mat4( 1.0f );
   
@@ -35,32 +35,29 @@ void Particles::update( float dt ) {
       continue;
     
     glm::vec3 position = particles_[ i ].position;
-    position.x += 0 * dt;
-    position.y += 2 * dt;
+    position.x += 1 * dt;
+    position.y += 0 * dt;
     position.z += 0 * dt;
     
     particles_[ i ].position = position;
     
     for( unsigned int j = 0; j < 108; j += 3 ) {
-      float x = cubeVertices_[ j ]     * particles_[ i ].scale;
-      float y = cubeVertices_[ j + 1 ] * particles_[ i ].scale;
-      float z = cubeVertices_[ j + 2 ] * particles_[ i ].scale;
       
-      x += position.x;
-      y += position.y;
-      z += position.z;
+      bufferData.push_back( cubeVertices_[ j ] + position.x );
+      bufferData.push_back( cubeVertices_[ j + 1 ] + position.y );
+      bufferData.push_back( cubeVertices_[ j + 2 ] + position.z );
+      bufferData.push_back( particles_[ i ].colour.r );
+      bufferData.push_back( particles_[ i ].colour.g );
+      bufferData.push_back( particles_[ i ].colour.b );
+      bufferData.push_back( particles_[ i ].colour.a );
       
-      
-      bufferData.push_back( x );
-      bufferData.push_back( y );
-      bufferData.push_back( z );
     }
     
-    particles_[ i ].scale += ( 0.1f * dt );
+    //particles_[ i ].scale += ( particles_[ i ].scaleIncrease * dt );
     
   }
   
-  vb_.loadBufferData( &bufferData[ 0 ], sizeof( float ) * 108 );
+  vb_.loadBufferData( &bufferData[ 0 ], sizeof( bufferData[ 0 ] ) * bufferData.size() );
   
 }
 
@@ -72,7 +69,8 @@ void Particles::render( glm::mat4 viewProjectionMatrix ) {
   shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
   
   vb_.bind();
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, 0 );
+  glVertexAttribPointer( colourID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( const void* )( sizeof( float ) * 3 ) );
   
   glDrawArrays( GL_TRIANGLES, 0, 36 );
   
@@ -81,4 +79,3 @@ void Particles::render( glm::mat4 viewProjectionMatrix ) {
 Particles::~Particles() {
   
 }
-
