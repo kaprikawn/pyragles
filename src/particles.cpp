@@ -20,6 +20,13 @@ Particles::Particles() {
   
   for( unsigned int i = 0; i < PARTICLE_COUNT; i++ ) {
     Particle newParticle;
+    if( i == 1 ) {
+      newParticle.direction.x = 2.0f;
+      newParticle.direction.y = 0.0f;
+      newParticle.colour.g = 1.0f;
+      newParticle.colour.b = 0.0f;
+      
+    }
     particles_[ i ] = newParticle;
   }
   
@@ -35,9 +42,7 @@ void Particles::update( float dt ) {
       continue;
     
     glm::vec3 position = particles_[ i ].position;
-    position.x += 1 * dt;
-    position.y += 0 * dt;
-    position.z += 0 * dt;
+    position += ( particles_[ i ].direction * dt );
     
     particles_[ i ].position = position;
     
@@ -72,7 +77,7 @@ void Particles::render( glm::mat4 viewProjectionMatrix ) {
   glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, 0 );
   glVertexAttribPointer( colourID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( const void* )( sizeof( float ) * 3 ) );
   
-  glDrawArrays( GL_TRIANGLES, 0, 36 );
+  glDrawArrays( GL_TRIANGLES, 0, 36 * PARTICLE_COUNT );
   
 }
 
