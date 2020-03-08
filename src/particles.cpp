@@ -16,22 +16,51 @@ Particles::Particles() {
   glEnableVertexAttribArray( positionID_ );
   //glEnableVertexAttribArray( colourID_ );
   
-  myPoint_ = { 0.0f, 1.0f, -5.0f, -1.0f, -1.0f, -5.0f, 1.0f, -1.0f, -5.0f };
-  
   modelMatrix_ = glm::mat4( 1.0f );
+  
+  for( unsigned int i = 0; i < PARTICLE_COUNT; i++ ) {
+    Particle newParticle;
+    particles_[ i ] = newParticle;
+  }
   
 }
 
 void Particles::update( float dt ) {
   
-  myPoint_[ 0 ] += 2.0f * dt;
-  myPoint_[ 3 ] += 2.0f * dt;
-  myPoint_[ 6 ] += 2.0f * dt;
+  std::vector<float> bufferData;
   
-  unsigned int size = sizeof( myPoint_[ 0 ] ) * 9;
-  size = sizeof( myPoint_[ 0 ] ) * 3;
+  for( unsigned int i = 0; i < PARTICLE_COUNT; i++ ) {
+    
+    if( !particles_[ i ].active )
+      continue;
+    
+    glm::vec3 position = particles_[ i ].position;
+    position.x += 0 * dt;
+    position.y += 2 * dt;
+    position.z += 0 * dt;
+    
+    particles_[ i ].position = position;
+    
+    for( unsigned int j = 0; j < 108; j += 3 ) {
+      float x = cubeVertices_[ j ]     * particles_[ i ].scale;
+      float y = cubeVertices_[ j + 1 ] * particles_[ i ].scale;
+      float z = cubeVertices_[ j + 2 ] * particles_[ i ].scale;
+      
+      x += position.x;
+      y += position.y;
+      z += position.z;
+      
+      
+      bufferData.push_back( x );
+      bufferData.push_back( y );
+      bufferData.push_back( z );
+    }
+    
+    particles_[ i ].scale += ( 0.1f * dt );
+    
+  }
   
-  vb_.loadBufferData( &myPoint_[ 0 ], size );
+  vb_.loadBufferData( &bufferData[ 0 ], sizeof( float ) * 108 );
   
 }
 
@@ -45,8 +74,7 @@ void Particles::render( glm::mat4 viewProjectionMatrix ) {
   vb_.bind();
   glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, 0, 0 );
   
-  //glDrawArrays( GL_TRIANGLES, 0, 3 );
-  glDrawArrays( GL_POINTS, 0, 1 );
+  glDrawArrays( GL_TRIANGLES, 0, 36 );
   
 }
 
