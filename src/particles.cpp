@@ -49,9 +49,9 @@ void Particles::update( float dt ) {
     
     for( unsigned int j = 0; j < 108; j += 3 ) {
       
-      bufferData.push_back( cubeVertices_[ j ] + position.x );
-      bufferData.push_back( cubeVertices_[ j + 1 ] + position.y );
-      bufferData.push_back( cubeVertices_[ j + 2 ] + position.z );
+      bufferData.push_back( ( cubeVertices_[ j ] * particles_[ i ].scale ) + position.x );
+      bufferData.push_back( ( cubeVertices_[ j + 1 ] * particles_[ i ].scale ) + position.y );
+      bufferData.push_back( ( cubeVertices_[ j + 2 ] * particles_[ i ].scale ) + position.z );
       bufferData.push_back( particles_[ i ].colour.r );
       bufferData.push_back( particles_[ i ].colour.g );
       bufferData.push_back( particles_[ i ].colour.b );
@@ -59,7 +59,7 @@ void Particles::update( float dt ) {
       
     }
     
-    //particles_[ i ].scale += ( particles_[ i ].scaleIncrease * dt );
+    particles_[ i ].scale += ( particles_[ i ].scaleIncrease * dt );
     
   }
   
