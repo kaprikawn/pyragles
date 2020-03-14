@@ -9,6 +9,8 @@ Ship::Ship( std::shared_ptr<InputHandler> inputHandler ) {
   
   position_.z = -3.0f;
   position_.y = START_Y;
+  
+  particles_ = std::make_unique<Particles>();
 }
 
 bool Ship::init( std::string modelName ) {
@@ -201,7 +203,7 @@ void Ship::calculateRotation( float dt ) {
   
   rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-  rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+  //rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
   
 }
 
@@ -215,6 +217,14 @@ void Ship::update( float dt ) {
   modelMatrix_ *= rotationMatrix_;
   
   // update mesh / vertices in mesh
+  particles_ -> update( dt );
+  particleTimer_ += ( dt * 60 );
+  
+  while( particleTimer_ > 0.0f ) {
+    particles_ -> spawnParticle( position_, xAngle_, yAngle_ );
+    particleTimer_ -= 1.0f;
+  }
+  
   
 }
 
@@ -234,6 +244,8 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   ib_.bind();
     
   glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
+  
+  particles_ -> render( viewProjectionMatrix );
   
 }
 

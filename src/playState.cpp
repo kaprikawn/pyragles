@@ -15,8 +15,6 @@ bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared
   
   floor_ = std::make_unique<Floor>();
   
-  particles_ = std::make_unique<Particles>();
-  
   return true;
 }
 
@@ -24,7 +22,7 @@ void PlayState::update( GLfloat dt ) {
   
   ship_ -> update( dt );
   floor_ -> update( dt );
-  particles_ -> update( dt );
+  
 
 }
 
@@ -33,8 +31,6 @@ void PlayState::render() {
   ship_ -> render( viewProjectionMatrix_ );
   floor_ -> render( viewProjectionMatrix_ );
   
-  particles_ -> render( viewProjectionMatrix_ );
-
 }
 
 int PlayState::nextLevel() {
