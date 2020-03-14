@@ -2,7 +2,7 @@
 #define PLAYSTATE_HPP
 
 #include "gameState.hpp"
-#include "renderer.hpp"
+#include "glCallLog.hpp"
 #include "inputHandler.hpp"
 #include "indexBuffer.hpp"
 #include "vertexBuffer.hpp"

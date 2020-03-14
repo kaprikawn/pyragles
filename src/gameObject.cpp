@@ -45,8 +45,8 @@ void GameObject::render( glm::mat4 viewProjectionMatrix ) {
 }
 
 
-void GameObject::loadVertexData( const void* data, unsigned int size ) {
-  vb_.init( data, size );
+void GameObject::loadVertexData( const void* data, unsigned int size, GLenum usage ) {
+  vb_.init( data, size, usage );
 }
 
 void GameObject::loadIndexData( const void* data, unsigned int count ) {

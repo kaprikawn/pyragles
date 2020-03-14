@@ -2,18 +2,18 @@
 #define FLOOR_HPP
 
 #include "gameObject.hpp"
+#include "global.hpp"
 
 class Floor : public GameObject {
   
   private :
   
-    float zPos_ = 0;
+    float zPos_ = FLOOR_Y;
     
   public :
     Floor();
     ~Floor();
     
-    //virtual bool init( std::string modelName );
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
   

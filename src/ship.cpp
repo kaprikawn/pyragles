@@ -2,11 +2,15 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "global.hpp"
 
 Ship::Ship( std::shared_ptr<InputHandler> inputHandler ) {
   inputHandler_ = inputHandler;
   
   position_.z = -3.0f;
+  position_.y = START_Y;
+  
+  particles_ = std::make_unique<Particles>();
 }
 
 bool Ship::init( std::string modelName ) {
@@ -112,6 +116,12 @@ void Ship::handleInput( float dt ) {
   
   if( velocity_.y < -yMax )
     velocity_.y = -yMax;
+    
+  if( position_.y < FLOOR_Y && velocity_.y < 0.0f )
+    velocity_.y = 0.0f;
+  
+  if( position_.y > CEILING + 2 && velocity_.y > 0.0f )
+    velocity_.y = 0.0f;
 }
 
 float differenceBetween( float target, float current ) {
@@ -125,7 +135,7 @@ float differenceBetween( float target, float current ) {
 
 void Ship::calculateRotation( float dt ) {
   
-  float maxRotationZ_ = 10.0f; // tilt
+  float maxRotationZ_ = 20.0f; // tilt
   float maxRotationY_ = 25.0f; // turn
   float maxRotationX_ = 10.0f; // up/down pitch
   
@@ -193,7 +203,7 @@ void Ship::calculateRotation( float dt ) {
   
   rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-  rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+  //rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
   
 }
 
@@ -207,6 +217,14 @@ void Ship::update( float dt ) {
   modelMatrix_ *= rotationMatrix_;
   
   // update mesh / vertices in mesh
+  particles_ -> update( dt );
+  particleTimer_ += ( dt * 60 );
+  
+  while( particleTimer_ > 0.0f ) {
+    particles_ -> spawnParticle( position_, xAngle_, yAngle_ );
+    particleTimer_ -= 1.0f;
+  }
+  
   
 }
 
@@ -226,6 +244,8 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   ib_.bind();
     
   glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
+  
+  particles_ -> render( viewProjectionMatrix );
   
 }
 

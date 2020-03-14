@@ -3,11 +3,13 @@
 
 #include "gameObject.hpp"
 #include "inputHandler.hpp"
+#include "particles.hpp"
 
 class Ship : public GameObject {
   
   private :
     std::shared_ptr<InputHandler> inputHandler_;
+    std::unique_ptr<Particles>    particles_;
     
     float joyAxisX_ = 0.0f;
     float joyAxisY_ = 0.0f;
@@ -15,6 +17,8 @@ class Ship : public GameObject {
     float xAngle_ = 0.0f;
     float yAngle_ = 0.0f;
     float zAngle_ = 0.0f;
+    
+    float particleTimer_ = 0.0f;
     
   public :
     Ship( std::shared_ptr<InputHandler> inputHandler );

@@ -1,7 +1,8 @@
 #include "texture.hpp"
-#include "renderer.hpp"
-#include "../deps/stb_image.h"
+#include <GLES2/gl2.h>
 #include <iostream>
+#include "glCallLog.hpp"
+#include "../deps/stb_image.h"
 
 Texture::Texture() {
   

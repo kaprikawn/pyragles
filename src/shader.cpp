@@ -3,7 +3,7 @@
 #include <fstream>
 #include <GLES2/gl2.h>
 #include <iostream>
-#include "renderer.hpp"
+#include "glCallLog.hpp"
 
 Shader::Shader() {
   
@@ -26,7 +26,7 @@ ShaderProgramSource Shader::parseShader( const std::string& filepath ) {
   };
   
   std::fstream stream( filepath );
-  std::stringstream ss[ 2 ];
+  std::stringstream ss[ 3 ];
   ShaderType type = ShaderType::NONE;
   std::string line;
   while( getline( stream, line ) ) {
@@ -75,6 +75,7 @@ unsigned int Shader::createShader( const std::string& vertexShader, const std::s
   
   glAttachShader( program, vs );
   glAttachShader( program, fs );
+    
   glLinkProgram( program );
   glValidateProgram( program );
   
@@ -102,6 +103,10 @@ void Shader::setUniform4fv( const std::string& name, const float* mat4 ) {
 
 void Shader::setUniform1i( const std::string& name, int value ) {
   GLCall( glUniform1i( getUniformLocation( name ), value ) );
+}
+
+void Shader::setUniform3f( const std::string& name, float x, float y, float z ) {
+  GLCall( glUniform3f( getUniformLocation( name ), x, y, z ) );
 }
 
 int Shader::getUniformLocation( const std::string& name ) {

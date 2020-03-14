@@ -1,5 +1,6 @@
 #include "indexBuffer.hpp"
-#include "renderer.hpp"
+#include <GLES2/gl2.h>
+#include "glCallLog.hpp"
 
 IndexBuffer::IndexBuffer() {
   
