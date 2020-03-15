@@ -29,26 +29,26 @@ if [[ $# -gt 0 ]]; then
       fi
     fi
   done
-else
-  # make sure all the assets dir files are correct in the build dir
-  if [[ -d $ASSETS_DIR_DEV && -d $ASSETS_DIR_BUILD ]]; then
-    for f in $ASSETS_DIR_DEV/*.*
-    do
-      file=$(basename $f)
-      if [[ -e $ASSETS_DIR_BUILD/$file ]]; then
-        md5HashSrc=( $(md5sum $ASSETS_DIR_DEV/$file | cut -d ' ' -f 1 ) )
-        md5HashDest=( $(md5sum $ASSETS_DIR_BUILD/$file | cut -d ' ' -f 1 ) )
-        
-        if [[ $md5HashSrc != $md5HashDest ]]; then
-          echo $file is different - updating
-          if [[ -e $ASSETS_DIR_BUILD/$file ]]; then
-            rm -f $ASSETS_DIR_BUILD/$file
-          fi
-          cp -v $ASSETS_DIR_DEV/$file $ASSETS_DIR_BUILD/$file
+fi
+
+# make sure all the assets dir files are correct in the build dir
+if [[ -d $ASSETS_DIR_DEV && -d $ASSETS_DIR_BUILD ]]; then
+  for f in $ASSETS_DIR_DEV/*.*
+  do
+    file=$(basename $f)
+    if [[ -e $ASSETS_DIR_BUILD/$file ]]; then
+      md5HashSrc=( $(md5sum $ASSETS_DIR_DEV/$file | cut -d ' ' -f 1 ) )
+      md5HashDest=( $(md5sum $ASSETS_DIR_BUILD/$file | cut -d ' ' -f 1 ) )
+      
+      if [[ $md5HashSrc != $md5HashDest ]]; then
+        echo $file is different - updating
+        if [[ -e $ASSETS_DIR_BUILD/$file ]]; then
+          rm -f $ASSETS_DIR_BUILD/$file
         fi
+        cp -v $ASSETS_DIR_DEV/$file $ASSETS_DIR_BUILD/$file
       fi
-    done
-  fi
+    fi
+  done
 fi
 
 if [[ ! -d build ]]; then

@@ -15,7 +15,6 @@ struct ShaderProgramSource {
 class Shader {
   private :
     
-    std::string   filepath_;
     unsigned int  rendererID_;
     std::unordered_map<std::string, int> uniformLocationCache_;
     
