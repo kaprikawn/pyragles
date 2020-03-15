@@ -1,7 +1,7 @@
 #ifndef EXHAUST_HPP
 #define EXHAUST_HPP
 
-#define PARTICLE_COUNT 10
+#define PARTICLE_COUNT 20
 
 #include <vector>
 #include <array>
