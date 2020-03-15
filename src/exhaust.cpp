@@ -1,9 +1,9 @@
-#include "particles.hpp"
+#include "exhaust.hpp"
 #include <iostream>
 #include <GLES2/gl2.h>
 #include "glCallLog.hpp"
 
-Particles::Particles() {
+Exhaust::Exhaust() {
   
   loadShader( "shaderParticles.glsl" );
   
@@ -30,7 +30,7 @@ Particles::Particles() {
   }
 }
 
-void Particles::update( float dt ) {
+void Exhaust::update( float dt ) {
   
   std::vector<float> bufferData;
   unsigned int particleCount = 0;
@@ -79,7 +79,7 @@ void Particles::update( float dt ) {
   vb_.loadBufferData( &bufferData[ 0 ], sizeof( bufferData[ 0 ] ) * bufferData.size() );
 }
 
-void Particles::render( glm::mat4 viewProjectionMatrix ) {
+void Exhaust::render( glm::mat4 viewProjectionMatrix ) {
   
   mvp_ = viewProjectionMatrix * modelMatrix_;
   
@@ -94,14 +94,14 @@ void Particles::render( glm::mat4 viewProjectionMatrix ) {
   
 }
 
-float Particles::randomFloat() {
+float Exhaust::randomFloat() {
   
   unsigned int myInt = zeroToHundread( eng );
   
   return ( float ) myInt / 100.0f;
 }
 
-bool Particles::randomBool() {
+bool Exhaust::randomBool() {
   
   unsigned int myInt = zeroToHundread( eng );
   
@@ -111,9 +111,11 @@ bool Particles::randomBool() {
   return false;
 }
 
-void Particles::spawnParticle( glm::vec3 newPosition, float xAngle, float yAngle ) {
+void Exhaust::spawnParticle( glm::vec3 newPosition, float xAngle, float yAngle ) {
   
   newPosition.y += 1.5f; // ship isn't totally centre
+  newPosition.z += 2.5f; // move to back of ship
+  newPosition.x += yAngle * 0.05f;
   
   float maxPositionDeviation = 0.3f;
   if( randomBool() ) {
@@ -172,6 +174,6 @@ void Particles::spawnParticle( glm::vec3 newPosition, float xAngle, float yAngle
   }
 }
 
-Particles::~Particles() {
+Exhaust::~Exhaust() {
   
 }

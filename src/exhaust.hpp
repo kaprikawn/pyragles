@@ -1,7 +1,7 @@
-#ifndef PARTICLES_HPP
-#define PARTICLES_HPP
+#ifndef EXHAUST_HPP
+#define EXHAUST_HPP
 
-#define PARTICLE_COUNT 200
+#define PARTICLE_COUNT 10
 
 #include <vector>
 #include <array>
@@ -18,7 +18,7 @@ struct Particle {
   glm::vec3 direction     = { 0.0f, 1.0f, 0.0f };
 };
 
-class Particles : public GameObject {
+class Exhaust : public GameObject {
   
   private :
   
@@ -69,8 +69,8 @@ class Particles : public GameObject {
     };
     
   public :
-    Particles();
-    ~Particles();
+    Exhaust();
+    ~Exhaust();
     
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
@@ -82,4 +82,4 @@ class Particles : public GameObject {
     
 };
     
-#endif //PARTICLES_HPP
+#endif //EXHAUST_HPP

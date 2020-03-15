@@ -10,7 +10,7 @@ Ship::Ship( std::shared_ptr<InputHandler> inputHandler ) {
   position_.z = -3.0f;
   position_.y = START_Y;
   
-  particles_ = std::make_unique<Particles>();
+  particles_ = std::make_unique<Exhaust>();
 }
 
 bool Ship::init( std::string modelName ) {
