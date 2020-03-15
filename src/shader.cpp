@@ -4,6 +4,7 @@
 #include <GLES2/gl2.h>
 #include <iostream>
 #include "glCallLog.hpp"
+#include "shaderCache.hpp"
 
 Shader::Shader() {
   
@@ -11,12 +12,22 @@ Shader::Shader() {
 
 void Shader::init( const std::string& filename ) {
   
-  filepath_   = "./assets/" + filename;
   rendererID_ = 0;
   
-  ShaderProgramSource source = parseShader( filepath_ );
+  int rendererID = ShaderCache::Instance() -> getRendererID( filename );
   
-  rendererID_ = createShader( source.vertexSource, source.fragmentSource );
+  if( rendererID == -1 ) { // if shader isn't already cached, compile and cache it
+    
+    std::string filepath = "./assets/" + filename;
+    ShaderProgramSource source = parseShader( filepath );
+    
+    rendererID_ = createShader( source.vertexSource, source.fragmentSource );
+    
+    ShaderCache::Instance() -> addRendererID( filename, rendererID_ );
+    
+  } else { // else get renderer id from cache
+    rendererID_ = ( unsigned int )rendererID;
+  }
 }
 
 ShaderProgramSource Shader::parseShader( const std::string& filepath ) {
