@@ -3,11 +3,11 @@
 
 const std::string PlayState::s_playID = "PLAY";
 
-bool PlayState::onEnter( std::shared_ptr<InputHandler> inputHandler, int levelNumber ) {
+bool PlayState::onEnter( int levelNumber ) {
   
   viewProjectionMatrix_ = Camera::Instance() -> viewProjectionMatrix();
   
-  ship_ = std::make_unique<Ship>( inputHandler );
+  ship_ = std::make_unique<Ship>();
   bool loadSuccessful = ship_ -> init( "ship.glb" );
   if( !loadSuccessful )
     return false;

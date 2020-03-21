@@ -6,7 +6,6 @@
 #include <GLES2/gl2.h>
 #include "gameState.hpp"
 #include "playState.hpp"
-#include "inputHandler.hpp"
 
 enum GameStates {
   TRANSITION, PLAY, MENU
@@ -23,8 +22,8 @@ class GameStateMachine {
     int nextLevel_ = 11;
     
   public:
-    bool pushState  ( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler );
-    bool changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler );
+    bool pushState  ( std::unique_ptr<GameState> state );
+    bool changeState( std::unique_ptr<GameState> state );
     void popState   ();
     
     void update     ( GLfloat dt );

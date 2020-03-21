@@ -3,9 +3,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "global.hpp"
+#include "inputHandler.hpp"
 
-Ship::Ship( std::shared_ptr<InputHandler> inputHandler ) {
-  inputHandler_ = inputHandler;
+Ship::Ship() {
   
   position_.z = -3.0f;
   position_.y = START_Y;
@@ -47,7 +47,7 @@ void Ship::handleInput( float dt ) {
   
   // left and right
   float xMax      = 6.0f;
-  joyAxisX_       = inputHandler_ -> joyAxisX();
+  joyAxisX_       = InputHandler::Instance() -> joyAxisX();
   acceleration_.x = joyAxisX_ * multiplier;
   
   if( joyAxisX_ == 0.0f ) {
@@ -83,7 +83,7 @@ void Ship::handleInput( float dt ) {
   
   // up and down
   float yMax      = 6.0f;
-  joyAxisY_  = inputHandler_ -> joyAxisY();
+  joyAxisY_  = InputHandler::Instance() -> joyAxisY();
   acceleration_.y = joyAxisY_ * multiplier;
   
   if( joyAxisY_ == 0.0f ) {

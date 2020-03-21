@@ -2,13 +2,11 @@
 #define SHIP_HPP
 
 #include "gameObject.hpp"
-#include "inputHandler.hpp"
 #include "exhaust.hpp"
 
 class Ship : public GameObject {
   
   private :
-    std::shared_ptr<InputHandler> inputHandler_;
     std::unique_ptr<Exhaust>      particles_;
     
     float joyAxisX_ = 0.0f;
@@ -21,7 +19,7 @@ class Ship : public GameObject {
     float particleTimer_ = 0.0f;
     
   public :
-    Ship( std::shared_ptr<InputHandler> inputHandler );
+    Ship();
     ~Ship();
     bool init( std::string modelName );
     virtual void update( float dt );

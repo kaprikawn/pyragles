@@ -3,7 +3,6 @@
 
 #include "gameState.hpp"
 #include "glCallLog.hpp"
-#include "inputHandler.hpp"
 #include "indexBuffer.hpp"
 #include "vertexBuffer.hpp"
 #include "shader.hpp"
@@ -24,7 +23,7 @@ class PlayState : public GameState {
     
   public:
     
-    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, int levelNumber );
+    virtual bool onEnter( int levelNumber );
     virtual void update( GLfloat dt );
     virtual void render();
     virtual bool onExit();

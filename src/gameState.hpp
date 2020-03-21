@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 #include <GLES2/gl2.h>
-#include "inputHandler.hpp"
+#include <vector>
 
 class PhysicsObject;
 
@@ -18,7 +18,7 @@ class GameState {
   public:
     virtual ~GameState() {}
     
-    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, int levelNumber ) = 0;
+    virtual bool onEnter( int levelNumber ) = 0;
     virtual void update ( GLfloat dt ) = 0;
     virtual void render () = 0;
     virtual bool onExit () = 0;

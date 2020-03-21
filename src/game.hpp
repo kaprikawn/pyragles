@@ -3,7 +3,6 @@
 
 #include <SDL2/SDL.h>
 #include <memory>
-#include "inputHandler.hpp"
 #include "gameStateMachine.hpp"
 
 class Game {
@@ -11,7 +10,6 @@ class Game {
     SDL_Window*     window_;
     SDL_GLContext   glContext_;
     
-    std::shared_ptr<InputHandler>     inputHandler_;
     std::unique_ptr<GameStateMachine> gameStateMachine_;
     
     int             newState_ = -1;

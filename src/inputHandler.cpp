@@ -1,12 +1,14 @@
 #include "inputHandler.hpp"
 #include <iostream>
 
-InputHandler::InputHandler( bool invertY ) {
+InputHandlerClass* InputHandlerClass::instance_ = 0;
+
+void InputHandlerClass::init( bool invertY ) {
   if( invertY )
     yInverted_ = true;
 }
 
-void InputHandler::calculateJoyAxis() {
+void InputHandlerClass::calculateJoyAxis() {
   
   if( keystates_[ SDL_SCANCODE_W ] == 1 ) {
     joyAxisY_ = 1.0f;
@@ -25,7 +27,7 @@ void InputHandler::calculateJoyAxis() {
   }
 }
 
-void InputHandler::onKeyDown( SDL_Event& event ) {
+void InputHandlerClass::onKeyDown( SDL_Event& event ) {
   
   keystates_ = SDL_GetKeyboardState( NULL );
   
@@ -45,7 +47,7 @@ void InputHandler::onKeyDown( SDL_Event& event ) {
   }
 }
 
-void InputHandler::onKeyUp( SDL_Event& event ) {
+void InputHandlerClass::onKeyUp( SDL_Event& event ) {
   keystates_ = SDL_GetKeyboardState( NULL );
   
   if(  event.key.keysym.scancode == SDL_SCANCODE_W
@@ -56,12 +58,12 @@ void InputHandler::onKeyUp( SDL_Event& event ) {
     calculateJoyAxis();
 }
 
-bool InputHandler::isPressed( int button ) {
+bool InputHandlerClass::isPressed( int button ) {
   
   return false;
 }
 
-void InputHandler::initialiseGamepads() {
+void InputHandlerClass::initialiseGamepads() {
   
   if( SDL_WasInit( SDL_INIT_JOYSTICK ) == 0 ) {
     SDL_InitSubSystem( SDL_INIT_JOYSTICK );
@@ -89,18 +91,18 @@ void InputHandler::initialiseGamepads() {
   std::cout << "Initialised " << gamepads_.size()  << " gamepad(s)" << std::endl;
 }
 
-void InputHandler::onHatMotion( SDL_Event &event ) {
+void InputHandlerClass::onHatMotion( SDL_Event &event ) {
   
   for( unsigned int i = 0; i < gamepads_.size(); i++ )
     currentHat_ = SDL_JoystickGetHat( gamepads_[i], 0 );
 }
 
-void InputHandler::onGamepadButtonDown( SDL_Event &event ) {
+void InputHandlerClass::onGamepadButtonDown( SDL_Event &event ) {
   if( event.jbutton.button == 2 )
     justPressed_[ FIRE ] = true;
 }
 
-void InputHandler::onJoystickAxisMove( SDL_Event &event ) {
+void InputHandlerClass::onJoystickAxisMove( SDL_Event &event ) {
   
   Sint16  joyAxisX  = 0;
   Sint16  joyAxisY  = 0;
@@ -135,7 +137,7 @@ void InputHandler::onJoystickAxisMove( SDL_Event &event ) {
   }
 }
 
-void InputHandler::processEvent( SDL_Event& event, Uint32 frameTime ) {
+void InputHandlerClass::processEvent( SDL_Event& event, Uint32 frameTime ) {
     
   switch( event.type ) {
     
@@ -163,10 +165,6 @@ void InputHandler::processEvent( SDL_Event& event, Uint32 frameTime ) {
   
 }
 
-void InputHandler::reset() {
+void InputHandlerClass::reset() {
   justPressed_[ FIRE ] = false;
-}
-
-InputHandler::~InputHandler() {
-  
 }

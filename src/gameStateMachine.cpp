@@ -1,9 +1,9 @@
 #include <iostream>
 #include "gameStateMachine.hpp"
 
-bool GameStateMachine::pushState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler ) {
+bool GameStateMachine::pushState( std::unique_ptr<GameState> state ) {
   gameStates_.push_back( std::move( state ) );
-  bool loadSuccessful = gameStates_.back() -> onEnter( inputHandler, nextLevel_ );
+  bool loadSuccessful = gameStates_.back() -> onEnter( nextLevel_ );
   if( !loadSuccessful )
     return false;
   
@@ -25,7 +25,7 @@ std::string GameStateMachine::getCurrentGameStateID() {
   return NULL;
 }
 
-bool GameStateMachine::changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler ) {
+bool GameStateMachine::changeState( std::unique_ptr<GameState> state ) {
   std::cout << "Changing game state to " << state -> getStateID() << std::endl;
   if( !gameStates_.empty() ) {
     if( gameStates_.back() -> getStateID() == state -> getStateID() )
@@ -36,7 +36,7 @@ bool GameStateMachine::changeState( std::unique_ptr<GameState> state, std::share
   
   gameStates_.push_back( std::move( state ) );
   
-  bool changeSuccessful = gameStates_.back() -> onEnter( inputHandler, nextLevel_ );
+  bool changeSuccessful = gameStates_.back() -> onEnter( nextLevel_ );
   if( !changeSuccessful )
     return false;
   

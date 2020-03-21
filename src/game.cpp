@@ -3,6 +3,7 @@
 #include <GLES2/gl2.h>
 #include "gameStateMachine.hpp"
 #include "camera.hpp"
+#include "inputHandler.hpp"
 
 Game::Game( bool fullscreen, bool invertY ) {
   
@@ -63,11 +64,11 @@ bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int win
   glDepthFunc( GL_LESS );
   
   gameStateMachine_ = std::make_unique<GameStateMachine>();
-  inputHandler_ = std::make_shared<InputHandler>( invertY );
+  InputHandler::Instance() -> init( invertY );
   
   Camera::Instance() -> init( windowWidth, windowHeight );
   
-  inputHandler_ -> initialiseGamepads();
+  InputHandler::Instance() -> initialiseGamepads();
   
   bool loadSuccessful = Game::changeGameState( PLAY, 0 );
   if( !loadSuccessful )
@@ -98,10 +99,10 @@ void Game::run() {
     
     SDL_Event event;
     while( SDL_PollEvent( &event ) ) {
-      inputHandler_ -> processEvent( event, currentTime );
+      InputHandler::Instance() -> processEvent( event, currentTime );
     }
     
-    if( inputHandler_ -> quit() )
+    if( InputHandler::Instance() -> quit() )
       running_ = false;
       
     gameStateMachine_ -> update( dt );
@@ -112,7 +113,7 @@ void Game::run() {
     
     Game::render();
     
-    inputHandler_ -> reset();
+    InputHandler::Instance() -> reset();
   } while( running_ );
   
 }
@@ -129,7 +130,7 @@ void Game::setNewState( int newState, int transitionType = 0 ) {
 bool Game::changeGameState( int newState, int transitionType ) {
   if( newState == PLAY ) {
     std::unique_ptr<GameState> playState ( std::make_unique<PlayState>() );
-    bool changeSuccessful = gameStateMachine_ -> changeState( std::move( playState ), inputHandler_ );
+    bool changeSuccessful = gameStateMachine_ -> changeState( std::move( playState ) );
     if( !changeSuccessful )
       return false;
   }
