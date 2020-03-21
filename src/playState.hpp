@@ -17,8 +17,6 @@ class PlayState : public GameState {
     
     int                         nextLevel_;
     
-    std::shared_ptr<Camera>     camera_;
-    
     glm::mat4                   viewProjectionMatrix_;
     
     std::unique_ptr<Ship>       ship_;
@@ -26,7 +24,7 @@ class PlayState : public GameState {
     
   public:
     
-    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera, int levelNumber );
+    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, int levelNumber );
     virtual void update( GLfloat dt );
     virtual void render();
     virtual bool onExit();

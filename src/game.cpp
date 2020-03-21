@@ -2,6 +2,7 @@
 #include <iostream>
 #include <GLES2/gl2.h>
 #include "gameStateMachine.hpp"
+#include "camera.hpp"
 
 Game::Game( bool fullscreen, bool invertY ) {
   
@@ -63,7 +64,8 @@ bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int win
   
   gameStateMachine_ = std::make_unique<GameStateMachine>();
   inputHandler_ = std::make_shared<InputHandler>( invertY );
-  camera_ = std::make_shared<Camera>( windowWidth, windowHeight );
+  
+  Camera::Instance() -> init( windowWidth, windowHeight );
   
   inputHandler_ -> initialiseGamepads();
   
@@ -127,7 +129,7 @@ void Game::setNewState( int newState, int transitionType = 0 ) {
 bool Game::changeGameState( int newState, int transitionType ) {
   if( newState == PLAY ) {
     std::unique_ptr<GameState> playState ( std::make_unique<PlayState>() );
-    bool changeSuccessful = gameStateMachine_ -> changeState( std::move( playState ), inputHandler_, camera_ );
+    bool changeSuccessful = gameStateMachine_ -> changeState( std::move( playState ), inputHandler_ );
     if( !changeSuccessful )
       return false;
   }

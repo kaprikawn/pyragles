@@ -23,8 +23,8 @@ class GameStateMachine {
     int nextLevel_ = 11;
     
   public:
-    bool pushState  ( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera );
-    bool changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera );
+    bool pushState  ( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler );
+    bool changeState( std::unique_ptr<GameState> state, std::shared_ptr<InputHandler> inputHandler );
     void popState   ();
     
     void update     ( GLfloat dt );

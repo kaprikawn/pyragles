@@ -2,8 +2,9 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera( int windowWidth, int windowHeight ) {
-  
+CameraClass* CameraClass::instance_ = 0;
+
+void CameraClass::init( int windowWidth, int windowHeight ) {
   windowWidth_    = windowWidth;
   windowHeight_   = windowHeight;
   windowWidthF_   = ( float )windowWidth;
@@ -22,9 +23,11 @@ Camera::Camera( int windowWidth, int windowHeight ) {
   );
   
   glViewport( 0, 0, windowWidthF_, windowHeightF_ );
+  
 }
 
-void Camera::update( std::shared_ptr<glm::vec3> shipPosition, GLfloat dt ) {
+
+void CameraClass::update( std::shared_ptr<glm::vec3> shipPosition, GLfloat dt ) {
   
   glm::vec3 velocity;
   velocity.x = shipPosition -> x - position_.x;
