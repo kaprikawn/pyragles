@@ -33,9 +33,6 @@ bool Ship::init( std::string modelName ) {
   texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
   mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
   
-  std::cout << "mvpID1 is " << mvpID_ << std::endl;
-  std::cout << "positionID1_ is " << positionID_ << std::endl;
-  
   GLCall( glEnableVertexAttribArray( positionID_ ) );
   //GLCall( glEnableVertexAttribArray( normalID_ ) );
   GLCall( glEnableVertexAttribArray( texCoordID_ ) );

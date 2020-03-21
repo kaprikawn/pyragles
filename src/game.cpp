@@ -61,6 +61,8 @@ bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int win
   
   glClearColor( 0.0f, 0.65f, 1.0f, 1.0f );
   glEnable( GL_DEPTH_TEST );
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
   glDepthFunc( GL_LESS );
   
   gameStateMachine_ = std::make_unique<GameStateMachine>();

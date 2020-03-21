@@ -17,6 +17,7 @@ class Texture {
     void init( unsigned char* textureData, int width, int height );
     void bind( unsigned int slot = 0 ) const;
     void unbind() const;
+    void initFromPNG( std::string filename );
     
 };
     

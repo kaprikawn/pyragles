@@ -9,11 +9,11 @@ Hud::Hud() {
   windowWidth_  = Camera::Instance() -> windowWidthF();
   windowHeight_ = Camera::Instance() -> windowHeightF();
   
-  float positions[ 8 ] = {
-      100.0f, 100.0f
-    , 200.0f, 100.0f
-    , 200.0f, 200.0f
-    , 100.0f, 200.0f
+  float positions[ 16 ] = {
+      100.0f, 100.0f, 0.0f, 0.0f
+    , 200.0f, 100.0f, 1.0f, 0.0f
+    , 200.0f, 200.0f, 1.0f, 1.0f
+    , 100.0f, 200.0f, 0.0f, 1.0f
   };
   
   int indices[ 6 ] = { 0, 1, 2, 2, 3, 0 };
@@ -23,16 +23,21 @@ Hud::Hud() {
   loadShader( "shaderHud.glsl" );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
+  texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
   mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
   
   GLCall( glEnableVertexAttribArray( positionID_ ) );
+  GLCall( glEnableVertexAttribArray( texCoordID_ ) );
   
   proj_ = glm::ortho( 0.0f, Camera::Instance() -> windowWidthF(), 0.0f, Camera::Instance() -> windowHeightF(), -1.0f, 1.0f );
+  
+  texture_ = Texture();
+  texture_.initFromPNG( "hudNumbersA.png" );
   
 }
 
 void Hud::update() {
-  //modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
+  
 }
 
 void Hud::render() {
@@ -43,11 +48,12 @@ void Hud::render() {
   shader_.setUniform4fv( "uMVP", ( const float* )&proj_ );
   
   vb_.bind();
-  GLCall( glVertexAttribPointer( positionID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 2, 0 ) );
+  texture_.bind();
+  GLCall( glVertexAttribPointer( positionID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 4, ( GLvoid* )0 ) );
+  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 4, ( GLvoid* )( sizeof( float ) * 2 ) ) );
   ib_.bind();
     
   GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
-  //glDrawArrays( GL_TRIANGLES, 0, 3 );
   
   glEnable( GL_DEPTH_TEST );
   
