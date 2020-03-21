@@ -9,16 +9,17 @@ Hud::Hud() {
   windowWidth_  = Camera::Instance() -> windowWidthF();
   windowHeight_ = Camera::Instance() -> windowHeightF();
   
-  float positions[ 6 ] = {
-      -0.5f, -0.5f
-    ,  0.0f,  0.5f
-    ,  0.5f, -0.5f
+  float positions[ 8 ] = {
+      100.0f, 100.0f
+    , 200.0f, 100.0f
+    , 200.0f, 200.0f
+    , 100.0f, 200.0f
   };
   
-  int indices[ 3 ] = { 0, 1, 2 };
+  int indices[ 6 ] = { 0, 1, 2, 2, 3, 0 };
   
   loadVertexData( positions, sizeof( positions ) );
-  loadIndexData( indices, 3 );
+  loadIndexData( indices, 6 );
   loadShader( "shaderHud.glsl" );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
@@ -26,7 +27,7 @@ Hud::Hud() {
   
   GLCall( glEnableVertexAttribArray( positionID_ ) );
   
-  proj_ = glm::ortho( -2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f );
+  proj_ = glm::ortho( 0.0f, Camera::Instance() -> windowWidthF(), 0.0f, Camera::Instance() -> windowHeightF(), -1.0f, 1.0f );
   
 }
 

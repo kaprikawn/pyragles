@@ -28,8 +28,8 @@ void PlayState::update( GLfloat dt ) {
 
 void PlayState::render() {
   
-  //ship_ -> render( viewProjectionMatrix_ );
-  //floor_ -> render( viewProjectionMatrix_ );
+  ship_ -> render( viewProjectionMatrix_ );
+  floor_ -> render( viewProjectionMatrix_ );
   
   hud_ -> render();
 }
