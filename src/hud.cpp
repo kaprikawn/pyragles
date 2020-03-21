@@ -26,6 +26,8 @@ Hud::Hud() {
   
   GLCall( glEnableVertexAttribArray( positionID_ ) );
   
+  proj_ = glm::ortho( -2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f );
+  
 }
 
 void Hud::update() {
@@ -35,22 +37,16 @@ void Hud::update() {
 void Hud::render() {
   
   glDisable( GL_DEPTH_TEST );
-  
-  glm::mat4 viewProjectionMatrix = Camera::Instance() -> viewProjectionMatrix();
-  
-  mvp_ = viewProjectionMatrix * modelMatrix_;
-  
-  mvp_ = glm::ortho( 0.0f, windowWidth_, 0.0f, windowHeight_, -1.0f, 1.0f );
-  
+    
   shader_.bind();
-  //shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
+  shader_.setUniform4fv( "uMVP", ( const float* )&proj_ );
   
   vb_.bind();
   GLCall( glVertexAttribPointer( positionID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 2, 0 ) );
-  //ib_.bind();
+  ib_.bind();
     
-  //GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
-  glDrawArrays( GL_TRIANGLES, 0, 3 );
+  GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
+  //glDrawArrays( GL_TRIANGLES, 0, 3 );
   
   glEnable( GL_DEPTH_TEST );
   

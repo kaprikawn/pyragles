@@ -10,6 +10,8 @@ class Hud : public GameObject {
     float windowWidth_;
     float windowHeight_;
     
+    glm::mat4 proj_;
+    
   public :
     Hud();
     ~Hud();
