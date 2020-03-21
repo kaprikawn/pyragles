@@ -6,7 +6,7 @@
 #include <vector>
 
 enum Buttons {
-    LEFT, RIGHT, ASCEND, DESCEND, FIRE
+    LEFT, RIGHT, ASCEND, DESCEND, FIRE, BOMB
   , MAX_BUTTON_NUM
   , MAX_BUTTON = MAX_BUTTON_NUM
 };

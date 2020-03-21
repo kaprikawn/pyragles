@@ -4,6 +4,9 @@
 InputHandlerClass* InputHandlerClass::instance_ = 0;
 
 void InputHandlerClass::init( bool invertY ) {
+  
+  reset();
+  
   if( invertY )
     yInverted_ = true;
 }
@@ -40,6 +43,8 @@ void InputHandlerClass::onKeyDown( SDL_Event& event ) {
     
   if( event.key.keysym.scancode == SDL_SCANCODE_SPACE ) {
     justPressed_[ FIRE ] = true;
+  } else if( event.key.keysym.scancode == SDL_SCANCODE_B ) {
+    justPressed_[ BOMB ] = true;
   }
   
   if( keystates_[ SDL_SCANCODE_ESCAPE ] == 1 ) {
@@ -167,4 +172,5 @@ void InputHandlerClass::processEvent( SDL_Event& event, Uint32 frameTime ) {
 
 void InputHandlerClass::reset() {
   justPressed_[ FIRE ] = false;
+  justPressed_[ BOMB ] = false;
 }

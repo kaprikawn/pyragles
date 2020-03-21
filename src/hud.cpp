@@ -1,6 +1,7 @@
 #include "hud.hpp"
 #include <iostream>
 #include "glm/gtc/matrix_transform.hpp"
+#include "inputHandler.hpp"
 
 // http://www.mbsoftworks.sk/tutorials/opengl4/009-orthographic-2D-projection/inclue
 
@@ -9,16 +10,16 @@ Hud::Hud() {
   windowWidth_  = Camera::Instance() -> windowWidthF();
   windowHeight_ = Camera::Instance() -> windowHeightF();
   
-  float positions[ 16 ] = {
-      100.0f, 100.0f, 0.0f, 0.0f
-    , 200.0f, 100.0f, 1.0f, 0.0f
-    , 200.0f, 200.0f, 1.0f, 1.0f
-    , 100.0f, 200.0f, 0.0f, 1.0f
+  vertexData_= {
+      100.0f, 100.0f, 0.5f, 0.0f // bottom left
+    , 200.0f, 100.0f, 1.0f, 0.0f // bottom right
+    , 200.0f, 200.0f, 1.0f, 1.0f // top right
+    , 100.0f, 200.0f, 0.5f, 1.0f // top left
   };
   
   int indices[ 6 ] = { 0, 1, 2, 2, 3, 0 };
   
-  loadVertexData( positions, sizeof( positions ) );
+  loadVertexData( &vertexData_[ 0 ], sizeof( vertexData_[ 0 ] ) * vertexData_.size(), GL_DYNAMIC_DRAW );
   loadIndexData( indices, 6 );
   loadShader( "shaderHud.glsl" );
   
@@ -36,9 +37,29 @@ Hud::Hud() {
   
 }
 
-void Hud::update() {
+void Hud::decreaseBombCount() {
+  
+  std::cout << "letting off bomb\n";
+  
+  vertexData_= {
+      100.0f, 100.0f, 0.0f, 0.0f // bottom left
+    , 200.0f, 100.0f, 0.5f, 0.0f // bottom right
+    , 200.0f, 200.0f, 0.5f, 1.0f // top right
+    , 100.0f, 200.0f, 0.0f, 1.0f // top left
+  };
+  
+  vb_.loadBufferData( &vertexData_[ 0 ], sizeof( vertexData_[ 0 ] ) * vertexData_.size() );
   
 }
+
+void Hud::update() {
+  
+  if( InputHandler::Instance() -> justPressed( BOMB ) ) {
+    decreaseBombCount();
+  }
+  
+}
+
 
 void Hud::render() {
   
