@@ -12,7 +12,8 @@ bool PlayState::onEnter( int levelNumber ) {
   if( !loadSuccessful )
     return false;
   
-  floor_ = std::make_unique<Floor>();
+  floor_  = std::make_unique<Floor>();
+  hud_    = std::make_unique<Hud>();
   
   return true;
 }
@@ -22,14 +23,15 @@ void PlayState::update( GLfloat dt ) {
   ship_ -> update( dt );
   floor_ -> update( dt );
   
-
+  hud_ -> update();
 }
 
 void PlayState::render() {
   
-  ship_ -> render( viewProjectionMatrix_ );
-  floor_ -> render( viewProjectionMatrix_ );
+  //ship_ -> render( viewProjectionMatrix_ );
+  //floor_ -> render( viewProjectionMatrix_ );
   
+  hud_ -> render();
 }
 
 int PlayState::nextLevel() {

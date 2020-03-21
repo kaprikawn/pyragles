@@ -1,15 +1,16 @@
 #ifndef GAMEOBJECT_HPP
 #define GAMEOBJECT_HPP
 
+#include <glm/glm.hpp>
+#include <memory>
+#include <string>
+#include "glCallLog.hpp"
 #include "vertexBuffer.hpp"
 #include "indexBuffer.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
 #include "model.hpp"
 #include "camera.hpp"
-#include <glm/glm.hpp>
-#include <memory>
-#include <string>
 
 class GameObject {
   protected:

@@ -8,6 +8,7 @@
 #include "shader.hpp"
 #include "ship.hpp"
 #include "floor.hpp"
+#include "hud.hpp"
 #include <memory>
 
 class PlayState : public GameState {
@@ -20,6 +21,7 @@ class PlayState : public GameState {
     
     std::unique_ptr<Ship>       ship_;
     std::unique_ptr<Floor>      floor_;
+    std::unique_ptr<Hud>        hud_;
     
   public:
     

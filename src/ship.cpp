@@ -29,13 +29,16 @@ bool Ship::init( std::string modelName ) {
   texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
-  normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
+  //normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
   texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
   mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
   
-  glEnableVertexAttribArray( positionID_ );
-  glEnableVertexAttribArray( normalID_ );
-  glEnableVertexAttribArray( texCoordID_ );
+  std::cout << "mvpID1 is " << mvpID_ << std::endl;
+  std::cout << "positionID1_ is " << positionID_ << std::endl;
+  
+  GLCall( glEnableVertexAttribArray( positionID_ ) );
+  //GLCall( glEnableVertexAttribArray( normalID_ ) );
+  GLCall( glEnableVertexAttribArray( texCoordID_ ) );
   
   return true;
 }
@@ -203,7 +206,7 @@ void Ship::calculateRotation( float dt ) {
   
   rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-  //rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+  rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
   
 }
 
@@ -238,12 +241,12 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   
   vb_.bind();
   texture_.bind();
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 );
-  glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) );
-  glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) );
+  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 ) );
+  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) ) );
+  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) ) );
   ib_.bind();
     
-  glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
+  GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
   
   particles_ -> render( viewProjectionMatrix );
   

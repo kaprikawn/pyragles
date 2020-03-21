@@ -14,11 +14,11 @@ void IndexBuffer::init( const void* data, unsigned int count ) {
 }
 
 void IndexBuffer::bind() const {
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, rendererID_ );
+  GLCall( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, rendererID_ ) );
 }
 
 void IndexBuffer::unbind() const {
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+  GLCall( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 ) );
 }
 
 IndexBuffer::~IndexBuffer() {

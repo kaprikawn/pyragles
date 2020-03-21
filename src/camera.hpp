@@ -13,8 +13,8 @@ class CameraClass {
     
     glm::vec3   position_;
     
-    GLsizei windowWidth_;
-    GLsizei windowHeight_;
+    int windowWidth_;
+    int windowHeight_;
     
     float   windowWidthF_;
     float   windowHeightF_;
@@ -32,8 +32,8 @@ class CameraClass {
       return projection_ * view_;
     }
     
-    GLsizei windowWidth()   { return windowWidth_; }
-    GLsizei windowHeight()  { return windowHeight_; }
+    int windowWidth()   { return windowWidth_; }
+    int windowHeight()  { return windowHeight_; }
     
     float windowWidthF()    { return windowWidthF_; }
     float windowHeightF()   { return windowHeightF_; }
