@@ -2,6 +2,7 @@
 #include <iostream>
 #include "glm/gtc/matrix_transform.hpp"
 #include "inputHandler.hpp"
+#include "camera.hpp"
 
 // http://www.mbsoftworks.sk/tutorials/opengl4/009-orthographic-2D-projection/inclue
 
@@ -39,14 +40,19 @@ void Hud::updateBombCount( int bombCount ) {
   if( bombCount < 0 )
     bombCount = 0;
   
-  float left  = ( float ) bombCount / 10.0f;
+  float left  = ( float ) bombCount / 10.0f; // how far from the left of the texture we sample from
   float right = ( ( float ) bombCount + 1.0f ) / 10.0f;
   
+  // bomb hud positioning
+  float distanceFromLeft    = Camera::Instance() -> windowWidthF() / 25.6f;
+  float distanceFromBottom  = Camera::Instance() -> windowHeightF() / 14.40f;
+  float bombHudSize         = Camera::Instance() -> windowHeightF() / 14.4f;
+  
   vertexData_= {
-      100.0f, 100.0f, left , 0.0f // bottom left
-    , 200.0f, 100.0f, right, 0.0f // bottom right
-    , 200.0f, 200.0f, right, 1.0f // top right
-    , 100.0f, 200.0f, left , 1.0f // top left
+      distanceFromLeft, distanceFromBottom, left , 0.0f // bottom left
+    , distanceFromLeft + bombHudSize, distanceFromBottom, right, 0.0f // bottom right
+    , distanceFromLeft + bombHudSize, distanceFromBottom + bombHudSize, right, 1.0f // top right
+    , distanceFromLeft, distanceFromBottom + bombHudSize, left , 1.0f // top left
   };
   
   vb_.loadBufferData( &vertexData_[ 0 ], sizeof( vertexData_[ 0 ] ) * vertexData_.size() );

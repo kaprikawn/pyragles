@@ -38,12 +38,13 @@ void InputHandlerClass::onKeyDown( SDL_Event& event ) {
     || event.key.keysym.scancode == SDL_SCANCODE_A
     || event.key.keysym.scancode == SDL_SCANCODE_S
     || event.key.keysym.scancode == SDL_SCANCODE_D
-  )
+  ) {
     calculateJoyAxis();
+  }
     
   if( event.key.keysym.scancode == SDL_SCANCODE_SPACE ) {
     justPressed_[ FIRE ] = true;
-  } else if( event.key.keysym.scancode == SDL_SCANCODE_B ) {
+  } else if( event.key.keysym.scancode == SDL_SCANCODE_F ) {
     justPressed_[ BOMB ] = true;
   }
   
@@ -53,14 +54,16 @@ void InputHandlerClass::onKeyDown( SDL_Event& event ) {
 }
 
 void InputHandlerClass::onKeyUp( SDL_Event& event ) {
+  
   keystates_ = SDL_GetKeyboardState( NULL );
   
   if(  event.key.keysym.scancode == SDL_SCANCODE_W
     || event.key.keysym.scancode == SDL_SCANCODE_A
     || event.key.keysym.scancode == SDL_SCANCODE_S
     || event.key.keysym.scancode == SDL_SCANCODE_D
-  )
+  ) {
     calculateJoyAxis();
+  }
 }
 
 bool InputHandlerClass::isPressed( int button ) {
