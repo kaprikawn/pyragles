@@ -21,7 +21,7 @@ class Hud : public GameObject {
     Hud();
     ~Hud();
     
-    virtual void update( int bombCount );
+    virtual void update( unsigned short int bombCount );
     virtual void render();
     
     void updateBombCount( int bombCount );

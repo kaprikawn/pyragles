@@ -25,8 +25,9 @@ void PlayState::update( GLfloat dt ) {
   floor_ -> update( dt );
   
   if( bombCount_ > 0 ) {
-    if( InputHandler::Instance() -> justPressed( BOMB ) )
+    if( InputHandler::Instance() -> justPressed( BOMB ) ) {
       bombCount_--;
+    }
   }
   
   hud_ -> update( bombCount_ );

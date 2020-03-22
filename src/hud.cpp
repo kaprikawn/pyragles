@@ -59,7 +59,7 @@ void Hud::updateBombCount( int bombCount ) {
   
 }
 
-void Hud::update( int bombCount ) {
+void Hud::update( unsigned short int bombCount ) {
   
   if( bombCount == prevBombCount_ )
     return;
@@ -68,7 +68,6 @@ void Hud::update( int bombCount ) {
   updateBombCount( bombCount );
   
 }
-
 
 void Hud::render() {
   

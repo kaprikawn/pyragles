@@ -23,7 +23,7 @@ class PlayState : public GameState {
     std::unique_ptr<Floor>      floor_;
     std::unique_ptr<Hud>        hud_;
     
-    int                         bombCount_ = 9;
+    unsigned short int          bombCount_ = 9;
     
   public:
     
