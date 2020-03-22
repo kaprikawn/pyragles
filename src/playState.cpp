@@ -1,5 +1,6 @@
 #include "playState.hpp"
 #include <iostream>
+#include "inputHandler.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -23,7 +24,12 @@ void PlayState::update( GLfloat dt ) {
   ship_ -> update( dt );
   floor_ -> update( dt );
   
-  hud_ -> update();
+  if( bombCount_ > 0 ) {
+    if( InputHandler::Instance() -> justPressed( BOMB ) )
+      bombCount_--;
+  }
+  
+  hud_ -> update( bombCount_ );
 }
 
 void PlayState::render() {

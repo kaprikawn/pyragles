@@ -10,18 +10,13 @@ Hud::Hud() {
   windowWidth_  = Camera::Instance() -> windowWidthF();
   windowHeight_ = Camera::Instance() -> windowHeightF();
   
-  vertexData_= {
-      100.0f, 100.0f, 0.5f, 0.0f // bottom left
-    , 200.0f, 100.0f, 1.0f, 0.0f // bottom right
-    , 200.0f, 200.0f, 1.0f, 1.0f // top right
-    , 100.0f, 200.0f, 0.5f, 1.0f // top left
-  };
-  
   int indices[ 6 ] = { 0, 1, 2, 2, 3, 0 };
   
-  loadVertexData( &vertexData_[ 0 ], sizeof( vertexData_[ 0 ] ) * vertexData_.size(), GL_DYNAMIC_DRAW );
+  vb_.init( nullptr, sizeof( float ) * 16, GL_DYNAMIC_DRAW );
   loadIndexData( indices, 6 );
   loadShader( "shaderHud.glsl" );
+  
+  updateBombCount( 9 );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
   texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
@@ -33,30 +28,38 @@ Hud::Hud() {
   proj_ = glm::ortho( 0.0f, Camera::Instance() -> windowWidthF(), 0.0f, Camera::Instance() -> windowHeightF(), -1.0f, 1.0f );
   
   texture_ = Texture();
-  texture_.initFromPNG( "hudNumbersA.png" );
+  texture_.initFromPNG( "hudNumbers.png" );
   
 }
 
-void Hud::decreaseBombCount() {
+void Hud::updateBombCount( int bombCount ) {
   
-  std::cout << "letting off bomb\n";
+  if( bombCount > 9 )
+    bombCount = 9;
+  if( bombCount < 0 )
+    bombCount = 0;
+  
+  float left  = ( float ) bombCount / 10.0f;
+  float right = ( ( float ) bombCount + 1.0f ) / 10.0f;
   
   vertexData_= {
-      100.0f, 100.0f, 0.0f, 0.0f // bottom left
-    , 200.0f, 100.0f, 0.5f, 0.0f // bottom right
-    , 200.0f, 200.0f, 0.5f, 1.0f // top right
-    , 100.0f, 200.0f, 0.0f, 1.0f // top left
+      100.0f, 100.0f, left , 0.0f // bottom left
+    , 200.0f, 100.0f, right, 0.0f // bottom right
+    , 200.0f, 200.0f, right, 1.0f // top right
+    , 100.0f, 200.0f, left , 1.0f // top left
   };
   
   vb_.loadBufferData( &vertexData_[ 0 ], sizeof( vertexData_[ 0 ] ) * vertexData_.size() );
   
 }
 
-void Hud::update() {
+void Hud::update( int bombCount ) {
   
-  if( InputHandler::Instance() -> justPressed( BOMB ) ) {
-    decreaseBombCount();
-  }
+  if( bombCount == prevBombCount_ )
+    return;
+    
+  prevBombCount_ = bombCount;
+  updateBombCount( bombCount );
   
 }
 

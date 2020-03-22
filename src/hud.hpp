@@ -11,6 +11,8 @@ class Hud : public GameObject {
     float windowWidth_;
     float windowHeight_;
     
+    int   prevBombCount_  = 0;
+    
     std::vector<float> vertexData_;
     
     glm::mat4 proj_;
@@ -19,10 +21,10 @@ class Hud : public GameObject {
     Hud();
     ~Hud();
     
-    virtual void update();
+    virtual void update( int bombCount );
     virtual void render();
     
-    void decreaseBombCount();
+    void updateBombCount( int bombCount );
     
 };
     
