@@ -35,8 +35,8 @@ Hud::Hud() {
   texture_.initFromPNG( "hudNumbers.png" );
   
   // health gauge
-  // healthVb_.init( nullptr, sizeof( float ) * 20, GL_DYNAMIC_DRAW );
-  // healthShader_.init( "shaderVertexColours.glsl" );
+  healthVb_.init( nullptr, sizeof( float ) * 20, GL_DYNAMIC_DRAW );
+  healthShader_.init( "shaderVertexColours.glsl" );
   // healthPositionID_ = glGetAttribLocation( bombsShader_.rendererID(),  "aPosition" );
   // healthColourID_   = glGetAttribLocation( bombsShader_.rendererID(),  "aColour" );
   // healthMvpID_      = glGetUniformLocation( bombsShader_.rendererID(), "uMVP" );
