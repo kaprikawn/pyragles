@@ -1,7 +1,6 @@
 #ifndef HUD_HPP
 #define HUD_HPP
 
-#include "gameObject.hpp"
 #include <vector>
 #include "vertexBuffer.hpp"
 #include "indexBuffer.hpp"

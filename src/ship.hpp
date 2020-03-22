@@ -3,11 +3,13 @@
 
 #include "gameObject.hpp"
 #include "exhaust.hpp"
+#include "target.hpp"
 
 class Ship : public GameObject {
   
   private :
-    std::unique_ptr<Exhaust>      particles_;
+    std::unique_ptr<Target>   target_;
+    std::unique_ptr<Exhaust>  particles_;
     
     float joyAxisX_ = 0.0f;
     float joyAxisY_ = 0.0f;

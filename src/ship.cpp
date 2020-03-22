@@ -10,7 +10,8 @@ Ship::Ship() {
   position_.z = -3.0f;
   position_.y = START_Y;
   
-  particles_ = std::make_unique<Exhaust>();
+  target_     = std::make_unique<Target>();
+  particles_  = std::make_unique<Exhaust>();
 }
 
 bool Ship::init( std::string modelName ) {
@@ -216,6 +217,8 @@ void Ship::update( float dt ) {
   modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
   modelMatrix_ *= rotationMatrix_;
   
+  target_ -> update( dt, position_, xAngle_, yAngle_ );
+  
   // update mesh / vertices in mesh
   particles_ -> update( dt );
   particleTimer_ += ( dt * 60 );
@@ -245,7 +248,8 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
     
   GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
   
-  particles_ -> render( viewProjectionMatrix );
+  target_     -> render( viewProjectionMatrix );
+  particles_  -> render( viewProjectionMatrix );
   
 }
 

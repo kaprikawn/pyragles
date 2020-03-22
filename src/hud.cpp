@@ -4,6 +4,7 @@
 #include <glm/gtx/color_space.hpp>
 #include "inputHandler.hpp"
 #include "camera.hpp"
+#include "glCallLog.hpp"
 
 // http://www.mbsoftworks.sk/tutorials/opengl4/009-orthographic-2D-projection/inclue
 
@@ -21,7 +22,6 @@ Hud::Hud() {
   int indices[ 6 ] = { 0, 1, 2, 2, 3, 0 };
   ib_.init( indices, 6 );
   indexCount_ = ib_.getCount();
-  
   
   // bombs counter
   bombsVb_.init( nullptr, sizeof( float ) * 16, GL_DYNAMIC_DRAW );
