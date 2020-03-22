@@ -30,7 +30,7 @@ void PlayState::update( GLfloat dt ) {
     }
   }
   
-  hud_ -> update( bombCount_ );
+  hud_ -> update( dt, bombCount_ );
 }
 
 void PlayState::render() {

@@ -15,7 +15,9 @@ class Hud {
     float windowWidth_;
     float windowHeight_;
     
-    int   prevBombCount_  = 0;
+    int   prevBombCount_              = 0;
+    float displayedHealth_            = 100.0f;
+    unsigned short int targetHealth_  = 100; // what your actual current health is
     
     VertexBuffer  healthVb_;
     VertexBuffer  bombsVb_;
@@ -41,12 +43,13 @@ class Hud {
     
   public :
     Hud();
-    ~Hud();
+    virtual ~Hud();
     
-    virtual void update( unsigned short int bombCount );
+    virtual void update( float dt, unsigned short int bombCount );
     virtual void render();
     
-    void updateBombCount( int bombCount );
+    void updateBombCount( unsigned short int bombCount );
+    void updateHealthBar( float displayedHealth );
     
 };
     
