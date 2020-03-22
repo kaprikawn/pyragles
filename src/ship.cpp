@@ -3,9 +3,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "global.hpp"
+#include "inputHandler.hpp"
 
-Ship::Ship( std::shared_ptr<InputHandler> inputHandler ) {
-  inputHandler_ = inputHandler;
+Ship::Ship() {
   
   position_.z = -3.0f;
   position_.y = START_Y;
@@ -29,13 +29,13 @@ bool Ship::init( std::string modelName ) {
   texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
-  normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
+  //normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
   texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
   mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
   
-  glEnableVertexAttribArray( positionID_ );
-  glEnableVertexAttribArray( normalID_ );
-  glEnableVertexAttribArray( texCoordID_ );
+  GLCall( glEnableVertexAttribArray( positionID_ ) );
+  //GLCall( glEnableVertexAttribArray( normalID_ ) );
+  GLCall( glEnableVertexAttribArray( texCoordID_ ) );
   
   return true;
 }
@@ -47,7 +47,7 @@ void Ship::handleInput( float dt ) {
   
   // left and right
   float xMax      = 6.0f;
-  joyAxisX_       = inputHandler_ -> joyAxisX();
+  joyAxisX_       = InputHandler::Instance() -> joyAxisX();
   acceleration_.x = joyAxisX_ * multiplier;
   
   if( joyAxisX_ == 0.0f ) {
@@ -83,7 +83,7 @@ void Ship::handleInput( float dt ) {
   
   // up and down
   float yMax      = 6.0f;
-  joyAxisY_  = inputHandler_ -> joyAxisY();
+  joyAxisY_  = InputHandler::Instance() -> joyAxisY();
   acceleration_.y = joyAxisY_ * multiplier;
   
   if( joyAxisY_ == 0.0f ) {
@@ -203,7 +203,7 @@ void Ship::calculateRotation( float dt ) {
   
   rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( xAngle_ ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
   rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-  //rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+  rotationMatrix_ = glm::rotate( rotationMatrix_,   glm::radians( zAngle_ ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
   
 }
 
@@ -238,12 +238,12 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   
   vb_.bind();
   texture_.bind();
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 );
-  glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) );
-  glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) );
+  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 ) );
+  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) ) );
+  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) ) );
   ib_.bind();
     
-  glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
+  GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
   
   particles_ -> render( viewProjectionMatrix );
   

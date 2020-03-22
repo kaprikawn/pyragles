@@ -6,12 +6,12 @@
 #include <vector>
 
 enum Buttons {
-    LEFT, RIGHT, ASCEND, DESCEND, FIRE
+    LEFT, RIGHT, ASCEND, DESCEND, FIRE, BOMB
   , MAX_BUTTON_NUM
   , MAX_BUTTON = MAX_BUTTON_NUM
 };
 
-class InputHandler {
+class InputHandlerClass {
   
   private:
     
@@ -41,11 +41,13 @@ class InputHandler {
     
     bool quit_ = false;
     
+    InputHandlerClass  (){}
+    ~InputHandlerClass (){}
+    static InputHandlerClass* instance_;
+    
   public:
   
-    InputHandler( bool invertY );
-    ~InputHandler();
-    
+    void init( bool invertY );
     void processEvent( SDL_Event& event, Uint32 frameTime );
     void reset();
     
@@ -79,6 +81,14 @@ class InputHandler {
     
     bool yInverted() { return yInverted_; }
     
+    static InputHandlerClass* Instance() {
+      if( instance_ == 0 ) {
+        instance_ = new InputHandlerClass();
+      }
+      return instance_;
+    }
 };
+
+typedef InputHandlerClass InputHandler;
 
 #endif //INPUTHANDLER_HPP

@@ -3,12 +3,12 @@
 
 #include "gameState.hpp"
 #include "glCallLog.hpp"
-#include "inputHandler.hpp"
 #include "indexBuffer.hpp"
 #include "vertexBuffer.hpp"
 #include "shader.hpp"
 #include "ship.hpp"
 #include "floor.hpp"
+#include "hud.hpp"
 #include <memory>
 
 class PlayState : public GameState {
@@ -17,16 +17,17 @@ class PlayState : public GameState {
     
     int                         nextLevel_;
     
-    std::shared_ptr<Camera>     camera_;
-    
     glm::mat4                   viewProjectionMatrix_;
     
     std::unique_ptr<Ship>       ship_;
     std::unique_ptr<Floor>      floor_;
+    std::unique_ptr<Hud>        hud_;
+    
+    unsigned short int          bombCount_ = 9;
     
   public:
     
-    virtual bool onEnter( std::shared_ptr<InputHandler> inputHandler, std::shared_ptr<Camera> camera, int levelNumber );
+    virtual bool onEnter( int levelNumber );
     virtual void update( GLfloat dt );
     virtual void render();
     virtual bool onExit();

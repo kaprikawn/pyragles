@@ -13,7 +13,7 @@ void VertexBuffer::init( const void* data, unsigned int size, GLenum usage ) {
 }
 
 void VertexBuffer::bind() const {
-  glBindBuffer( GL_ARRAY_BUFFER, rendererID_ );
+  GLCall( glBindBuffer( GL_ARRAY_BUFFER, rendererID_ ) );
 }
 
 void VertexBuffer::loadBufferData( const void* data, unsigned int size ) const {
