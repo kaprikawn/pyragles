@@ -118,6 +118,10 @@ void Game::run() {
     InputHandler::Instance() -> reset();
   } while( running_ );
   
+  SDL_GL_DeleteContext( glContext_ );
+	SDL_DestroyWindow( window_ );
+	SDL_Quit();
+  
 }
 
 void Game::render() {
