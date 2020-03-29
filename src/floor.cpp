@@ -126,7 +126,7 @@ Floor::Floor() {
 
 void Floor::update( float dt ) {
   modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, zPos_ ) );
-  zPos_ += dt * 20;
+  zPos_ += dt * SCROLL_SPEED;
   while( zPos_ > 4 )
     zPos_ -= 4;
 }

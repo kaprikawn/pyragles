@@ -49,7 +49,7 @@ Hud::Hud() {
   GLCall( glEnableVertexAttribArray( healthColourID_ ) );
   
   updateHealthBar( targetHealth_ );
-  targetHealth_ = 1;
+  //targetHealth_ = 1;
 }
 
 void Hud::updateBombCount( unsigned short int bombCount ) {

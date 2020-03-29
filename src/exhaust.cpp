@@ -113,8 +113,8 @@ bool Exhaust::randomBool() {
 
 void Exhaust::spawnParticle( glm::vec3 newPosition, float xAngle, float yAngle ) {
   
-  newPosition.y += 1.7f; // ship isn't totally centre
-  newPosition.z += 2.5f; // move to back of ship
+  //newPosition.y += 1.7f; // ship isn't totally centre
+  newPosition.z += 1.3f; // move to back of ship
   newPosition.x += yAngle * 0.05f;
   
   float maxPositionDeviation = 0.3f;

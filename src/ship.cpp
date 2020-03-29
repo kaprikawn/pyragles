@@ -17,7 +17,7 @@ Ship::Ship() {
 bool Ship::init( std::string modelName ) {
   
   //model_ = std::make_unique<Model>();
-  bool gltfLoaded = loadModelFromGltf( modelName );
+  bool gltfLoaded = loadModelFromGltf( "ship_2020032.glb" );
   if( !gltfLoaded )
     return false;
   
@@ -224,7 +224,8 @@ void Ship::update( float dt ) {
   particleTimer_ += ( dt * 60 );
   
   while( particleTimer_ > 0.0f ) {
-    particles_ -> spawnParticle( position_, xAngle_, yAngle_ );
+    glm::vec3 particleStart = position_;
+    particles_ -> spawnParticle( particleStart, xAngle_, yAngle_ );
     particleTimer_ -= 1.0f;
   }
   
