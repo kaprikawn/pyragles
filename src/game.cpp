@@ -119,8 +119,8 @@ void Game::run() {
   } while( running_ );
   
   SDL_GL_DeleteContext( glContext_ );
-	SDL_DestroyWindow( window_ );
-	SDL_Quit();
+  SDL_DestroyWindow( window_ );
+  SDL_Quit();
   
 }
 
