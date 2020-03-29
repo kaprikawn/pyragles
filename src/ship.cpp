@@ -17,7 +17,7 @@ Ship::Ship() {
 bool Ship::init( std::string modelName ) {
   
   //model_ = std::make_unique<Model>();
-  bool gltfLoaded = loadModelFromGltf( "ship_2020032.glb" );
+  bool gltfLoaded = loadModelFromGltf( "ship.glb" );
   if( !gltfLoaded )
     return false;
   
