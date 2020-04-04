@@ -16,8 +16,7 @@ Ship::Ship() {
 
 bool Ship::init( std::string modelName ) {
   
-  //model_ = std::make_unique<Model>();
-  bool gltfLoaded = loadModelFromGltf( "ship.glb" );
+  bool gltfLoaded = GameObject::loadModelFromGltf( "ship.glb" );
   if( !gltfLoaded )
     return false;
   
@@ -37,6 +36,12 @@ bool Ship::init( std::string modelName ) {
   GLCall( glEnableVertexAttribArray( positionID_ ) );
   //GLCall( glEnableVertexAttribArray( normalID_ ) );
   GLCall( glEnableVertexAttribArray( texCoordID_ ) );
+  
+  originalCollider_ = model_ -> getCollider();
+  if( originalCollider_.size() > 0 ) {
+    hasCollider_  = true;
+    collider_ = originalCollider_;
+  }
   
   return true;
 }
@@ -217,6 +222,8 @@ void Ship::update( float dt ) {
   modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
   modelMatrix_ *= rotationMatrix_;
   
+  GameObject::updateCollider();
+  
   target_ -> update( dt, position_, xAngle_, yAngle_ );
   
   // update mesh / vertices in mesh
@@ -228,8 +235,6 @@ void Ship::update( float dt ) {
     particles_ -> spawnParticle( particleStart, xAngle_, yAngle_ );
     particleTimer_ -= 1.0f;
   }
-  
-  
 }
 
 void Ship::render( glm::mat4 viewProjectionMatrix ) {

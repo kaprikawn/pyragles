@@ -27,7 +27,9 @@ class GameObject {
     int  colourID_;
     int  mvpID_;
     
-    float yAngle_ = 0;
+    float xAngle_ = 0.0f;
+    float yAngle_ = 0.0f;
+    float zAngle_ = 0.0f;
     
     glm::mat4 modelMatrix_;
     glm::mat4 rotationMatrix_;
@@ -37,6 +39,10 @@ class GameObject {
     glm::vec3 position_;
     
     unsigned int  indexCount_ = 0;
+    
+    std::vector<glm::vec3>  originalCollider_; // at start before any transformations
+    std::vector<glm::vec3>  collider_; // current collider (add position and rotation)
+    bool hasCollider_ = false;
     
   public:
     
@@ -52,8 +58,11 @@ class GameObject {
     void loadIndexData( const void* data, unsigned int count );
     void loadShader( const std::string& filename );
     void loadTexture( unsigned char* textureData, int width, int height );
+    void recalculateMeshPosition();
     
     unsigned int indexCount() const { return indexCount_; }
+    
+    void updateCollider();
     
 };
 
