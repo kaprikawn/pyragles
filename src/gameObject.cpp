@@ -104,6 +104,10 @@ void GameObject::updateCollider() {
     collider_[ v ].y = transformed.y;
     collider_[ v ].z = transformed.z;
     
+    // std::cout << "x is " << transformed.x << std::endl;
+    // std::cout << "y is " << transformed.y << std::endl;
+    // std::cout << "z is " << transformed.z << std::endl;
+    
   }
 }
 
