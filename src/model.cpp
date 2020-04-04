@@ -312,8 +312,5 @@ std::vector<GLushort> Model::ushorts( unsigned int byteOffset, unsigned int byte
 }
 
 Model::~Model() {
-  if( textureData_ )
-    delete textureData_;
-  
-  textureData_ = nullptr;
+
 }
