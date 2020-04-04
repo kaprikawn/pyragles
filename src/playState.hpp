@@ -9,6 +9,7 @@
 #include "ship.hpp"
 #include "floor.hpp"
 #include "hud.hpp"
+#include "enemy.hpp"
 #include <memory>
 
 class PlayState : public GameState {
@@ -24,6 +25,8 @@ class PlayState : public GameState {
     std::unique_ptr<Hud>        hud_;
     
     unsigned short int          bombCount_ = 9;
+    
+    std::vector<std::unique_ptr<Enemy>> enemies_;
     
   public:
     

@@ -6,6 +6,7 @@ add_executable( ${PROJECT_NAME}
   gameStateMachine.cpp playState.cpp
   model.cpp
   ship.cpp target.cpp floor.cpp exhaust.cpp
+  enemy.cpp
   game.cpp main.cpp
 )
 

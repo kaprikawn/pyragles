@@ -59,7 +59,6 @@ class GameObject {
     void loadIndexData( const void* data, unsigned int count );
     void loadShader( const std::string& filename );
     void loadTexture( unsigned char* textureData, int width, int height );
-    void recalculateMeshPosition();
     
     unsigned int indexCount() const { return indexCount_; }
     
