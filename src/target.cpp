@@ -40,7 +40,7 @@ Target::Target() {
   position_.z = -10.0f;
   position_.y = 5.0f;
   
-  loadVertexData( &vertexData_[ 0 ], sizeof( vertexData_[ 0 ] ) * vertexData_.size(), GL_DYNAMIC_DRAW );
+  loadVertexData( &vertexData_[ 0 ], sizeof( vertexData_[ 0 ] ) * vertexData_.size(), GL_STATIC_DRAW );
   loadIndexData( &indexData[ 0 ], indexData.size() );
   loadShader( "shaderVertexColours.glsl" );
   

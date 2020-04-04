@@ -14,10 +14,6 @@ class Ship : public GameObject {
     float joyAxisX_ = 0.0f;
     float joyAxisY_ = 0.0f;
     
-    float xAngle_ = 0.0f;
-    float yAngle_ = 0.0f;
-    float zAngle_ = 0.0f;
-    
     float particleTimer_ = 0.0f;
     
   public :

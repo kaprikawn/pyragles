@@ -16,6 +16,10 @@ GameObject::GameObject() {
   texture_        = Texture();
 }
 
+void GameObject::recalculateMeshPosition() {
+  
+}
+
 void GameObject::updatePosition(  glm::vec3 velocity, GLfloat dt, bool skip ) {
   if( !skip )
     position_ += velocity * dt;
@@ -43,7 +47,6 @@ void GameObject::render( glm::mat4 viewProjectionMatrix ) {
   glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
   
 }
-
 
 void GameObject::loadVertexData( const void* data, unsigned int size, GLenum usage ) {
   vb_.init( data, size, usage );
@@ -86,6 +89,57 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   glEnableVertexAttribArray( texCoordID_ );
   
   return true;
+}
+
+void GameObject::updateCollider() {
+  if( !hasCollider_ )
+    return;
+    
+  float minX, maxX, minY, maxY, minZ, maxZ;
+  bool firstRun = true;
+  
+  for( unsigned int v = 0; v < collider_.size(); v++ ) {
+    
+    glm::mat4 updateMatrix = glm::translate( modelMatrix_, originalCollider_[ v ] );
+    glm::vec4 transformed = updateMatrix * glm::vec4( originalCollider_[ v ], 1.0f );
+    
+    collider_[ v ].x = transformed.x;
+    collider_[ v ].y = transformed.y;
+    collider_[ v ].z = transformed.z;
+    
+    // for AABB - get max bounds
+    if( firstRun ) {
+      minX = maxX = transformed.x;
+      minY = maxY = transformed.y;
+      minZ = maxZ = transformed.z;
+    } else {
+      if( transformed.x < minX )
+        minX = transformed.x;
+      if( transformed.x > maxX )
+        maxX = transformed.x;
+      if( transformed.y < minY )
+        minY = transformed.y;
+      if( transformed.y > maxY )
+        maxY = transformed.y;
+      if( transformed.x < minZ )
+        minZ = transformed.x;
+      if( transformed.x > maxZ )
+        maxZ = transformed.x;
+    }
+    
+    minX_ = minX;
+    maxX_ = maxX;
+    minY_ = minY;
+    maxY_ = maxY;
+    minZ_ = minZ;
+    maxZ_ = maxZ;
+    
+    // std::cout << "x is " << transformed.x << std::endl;
+    // std::cout << "y is " << transformed.y << std::endl;
+    // std::cout << "z is " << transformed.z << std::endl;
+    
+    firstRun = false;
+  }
 }
 
 GameObject::~GameObject() {

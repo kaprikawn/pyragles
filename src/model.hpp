@@ -33,6 +33,7 @@ class Model {
     std::vector<glm::vec2>    texcoord_0s_;
     std::vector<unsigned int> indices_;
     unsigned int              indexCount_ = 0;
+    std::vector<glm::vec3>    collider_;
     
     bool                      useUvData_ = false;
     std::vector<float>        vertexData_;
@@ -52,6 +53,8 @@ class Model {
     ~Model();
     
     bool loadFromGltf( const std::string& filename );
+    void loadModel( int mesh );
+    void updateCollider();
     
     std::vector<glm::vec3>  positions( unsigned int positionIndex     , unsigned int &positionsCount );
     std::vector<glm::vec3>  normals( unsigned int normalIndex         , unsigned int &normalsCount );
@@ -79,6 +82,7 @@ class Model {
     int             textureWidth()        { return textureWidth_; }
     int             textureHeight()       { return textureHeight_; }
     
+    std::vector<glm::vec3> getCollider()  { return collider_; }
 };
 
 #endif //MODEL_HPP

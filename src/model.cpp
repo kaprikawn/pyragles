@@ -56,46 +56,19 @@ bool Model::loadFromGltf( const std::string& filename ) {
       int mesh          = node[ "mesh" ];
       std::string name  = node[ "name" ];
       
-      mesh_             = mesh;
-      name_             = name;
-      
-      unsigned int positionIndex    = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
-      unsigned int normalIndex      = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "NORMAL" ];
-      unsigned int texcoord_0Index  = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "TEXCOORD_0" ];
-      unsigned int indicesIndex     = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
-      
-      unsigned int positionsCount;
-      unsigned int normalsCount;
-      unsigned int uvCount;
-      
-      positions_        = Model::positions( positionIndex, positionsCount );
-      normals_          = Model::normals( normalIndex, normalsCount );
-      texcoord_0s_      = Model::texcoord_0s( texcoord_0Index, uvCount );
-      indices_          = Model::indices( indicesIndex );
-      indexCount_     = indices_.size();
-      
-      if( positionsCount == uvCount && positionsCount > 0 ) {
-        useUvData_ = true;
-        for( unsigned int i = 0; i < positionsCount; i++ ) {
-          vertexData_.push_back( positions_[i][0] );
-          vertexData_.push_back( positions_[i][1] );
-          vertexData_.push_back( positions_[i][2] );
-          vertexData_.push_back( normals_[i][0] );
-          vertexData_.push_back( normals_[i][1] );
-          vertexData_.push_back( normals_[i][2] );
-          vertexData_.push_back( texcoord_0s_[i][0] );
-          vertexData_.push_back( texcoord_0s_[i][1] );
-          
-          vertexDataSize_ += ( sizeof( float ) * 8 );
-        }
+      if( name == "Collider" ) {
+        
+        unsigned int positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
+        unsigned int positionsCount;
+        
+        collider_ = Model::positions( positionIndex, positionsCount );
+        
       } else {
-        for( unsigned int i = 0; i < positionsCount; i++ ) {
-          vertexData_.push_back( positions_[i][0] );
-          vertexData_.push_back( positions_[i][1] );
-          vertexData_.push_back( positions_[i][2] );
-          
-          vertexDataSize_ += ( sizeof( float ) * 3 );
-        }
+        
+        mesh_ = mesh;
+        name_ = name;
+        Model::loadModel( mesh );
+        
       }
     }
   }
@@ -103,6 +76,48 @@ bool Model::loadFromGltf( const std::string& filename ) {
   Model::loadTexture();
   
   return true;
+}
+
+void Model::loadModel( int mesh ) {
+  
+  unsigned int positionIndex    = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
+  unsigned int normalIndex      = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "NORMAL" ];
+  unsigned int texcoord_0Index  = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "TEXCOORD_0" ];
+  unsigned int indicesIndex     = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
+  
+  unsigned int positionsCount;
+  unsigned int normalsCount;
+  unsigned int uvCount;
+  
+  positions_    = Model::positions( positionIndex, positionsCount );
+  normals_      = Model::normals( normalIndex, normalsCount );
+  texcoord_0s_  = Model::texcoord_0s( texcoord_0Index, uvCount );
+  indices_      = Model::indices( indicesIndex );
+  indexCount_   = indices_.size();
+  
+  if( positionsCount == uvCount && positionsCount > 0 ) {
+    useUvData_ = true;
+    for( unsigned int i = 0; i < positionsCount; i++ ) {
+      vertexData_.push_back( positions_[i][0] );
+      vertexData_.push_back( positions_[i][1] );
+      vertexData_.push_back( positions_[i][2] );
+      vertexData_.push_back( normals_[i][0] );
+      vertexData_.push_back( normals_[i][1] );
+      vertexData_.push_back( normals_[i][2] );
+      vertexData_.push_back( texcoord_0s_[i][0] );
+      vertexData_.push_back( texcoord_0s_[i][1] );
+      
+      vertexDataSize_ += ( sizeof( float ) * 8 );
+    }
+  } else {
+    for( unsigned int i = 0; i < positionsCount; i++ ) {
+      vertexData_.push_back( positions_[i][0] );
+      vertexData_.push_back( positions_[i][1] );
+      vertexData_.push_back( positions_[i][2] );
+      
+      vertexDataSize_ += ( sizeof( float ) * 3 );
+    }
+  }
 }
 
 void Model::loadTexture() {
