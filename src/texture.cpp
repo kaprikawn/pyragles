@@ -30,7 +30,8 @@ void Texture::init( unsigned char* textureData, int width, int height ) {
 
 void Texture::initFromPNG( std::string filename ) {
   
-  stbi_set_flip_vertically_on_load( 1 );
+  //stbi_set_flip_vertically_on_load( 1 );
+
   std::string filepath = "./assets/" + filename;
   
   int width, height, bpp;

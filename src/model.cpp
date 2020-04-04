@@ -69,8 +69,6 @@ bool Model::loadFromGltf( const std::string& filename ) {
         name_ = name;
         Model::loadModel( mesh );
         
-        std::cout << "loading " << name << std::endl;
-        
       }
     }
   }

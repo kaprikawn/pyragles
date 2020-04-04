@@ -48,6 +48,10 @@ void Enemy::update( float dt ) {
   
   updatePosition( velocity_, dt );
   
+  if( position_.z > 0.0f ) {
+    velocity_.z = 0.0f;
+  }
+  
   yAngle_ += 100.0f * dt;
   if( yAngle_ > 360.0f )
     yAngle_ -= 360.0f;
