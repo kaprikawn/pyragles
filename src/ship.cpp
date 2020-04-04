@@ -7,8 +7,8 @@
 
 Ship::Ship() {
   
-  //position_.z = -3.0f;
-  //position_.y = START_Y;
+  position_.z = -3.0f;
+  position_.y = START_Y;
   
   target_     = std::make_unique<Target>();
   particles_  = std::make_unique<Exhaust>();

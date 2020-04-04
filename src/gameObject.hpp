@@ -43,6 +43,7 @@ class GameObject {
     std::vector<glm::vec3>  originalCollider_; // at start before any transformations
     std::vector<glm::vec3>  collider_; // current collider (add position and rotation)
     bool hasCollider_ = false;
+    float minX_, maxX_, minY_, maxY_, minZ_, maxZ_;
     
   public:
     
