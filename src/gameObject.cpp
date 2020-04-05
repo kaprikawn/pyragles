@@ -67,6 +67,11 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   bool modelLoaded = model_ -> loadFromGltf( modelName );
   if( !modelLoaded )
     return false;
+  if( model_ -> hasCollider() ) {
+    hasCollider_ = true;
+    originalCollider_ = model_ -> collider();
+    collider_         = originalCollider_;
+  }
   
   indexCount_ = model_ -> indexCount();
   
@@ -87,14 +92,15 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   return true;
 }
 
-void GameObject::updateCollider() {
+void GameObject::updateCollider( int debug ) {
+  
   if( !hasCollider_ )
     return;
     
-  float minX, maxX, minY, maxY, minZ, maxZ;
-  bool firstRun = true;
-  
-  for( unsigned int v = 0; v < collider_.size(); v++ ) {
+  // if( debug == 1 )
+  //   printf( "some gobbledegook\n" );
+    
+  for( unsigned int v = 0; v < originalCollider_.size(); v++ ) {
     
     glm::mat4 updateMatrix = glm::translate( modelMatrix_, originalCollider_[ v ] );
     glm::vec4 transformed = updateMatrix * glm::vec4( originalCollider_[ v ], 1.0f );
@@ -103,38 +109,10 @@ void GameObject::updateCollider() {
     collider_[ v ].y = transformed.y;
     collider_[ v ].z = transformed.z;
     
-    // for AABB - get max bounds
-    if( firstRun ) {
-      minX = maxX = transformed.x;
-      minY = maxY = transformed.y;
-      minZ = maxZ = transformed.z;
-    } else {
-      if( transformed.x < minX )
-        minX = transformed.x;
-      if( transformed.x > maxX )
-        maxX = transformed.x;
-      if( transformed.y < minY )
-        minY = transformed.y;
-      if( transformed.y > maxY )
-        maxY = transformed.y;
-      if( transformed.x < minZ )
-        minZ = transformed.x;
-      if( transformed.x > maxZ )
-        maxZ = transformed.x;
-    }
-    
-    minX_ = minX;
-    maxX_ = maxX;
-    minY_ = minY;
-    maxY_ = maxY;
-    minZ_ = minZ;
-    maxZ_ = maxZ;
-    
     // std::cout << "x is " << transformed.x << std::endl;
     // std::cout << "y is " << transformed.y << std::endl;
     // std::cout << "z is " << transformed.z << std::endl;
     
-    firstRun = false;
   }
 }
 

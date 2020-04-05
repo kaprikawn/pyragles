@@ -36,7 +36,7 @@ bool Ship::init( std::string modelName ) {
   //GLCall( glEnableVertexAttribArray( normalID_ ) );
   GLCall( glEnableVertexAttribArray( texCoordID_ ) );
   
-  originalCollider_ = model_ -> getCollider();
+  originalCollider_ = model_ -> collider();
   if( originalCollider_.size() > 0 ) {
     hasCollider_  = true;
     collider_ = originalCollider_;

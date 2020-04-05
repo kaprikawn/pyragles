@@ -1,6 +1,7 @@
 #include "playState.hpp"
 #include <iostream>
 #include "inputHandler.hpp"
+#include "collision.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
@@ -45,13 +46,19 @@ void PlayState::update( GLfloat dt ) {
   }
   
   ship_ -> update( dt );
-  
   hud_ -> update( dt, bombCount_ );
+  
+  // check for collisions
+  for( unsigned int e = 0; e < enemies_.size(); e++ ) {
+    
+    std::vector<glm::vec3>  collider = enemies_[ e ] -> collider();
+    
+    Collision myCollision( ship_ -> collider(), enemies_[ e ] -> collider() );
+    std::cout << "are colliding is " << myCollision.areColliding() << std::endl;
+  }
 }
 
 void PlayState::render() {
-  
-  
   
   if( enemies_.size() > 0 ) {
     for( unsigned int i = 0; i < enemies_.size(); i++ ) {

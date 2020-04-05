@@ -34,6 +34,7 @@ class Model {
     std::vector<unsigned int> indices_;
     unsigned int              indexCount_ = 0;
     std::vector<glm::vec3>    collider_;
+    bool                      hasCollider_ = false;
     
     bool                      useUvData_ = false;
     std::vector<float>        vertexData_;
@@ -82,7 +83,8 @@ class Model {
     int             textureWidth()        { return textureWidth_; }
     int             textureHeight()       { return textureHeight_; }
     
-    std::vector<glm::vec3> getCollider()  { return collider_; }
+    bool                    hasCollider() { return hasCollider_; }
+    std::vector<glm::vec3>  collider()    { return collider_; }
 };
 
 #endif //MODEL_HPP
