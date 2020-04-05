@@ -48,8 +48,6 @@ void GameObject::render( glm::mat4 viewProjectionMatrix ) {
     vbCol_.bind();
     glVertexAttribPointer( positionIDCol_, 3, GL_FLOAT, GL_FALSE, 0, 0 );
     glDrawArrays( GL_TRIANGLES, 0, model_ -> colliderVertexCount() );
-    
-    std::cout << "position is " << position_.x << std::endl;
   }
   
 }
@@ -128,9 +126,9 @@ void GameObject::updateCollider( int debug ) {
     // collider_[ v ].y = transformed.y;
     // collider_[ v ].z = transformed.z;
     
-    //std::cout << "x is " << transformed.x << std::endl;
-    // std::cout << "y is " << transformed.y << std::endl;
-    // std::cout << "z is " << transformed.z << std::endl;
+    // std::cout << "x is " << collider_[ v ].x << std::endl;
+    // std::cout << "y is " << collider_[ v ].y << std::endl;
+    // std::cout << "z is " << collider_[ v ].z << std::endl;
     
   }
 }

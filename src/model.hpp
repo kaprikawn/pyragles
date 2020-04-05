@@ -56,6 +56,7 @@ class Model {
     
     bool loadFromGltf( const std::string& filename );
     void loadModel( int mesh );
+    std::vector<glm::vec4> loadCollider( int mesh );
     void updateCollider();
     
     std::vector<glm::vec4>  positions( unsigned int positionIndex     , unsigned int &positionsCount );

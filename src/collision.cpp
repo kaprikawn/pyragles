@@ -58,8 +58,8 @@ bool areCollidingAABB( std::vector<glm::vec4> collider1, std::vector<glm::vec4> 
   AABB myAABB1 = getAABB( collider1 );
   AABB myAABB2 = getAABB( collider2 );
   
-  std::cout << "myAABB1.maxX = " << myAABB1.maxX << std::endl;
-  std::cout << "myAABB2.minX = " << myAABB2.minX << std::endl;
+  // std::cout << "myAABB1.maxX = " << myAABB1.maxX << std::endl;
+  // std::cout << "myAABB2.minX = " << myAABB2.minX << std::endl;
   
   if( myAABB1.maxX < myAABB2.minX )
     return false;
