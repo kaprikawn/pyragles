@@ -1,13 +1,13 @@
 #shader vertex
 #version 100
 
-attribute vec3  aPosition;
+attribute vec4  aPosition;
 attribute vec4  aColour;
 varying   vec4  vColour;
 uniform   mat4  uMVP;
 
 void main() {
-  gl_Position = uMVP * vec4( aPosition, 1.0 );
+  gl_Position = uMVP * aPosition;
   vColour = aColour;
 }
 

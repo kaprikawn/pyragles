@@ -52,7 +52,7 @@ Target::Target() {
   GLCall( glEnableVertexAttribArray( colourID_ ) );
 }
 
-void Target::update( float dt, glm::vec3 shipPosition, float shipAngleX, float shipAngleY ) {
+void Target::update( float dt, glm::vec4 shipPosition, float shipAngleX, float shipAngleY ) {
   
   float distanceFromShip = 7.0f;
   
@@ -62,7 +62,7 @@ void Target::update( float dt, glm::vec3 shipPosition, float shipAngleX, float s
   position_.x = -( distanceFromShip * tan( glm::radians( shipAngleY ) ) ) + shipPosition.x;
   position_.y = distanceFromShip * tan( glm::radians( shipAngleX ) ) + shipPosition.y;
   
-  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
 }
 
 void Target::render( glm::mat4 viewProjectionMatrix ) {

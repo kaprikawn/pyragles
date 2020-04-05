@@ -51,22 +51,22 @@ void PlayState::update( GLfloat dt ) {
   // check for collisions
   for( unsigned int e = 0; e < enemies_.size(); e++ ) {
     
-    std::vector<glm::vec3>  collider = enemies_[ e ] -> collider();
+    std::vector<glm::vec4> collider = enemies_[ e ] -> collider();
     
     Collision myCollision( ship_ -> collider(), enemies_[ e ] -> collider() );
-    std::cout << "are colliding is " << myCollision.areColliding() << std::endl;
+    //std::cout << "are colliding is " << myCollision.areColliding() << std::endl;
   }
 }
 
 void PlayState::render() {
+  
+  ship_ -> render( viewProjectionMatrix_ );
   
   if( enemies_.size() > 0 ) {
     for( unsigned int i = 0; i < enemies_.size(); i++ ) {
       enemies_[ i ] -> render( viewProjectionMatrix_ );
     }
   }
-  
-  ship_ -> render( viewProjectionMatrix_ );
   
   floor_ -> render( viewProjectionMatrix_ );
   hud_ -> render();

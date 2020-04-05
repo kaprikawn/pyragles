@@ -59,16 +59,16 @@ bool Model::loadFromGltf( const std::string& filename ) {
       if( name == "Collider" ) {
         
         unsigned int positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
-        unsigned int positionsCount;
         
-        collider_ = Model::positions( positionIndex, positionsCount );
+        collider_ = Model::positions( positionIndex, colliderVertexCount_ );
+        colliderVertexCount_ *= 3;
         
-        // for( unsigned int i = 0; i < collider_.size(); i++ ) {
-        //   std::cout << "x is " << collider_[ i ].x << std::endl;
-        //   std::cout << "y is " << collider_[ i ].y << std::endl;
-        //   std::cout << "z is " << collider_[ i ].z << std::endl;
-        // }
-        
+        for( unsigned int i = 0; i < collider_.size(); i += 3 ) {
+          std::cout << "x1 is " << collider_[ i + 0 ].x <<  " y1 is " << collider_[ i + 0 ].y << " z1 is " << collider_[ i + 0 ].z << std::endl;
+          std::cout << "x2 is " << collider_[ i + 1 ].x <<  " y2 is " << collider_[ i + 1 ].y << " z2 is " << collider_[ i + 1 ].z << std::endl;
+          std::cout << "x3 is " << collider_[ i + 2 ].x <<  " y3 is " << collider_[ i + 2 ].y << " z3 is " << collider_[ i + 2 ].z << std::endl;
+        }
+        printf( "#####################\n" );
         if( collider_.size() > 0 )
           hasCollider_ = true;
         
@@ -110,13 +110,14 @@ void Model::loadModel( int mesh ) {
       vertexData_.push_back( positions_[i][0] );
       vertexData_.push_back( positions_[i][1] );
       vertexData_.push_back( positions_[i][2] );
+      vertexData_.push_back( 1.0f );
       vertexData_.push_back( normals_[i][0] );
       vertexData_.push_back( normals_[i][1] );
       vertexData_.push_back( normals_[i][2] );
       vertexData_.push_back( texcoord_0s_[i][0] );
       vertexData_.push_back( texcoord_0s_[i][1] );
       
-      vertexDataSize_ += ( sizeof( float ) * 8 );
+      vertexDataSize_ += ( sizeof( float ) * 9 );
     }
   } else {
     for( unsigned int i = 0; i < positionsCount; i++ ) {
@@ -146,9 +147,9 @@ void Model::loadTexture() {
   
 }
 
-std::vector<glm::vec3> Model::positions( unsigned int positionIndex, unsigned int &positionsCount ) {
+std::vector<glm::vec4> Model::positions( unsigned int positionIndex, unsigned int &positionsCount ) {
   
-  std::vector<glm::vec3> myVecs;
+  std::vector<glm::vec4> myVecs;
   
   nlohmann::json accessor = json_[ "accessors" ][ positionIndex ];
   int bufferViewIndex     = accessor[ "bufferView" ];
@@ -166,7 +167,7 @@ std::vector<glm::vec3> Model::positions( unsigned int positionIndex, unsigned in
   fs_.seekg( startPosition );
   
   do {
-    glm::vec3 myVec = { 0.0f, 0.0f, 0.0f };
+    glm::vec4 myVec = { 0.0f, 0.0f, 0.0f, 1.0f };
     
     fs_.read( ( char* )&myVec.x , 4 );
     fs_.read( ( char* )&myVec.y , 4 );
