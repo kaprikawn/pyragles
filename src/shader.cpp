@@ -12,22 +12,10 @@ Shader::Shader() {
 
 void Shader::init( const std::string& filename ) {
   
-  rendererID_ = 0;
+  std::string filepath = "./assets/" + filename;
+  ShaderProgramSource source = parseShader( filepath );
   
-  int rendererID = ShaderCache::Instance() -> getRendererID( filename );
-  
-  if( rendererID == -1 ) { // if shader isn't already cached, compile and cache it
-    
-    std::string filepath = "./assets/" + filename;
-    ShaderProgramSource source = parseShader( filepath );
-    
-    rendererID_ = createShader( source.vertexSource, source.fragmentSource );
-    
-    ShaderCache::Instance() -> addRendererID( filename, rendererID_ );
-    
-  } else { // else get renderer id from cache
-    rendererID_ = ( unsigned int )rendererID;
-  }
+  rendererID_ = createShader( source.vertexSource, source.fragmentSource );
 }
 
 ShaderProgramSource Shader::parseShader( const std::string& filepath ) {

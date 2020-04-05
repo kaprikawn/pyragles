@@ -16,10 +16,6 @@ GameObject::GameObject() {
   texture_        = Texture();
 }
 
-void GameObject::recalculateMeshPosition() {
-  
-}
-
 void GameObject::updatePosition(  glm::vec3 velocity, GLfloat dt, bool skip ) {
   if( !skip )
     position_ += velocity * dt;
@@ -31,20 +27,20 @@ void GameObject::update( float dt ) {
 
 void GameObject::render( glm::mat4 viewProjectionMatrix ) {
   
-  mvp_ = viewProjectionMatrix * modelMatrix_;
+  // mvp_ = viewProjectionMatrix * modelMatrix_;
   
-  shader_.bind();
-  shader_.setUniform1i( "uTexture", 0 );
-  shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
+  // shader_.bind();
+  // shader_.setUniform1i( "uTexture", 0 );
+  // shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
   
-  vb_.bind();
-  texture_.bind();
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 );
-  glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) );
-  glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) );
-  ib_.bind();
+  // vb_.bind();
+  // texture_.bind();
+  // glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 );
+  // glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) );
+  // glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) );
+  // ib_.bind();
     
-  glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
+  // glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
   
 }
 

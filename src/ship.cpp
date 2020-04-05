@@ -16,15 +16,14 @@ Ship::Ship() {
 
 bool Ship::init( std::string modelName ) {
   
-  bool gltfLoaded = GameObject::loadModelFromGltf( "ship.glb" );
+  bool gltfLoaded = GameObject::loadModelFromGltf( modelName );
   if( !gltfLoaded )
     return false;
   
-  loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
-  loadIndexData( model_ -> indexData(), model_ -> indexCount() );
-  loadShader( "shaderBasic.glsl" );
+  GameObject::loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
+  GameObject::loadIndexData( model_ -> indexData(), model_ -> indexCount() );
+  GameObject::loadShader( "shaderBasic.glsl" );
   
-  // https://www.raywenderlich.com/3047-opengl-es-2-0-for-iphone-tutorial-part-2-textures
   texture_ = Texture();
   texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
   

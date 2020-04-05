@@ -31,6 +31,7 @@ void Texture::init( unsigned char* textureData, int width, int height ) {
 void Texture::initFromPNG( std::string filename ) {
   
   stbi_set_flip_vertically_on_load( 1 );
+
   std::string filepath = "./assets/" + filename;
   
   int width, height, bpp;
@@ -55,6 +56,8 @@ void Texture::initFromPNG( std::string filename ) {
   
   GLCall( glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, localBuffer ) );
   GLCall( glBindTexture( GL_TEXTURE_2D, 0 ) );
+  
+  stbi_set_flip_vertically_on_load( 0 );
 }
 
 void Texture::bind( unsigned int slot /* = 0 */ ) const {
