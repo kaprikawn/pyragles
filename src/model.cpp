@@ -63,6 +63,15 @@ bool Model::loadFromGltf( const std::string& filename ) {
         
         collider_ = Model::positions( positionIndex, positionsCount );
         
+        // for( unsigned int i = 0; i < collider_.size(); i++ ) {
+        //   std::cout << "x is " << collider_[ i ].x << std::endl;
+        //   std::cout << "y is " << collider_[ i ].y << std::endl;
+        //   std::cout << "z is " << collider_[ i ].z << std::endl;
+        // }
+        
+        if( collider_.size() > 0 )
+          hasCollider_ = true;
+        
       } else {
         
         mesh_ = mesh;

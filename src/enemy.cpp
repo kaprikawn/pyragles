@@ -18,6 +18,10 @@ bool Enemy::init( std::string modelFilename ) {
   bool gltfLoaded = GameObject::loadModelFromGltf( modelFilename );
   if( !gltfLoaded )
     return false;
+    
+  // for( unsigned int i = 0; i < originalCollider_.size(); i++ ) {
+  //   std::cout << "x is " << originalCollider_[i].x << std::endl;
+  // }
   
   GameObject::loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
   GameObject::loadIndexData( model_ -> indexData(), model_ -> indexCount() );
@@ -34,12 +38,6 @@ bool Enemy::init( std::string modelFilename ) {
   GLCall( glEnableVertexAttribArray( positionID_ ) );
   //GLCall( glEnableVertexAttribArray( normalID_ ) );
   GLCall( glEnableVertexAttribArray( texCoordID_ ) );
-  
-  originalCollider_ = model_ -> getCollider();
-  if( originalCollider_.size() > 0 ) {
-    hasCollider_  = true;
-    collider_ = originalCollider_;
-  }
   
   return true;
 }
@@ -60,7 +58,13 @@ void Enemy::update( float dt ) {
   modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
   modelMatrix_ *= rotationMatrix_;
   
-  GameObject::updateCollider();
+  //std::cout << "dfas;ldfa has collider is " << hasCollider_ << std::endl;
+  
+  GameObject::updateCollider( 1 );
+  
+  // for( unsigned int i = 0; i < collider_.size(); i++ ) {
+  //   std::cout << "x is " << collider_[i].x << std::endl;
+  // }
   
 }
 
