@@ -28,13 +28,14 @@ class Model {
     
     std::string               name_;
     int                       mesh_;
-    std::vector<glm::vec3>    positions_;
+    std::vector<glm::vec4>    positions_;
     std::vector<glm::vec3>    normals_;
     std::vector<glm::vec2>    texcoord_0s_;
     std::vector<unsigned int> indices_;
     unsigned int              indexCount_ = 0;
-    std::vector<glm::vec3>    collider_;
+    std::vector<glm::vec4>    collider_;
     bool                      hasCollider_ = false;
+    unsigned int              colliderVertexCount_ = 0;
     
     bool                      useUvData_ = false;
     std::vector<float>        vertexData_;
@@ -57,7 +58,7 @@ class Model {
     void loadModel( int mesh );
     void updateCollider();
     
-    std::vector<glm::vec3>  positions( unsigned int positionIndex     , unsigned int &positionsCount );
+    std::vector<glm::vec4>  positions( unsigned int positionIndex     , unsigned int &positionsCount );
     std::vector<glm::vec3>  normals( unsigned int normalIndex         , unsigned int &normalsCount );
     std::vector<glm::vec2>  texcoord_0s( unsigned int texcoord_0Index , unsigned int &uvCount );
     std::vector<GLuint>     indices( unsigned int indicesIndex );
@@ -84,7 +85,8 @@ class Model {
     int             textureHeight()       { return textureHeight_; }
     
     bool                    hasCollider() { return hasCollider_; }
-    std::vector<glm::vec3>  collider()    { return collider_; }
+    std::vector<glm::vec4>  collider()    { return collider_; }
+    unsigned int            colliderVertexCount() { return colliderVertexCount_; }
 };
 
 #endif //MODEL_HPP

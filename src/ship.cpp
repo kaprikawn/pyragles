@@ -218,7 +218,7 @@ void Ship::update( float dt ) {
   calculateRotation( dt );
   updatePosition( velocity_, dt );
   
-  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
   modelMatrix_ *= rotationMatrix_;
   
   GameObject::updateCollider();
@@ -246,15 +246,17 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   
   vb_.bind();
   texture_.bind();
-  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 ) );
-  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) ) );
-  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) ) );
+  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
+  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 4 ) ) );
+  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 7 ) ) );
   ib_.bind();
     
   GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
   
   target_     -> render( viewProjectionMatrix );
   particles_  -> render( viewProjectionMatrix );
+  
+  GameObject::render( viewProjectionMatrix );
   
 }
 
