@@ -60,8 +60,7 @@ bool Model::loadFromGltf( const std::string& filename ) {
         
         unsigned int positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
         
-        collider_ = Model::positions( positionIndex, colliderVertexCount_ );
-        colliderVertexCount_ *= 3;
+        collider_ = Model::loadCollider( mesh );
         
         for( unsigned int i = 0; i < collider_.size(); i += 3 ) {
           std::cout << "x1 is " << collider_[ i + 0 ].x <<  " y1 is " << collider_[ i + 0 ].y << " z1 is " << collider_[ i + 0 ].z << std::endl;
@@ -69,8 +68,10 @@ bool Model::loadFromGltf( const std::string& filename ) {
           std::cout << "x3 is " << collider_[ i + 2 ].x <<  " y3 is " << collider_[ i + 2 ].y << " z3 is " << collider_[ i + 2 ].z << std::endl;
         }
         printf( "#####################\n" );
-        if( collider_.size() > 0 )
+        if( collider_.size() > 0 ) {
           hasCollider_ = true;
+          colliderVertexCount_ = collider_.size() * 3;
+        }
         
       } else {
         
@@ -128,6 +129,28 @@ void Model::loadModel( int mesh ) {
       vertexDataSize_ += ( sizeof( float ) * 3 );
     }
   }
+}
+
+std::vector<glm::vec4> Model::loadCollider( int mesh ) {
+  
+  unsigned int positionIndex    = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
+  unsigned int indicesIndex     = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "indices" ];
+  
+  unsigned int positionsCount;
+  
+  std::vector<glm::vec4>    positions;
+  std::vector<unsigned int> indices;
+  
+  positions    = Model::positions( positionIndex, positionsCount );
+  indices      = Model::indices( indicesIndex );
+  
+  std::vector<glm::vec4> collider;
+  
+  for( unsigned int i = 0; i < indices.size(); i++ ) {
+    collider.push_back( positions[ indices[ i ] ] );
+  }
+  
+  return collider;
 }
 
 void Model::loadTexture() {
