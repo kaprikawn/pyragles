@@ -4,20 +4,38 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJECT_DIR=$PWD
 ASSETS_DIR_DEV=$PROJECT_DIR/src/assets
 ASSETS_DIR_BUILD=$PROJECT_DIR/build/assets
+MESON_BUILD=0
+CLEAN_BUILD=0
 
 let cores=`grep -c ^processor /proc/cpuinfo`
-
-cd $PROJECT_DIR || exit 1
 
 if [[ $# -gt 0 ]]; then
   for var in "$@"
   do
     if [[ $var == "--clean" ]]; then
-      if [[ -d build ]]; then
-        rm -rfv build
-      fi
+      CLEAN_BUILD=1
+    fi
+    
+    if [[ $var == "--meson" ]]; then
+      MESON_BUILD=1
+      ASSETS_DIR_BUILD=$PROJECT_DIR/builddir/src/assets
     fi
   done
+fi
+
+cd $PROJECT_DIR || exit 1
+
+# if clean build then delete existing build dir
+if [[ $CLEAN_BUILD -eq 1 ]]; then
+  if [[ $MESON_BUILD -eq 1 ]]; then
+    if [[ -d builddir ]]; then
+      rm -rfv builddir
+    fi
+  else
+    if [[ -d build ]]; then
+      rm -rfv build
+    fi
+  fi
 fi
 
 if [[ ! -d $ASSETS_DIR_BUILD ]]; then
@@ -44,15 +62,16 @@ do
   fi
 done
 
-cd build || exit 1
-
-cmake .. || exit 1
-
-if [[ $cores -gt 1 ]]
-then
-  make -j${cores} || exit 1
+if [[ $MESON_BUILD -eq 1 ]]; then
+  # meson
+  meson builddir
+  cd builddir
+  ninja
 else
-  make || exit 1
+  # cmake
+  cd build
+  cmake ..
+  make -j${cores}
 fi
 
 exit 0
