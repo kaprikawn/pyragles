@@ -1,0 +1,27 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+      {
+          "label"   : "cmake build standard"
+        , "type"    : "shell"
+        , "command" : "${workspaceFolder}/projectBuild.sh"
+      }
+    , {
+          "label"   : "cmake build clean"
+        , "type"    : "shell"
+        , "command" : "${workspaceFolder}/projectBuild.sh --clean"
+      }
+    , {
+          "label"   : "meson build"
+        , "type"    : "shell"
+        , "command" : "${workspaceFolder}/projectBuild.sh --meson"
+      }
+    , {
+          "label"   : "meson build clean"
+        , "type"    : "shell"
+        , "command" : "${workspaceFolder}/projectBuild.sh --meson --clean"
+      }
+  ]
+}
