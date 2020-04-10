@@ -1,6 +1,4 @@
 builddir/
-.vscode/
 *.mtl
 build/
-pyragles.code-workspace
 zz*
