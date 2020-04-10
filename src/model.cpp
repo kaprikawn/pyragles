@@ -62,12 +62,12 @@ bool Model::loadFromGltf( const std::string& filename ) {
         
         collider_ = Model::loadCollider( mesh );
         
-        for( unsigned int i = 0; i < collider_.size(); i += 3 ) {
-          std::cout << "x1 is " << collider_[ i + 0 ].x <<  " y1 is " << collider_[ i + 0 ].y << " z1 is " << collider_[ i + 0 ].z << std::endl;
-          std::cout << "x2 is " << collider_[ i + 1 ].x <<  " y2 is " << collider_[ i + 1 ].y << " z2 is " << collider_[ i + 1 ].z << std::endl;
-          std::cout << "x3 is " << collider_[ i + 2 ].x <<  " y3 is " << collider_[ i + 2 ].y << " z3 is " << collider_[ i + 2 ].z << std::endl;
-        }
-        printf( "#####################\n" );
+        // for( unsigned int i = 0; i < collider_.size(); i += 3 ) {
+        //   std::cout << "x1 is " << collider_[ i + 0 ].x <<  " y1 is " << collider_[ i + 0 ].y << " z1 is " << collider_[ i + 0 ].z << std::endl;
+        //   std::cout << "x2 is " << collider_[ i + 1 ].x <<  " y2 is " << collider_[ i + 1 ].y << " z2 is " << collider_[ i + 1 ].z << std::endl;
+        //   std::cout << "x3 is " << collider_[ i + 2 ].x <<  " y3 is " << collider_[ i + 2 ].y << " z3 is " << collider_[ i + 2 ].z << std::endl;
+        // }
+        // printf( "#####################\n" );
         if( collider_.size() > 0 ) {
           hasCollider_ = true;
           colliderVertexCount_ = collider_.size() * 3;
