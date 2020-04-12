@@ -44,7 +44,7 @@ class GameObject {
     std::vector<glm::vec4>  collider_; // current collider (add position and rotation)
     bool hasCollider_ = false;
     
-    bool          debugCollider_ = true;
+    bool          debugCollider_ = false;
     VertexBuffer  vbCol_;
     Shader        shaderCol_;
     int           positionIDCol_;

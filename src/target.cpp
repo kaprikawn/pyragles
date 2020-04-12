@@ -6,27 +6,27 @@
 
 Target::Target() {
   
-  //    x       y    z     r     g     b     a
+  //    x       y    z     ?     r     g     b     a
   vertexData_ = {
-      -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -1.0f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+      -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
     
-    ,  0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  0.8f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  0.8f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  0.8f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
     
-    , -1.0f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -0.8f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -1.0f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -0.8f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -0.8f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
     
-    , -1.0f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -1.0f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
     
   };
   
@@ -73,8 +73,8 @@ void Target::render( glm::mat4 viewProjectionMatrix ) {
   shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
   
   vb_.bind();
-  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( GLvoid* ) 0 ) );
-  GLCall( glVertexAttribPointer( colourID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( GLvoid* ) ( sizeof( float ) * 3 ) ) );
+  GLCall( glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 ) );
+  GLCall( glVertexAttribPointer( colourID_  , 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) ( sizeof( float ) * 4 ) ) );
   ib_.bind();
     
   GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );

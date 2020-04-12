@@ -5,10 +5,10 @@
 Floor::Floor() {
   
   std::vector<float> vertices = {
-      -100.0f, -0.1f, -100.0f, 0.87f, 0.87f, 0.623f, 0.129f
-    , -100.0f, -0.1f,   10.0f, 0.87f, 0.87f, 0.623f, 0.129f 
-    ,  100.0f, -0.1f,   10.0f, 0.87f, 0.87f, 0.623f, 0.129f
-    ,  100.0f, -0.1f, -100.0f, 0.87f, 0.87f, 0.623f, 0.129f
+      -100.0f, -0.1f, -100.0f, 1.0f, 0.87f, 0.87f, 0.623f, 1.0f
+    , -100.0f, -0.1f,   10.0f, 1.0f, 0.87f, 0.87f, 0.623f, 1.0f 
+    ,  100.0f, -0.1f,   10.0f, 1.0f, 0.87f, 0.87f, 0.623f, 1.0f
+    ,  100.0f, -0.1f, -100.0f, 1.0f, 0.87f, 0.87f, 0.623f, 1.0f
   };
   
   std::vector<int> indices = {
@@ -22,6 +22,7 @@ Floor::Floor() {
       vertices.push_back( ( float )x );
       vertices.push_back( 0.0f );
       vertices.push_back( ( float )z );
+      vertices.push_back( 1.0f );
       vertices.push_back( 0.87f );
       vertices.push_back( 0.733f );
       vertices.push_back( 0.129f );
@@ -30,6 +31,7 @@ Floor::Floor() {
       vertices.push_back( ( float )x );
       vertices.push_back( 0.0f );
       vertices.push_back( ( float )( z + 2 ) );
+      vertices.push_back( 1.0f );
       vertices.push_back( 0.87f );
       vertices.push_back( 0.733f );
       vertices.push_back( 0.129f );
@@ -38,6 +40,7 @@ Floor::Floor() {
       vertices.push_back( ( float )( x + 2 ) );
       vertices.push_back( 0.0f );
       vertices.push_back( ( float )( z + 2 ) );
+      vertices.push_back( 1.0f );
       vertices.push_back( 0.87f );
       vertices.push_back( 0.733f );
       vertices.push_back( 0.129f );
@@ -46,6 +49,7 @@ Floor::Floor() {
       vertices.push_back( ( float )( x + 2 ) );
       vertices.push_back( 0.0f );
       vertices.push_back( ( float )z );
+      vertices.push_back( 1.0f );
       vertices.push_back( 0.87f );
       vertices.push_back( 0.733f );
       vertices.push_back( 0.129f );
@@ -68,6 +72,7 @@ Floor::Floor() {
       vertices.push_back( ( float )x );
       vertices.push_back( 0.0f );
       vertices.push_back( ( float )z );
+      vertices.push_back( 1.0f );
       vertices.push_back( 0.87f );
       vertices.push_back( 0.733f );
       vertices.push_back( 0.129f );
@@ -76,6 +81,7 @@ Floor::Floor() {
       vertices.push_back( ( float )x );
       vertices.push_back( 0.0f );
       vertices.push_back( ( float )( z + 2 ) );
+      vertices.push_back( 1.0f );
       vertices.push_back( 0.87f );
       vertices.push_back( 0.733f );
       vertices.push_back( 0.129f );
@@ -84,6 +90,7 @@ Floor::Floor() {
       vertices.push_back( ( float )( x + 2 ) );
       vertices.push_back( 0.0f );
       vertices.push_back( ( float )( z + 2 ) );
+      vertices.push_back( 1.0f );
       vertices.push_back( 0.87f );
       vertices.push_back( 0.733f );
       vertices.push_back( 0.129f );
@@ -92,6 +99,7 @@ Floor::Floor() {
       vertices.push_back( ( float )( x + 2 ) );
       vertices.push_back( 0.0f );
       vertices.push_back( ( float )z );
+      vertices.push_back( 1.0f );
       vertices.push_back( 0.87f );
       vertices.push_back( 0.733f );
       vertices.push_back( 0.129f );
@@ -139,8 +147,8 @@ void Floor::render( glm::mat4 viewProjectionMatrix ) {
   shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
   
   vb_.bind();
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( GLvoid* ) 0 ); 
-  glVertexAttribPointer( colourID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( GLvoid* )( sizeof( float ) * 3 ) );// TODO is the last parameter needed?
+  glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 ); 
+  glVertexAttribPointer( colourID_  , 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 4 ) );// TODO is the last parameter needed?
   ib_.bind();
   
   glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );

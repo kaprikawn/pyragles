@@ -10,12 +10,12 @@
 #include "gameObject.hpp"
 
 struct Particle {
-  glm::vec3 position      = { 0.0f, 0.0f, 0.0f };
+  glm::vec4 position      = { 0.0f, 0.0f, 0.0f, 1.0f };
   glm::vec4 colour        = { 1.0f, 1.0f, 0.0f, 1.0f };
   float     scale         = 0.1f;
   float     scaleIncrease = 0.1f;
   bool      active        = false;
-  glm::vec3 direction     = { 0.0f, 1.0f, 0.0f };
+  glm::vec4 direction     = { 0.0f, 1.0f, 0.0f, 1.0f };
 };
 
 class Exhaust : public GameObject {
@@ -75,7 +75,7 @@ class Exhaust : public GameObject {
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
     
-    void spawnParticle( glm::vec3 newPosition, float xAngle, float yAngle );
+    void spawnParticle( glm::vec4 newPosition, float xAngle, float yAngle );
     
     float randomFloat();
     bool  randomBool();

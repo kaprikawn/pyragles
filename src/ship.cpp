@@ -230,7 +230,7 @@ void Ship::update( float dt ) {
   particleTimer_ += ( dt * 60 );
   
   while( particleTimer_ > 0.0f ) {
-    glm::vec3 particleStart = position_;
+    glm::vec4 particleStart = position_;
     particles_ -> spawnParticle( particleStart, xAngle_, yAngle_ );
     particleTimer_ -= 1.0f;
   }
@@ -246,7 +246,7 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   
   vb_.bind();
   texture_.bind();
-  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
+  GLCall( glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
   //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 4 ) ) );
   GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 7 ) ) );
   ib_.bind();

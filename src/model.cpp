@@ -58,7 +58,7 @@ bool Model::loadFromGltf( const std::string& filename ) {
       
       if( name == "Collider" ) {
         
-        unsigned int positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
+        //unsigned int positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
         
         collider_ = Model::loadCollider( mesh );
         
@@ -68,6 +68,7 @@ bool Model::loadFromGltf( const std::string& filename ) {
         //   std::cout << "x3 is " << collider_[ i + 2 ].x <<  " y3 is " << collider_[ i + 2 ].y << " z3 is " << collider_[ i + 2 ].z << std::endl;
         // }
         // printf( "#####################\n" );
+        
         if( collider_.size() > 0 ) {
           hasCollider_ = true;
           colliderVertexCount_ = collider_.size() * 3;
@@ -141,6 +142,10 @@ std::vector<glm::vec4> Model::loadCollider( int mesh ) {
   std::vector<glm::vec4>    positions;
   std::vector<unsigned int> indices;
   
+  // std::cout << "lc mesh is " << mesh << std::endl;
+  // std::cout << "lc positionIndex is " << positionIndex << std::endl;
+  // std::cout << "lc indicesIndex is " << indicesIndex << std::endl;
+  
   positions    = Model::positions( positionIndex, positionsCount );
   indices      = Model::indices( indicesIndex );
   
@@ -186,16 +191,21 @@ std::vector<glm::vec4> Model::positions( unsigned int positionIndex, unsigned in
   //int byteLength  = bufferView[ "byteLength" ];
   //int buffer      = bufferView[ "buffer" ];
   
+  // std::cout << "positionIndex is " << positionIndex << std::endl;
+  // std::cout << "bufferViewIndex is " << bufferViewIndex << std::endl;
+  // std::cout << "byteOffset is " << byteOffset << std::endl;
+  
   unsigned int startPosition = binChunkDataStartByte_ + byteOffset;
   fs_.seekg( startPosition );
   
   do {
-    glm::vec4 myVec = { 0.0f, 0.0f, 0.0f, 1.0f };
+    float x, y, z;
     
-    fs_.read( ( char* )&myVec.x , 4 );
-    fs_.read( ( char* )&myVec.y , 4 );
-    fs_.read( ( char* )&myVec.z , 4 );
+    fs_.read( ( char* )&x , 4 );
+    fs_.read( ( char* )&y , 4 );
+    fs_.read( ( char* )&z , 4 );
     
+    glm::vec4 myVec = { x, y, z, 1.0f };
     myVecs.push_back( myVec );
     
     count--;
