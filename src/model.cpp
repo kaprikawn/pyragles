@@ -58,8 +58,6 @@ bool Model::loadFromGltf( const std::string& filename ) {
       
       if( name == "Collider" ) {
         
-        unsigned int positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
-        
         collider_ = Model::loadCollider( mesh );
         
         if( collider_.size() > 0 ) {
