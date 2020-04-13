@@ -58,6 +58,7 @@ bool Model::loadFromGltf( const std::string& filename ) {
       
       if( name == "Collider" ) {
         
+<<<<<<< HEAD
         //unsigned int positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
         
         collider_ = Model::loadCollider( mesh );
@@ -69,6 +70,18 @@ bool Model::loadFromGltf( const std::string& filename ) {
         // }
         // printf( "#####################\n" );
         
+=======
+        unsigned int positionIndex = json_[ "meshes" ][ mesh ][ "primitives" ][ 0 ][ "attributes" ][ "POSITION" ];
+        
+        collider_ = Model::loadCollider( mesh );
+        
+        for( unsigned int i = 0; i < collider_.size(); i += 3 ) {
+          std::cout << "x1 is " << collider_[ i + 0 ].x <<  " y1 is " << collider_[ i + 0 ].y << " z1 is " << collider_[ i + 0 ].z << std::endl;
+          std::cout << "x2 is " << collider_[ i + 1 ].x <<  " y2 is " << collider_[ i + 1 ].y << " z2 is " << collider_[ i + 1 ].z << std::endl;
+          std::cout << "x3 is " << collider_[ i + 2 ].x <<  " y3 is " << collider_[ i + 2 ].y << " z3 is " << collider_[ i + 2 ].z << std::endl;
+        }
+        printf( "#####################\n" );
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
         if( collider_.size() > 0 ) {
           hasCollider_ = true;
           colliderVertexCount_ = collider_.size() * 3;
@@ -142,10 +155,13 @@ std::vector<glm::vec4> Model::loadCollider( int mesh ) {
   std::vector<glm::vec4>    positions;
   std::vector<unsigned int> indices;
   
+<<<<<<< HEAD
   // std::cout << "lc mesh is " << mesh << std::endl;
   // std::cout << "lc positionIndex is " << positionIndex << std::endl;
   // std::cout << "lc indicesIndex is " << indicesIndex << std::endl;
   
+=======
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
   positions    = Model::positions( positionIndex, positionsCount );
   indices      = Model::indices( indicesIndex );
   
@@ -199,7 +215,11 @@ std::vector<glm::vec4> Model::positions( unsigned int positionIndex, unsigned in
   fs_.seekg( startPosition );
   
   do {
+<<<<<<< HEAD
     float x, y, z;
+=======
+    glm::vec4 myVec = { 0.0f, 0.0f, 0.0f, 1.0f };
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
     
     fs_.read( ( char* )&x , 4 );
     fs_.read( ( char* )&y , 4 );

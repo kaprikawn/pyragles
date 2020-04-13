@@ -46,7 +46,11 @@ void GameObject::render( glm::mat4 viewProjectionMatrix ) {
     shaderCol_.bind();
     shaderCol_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
     vbCol_.bind();
+<<<<<<< HEAD
     glVertexAttribPointer( positionIDCol_, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+=======
+    glVertexAttribPointer( positionIDCol_, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
     glDrawArrays( GL_TRIANGLES, 0, model_ -> colliderVertexCount() );
   }
   
@@ -76,7 +80,11 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   if( !modelLoaded )
     return false;
   if( model_ -> hasCollider() ) {
+<<<<<<< HEAD
     hasCollider_      = true;
+=======
+    hasCollider_ = true;
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
     originalCollider_ = model_ -> collider();
     collider_         = originalCollider_;
   }

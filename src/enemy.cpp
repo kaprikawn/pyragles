@@ -68,12 +68,17 @@ void Enemy::update( float dt ) {
   GameObject::updateCollider( 1 );
   
   // for( unsigned int i = 0; i < collider_.size(); i++ ) {
+<<<<<<< HEAD
   //   std::cout << "x is " << collider_[ i ].x << std::endl;
   //   std::cout << "y is " << collider_[ i ].y << std::endl;
   //   std::cout << "z is " << collider_[ i ].z << std::endl;
   // }
   
   // printf( "##################\n" );
+=======
+  //   std::cout << "x is " << collider_[i].x << std::endl;
+  // }
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
   
 }
 
@@ -87,7 +92,11 @@ void Enemy::render( glm::mat4 viewProjectionMatrix ) {
   
   vb_.bind();
   texture_.bind();
+<<<<<<< HEAD
   GLCall( glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
+=======
+  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
   //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 4 ) ) );
   GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 7 ) ) );
   ib_.bind();
