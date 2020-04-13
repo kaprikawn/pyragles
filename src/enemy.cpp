@@ -2,6 +2,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "global.hpp"
 
 Enemy::Enemy() {
   
@@ -11,13 +12,21 @@ bool Enemy::init( std::string modelFilename ) {
   
   position_.z = -20.0f;
   position_.y =  5.0f;
-  position_.x =  5.0f;
+  position_.x =  4.5f;
+  
+  // position_.z = -3.0f;
+  // position_.y = START_Y;
+
   
   velocity_.z = 10.0f;
   
   bool gltfLoaded = GameObject::loadModelFromGltf( modelFilename );
   if( !gltfLoaded )
     return false;
+    
+  // for( unsigned int i = 0; i < originalCollider_.size(); i++ ) {
+  //   std::cout << "x is " << originalCollider_[i].x << std::endl;
+  // }
   
   GameObject::loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
   GameObject::loadIndexData( model_ -> indexData(), model_ -> indexCount() );
@@ -35,12 +44,6 @@ bool Enemy::init( std::string modelFilename ) {
   //GLCall( glEnableVertexAttribArray( normalID_ ) );
   GLCall( glEnableVertexAttribArray( texCoordID_ ) );
   
-  originalCollider_ = model_ -> getCollider();
-  if( originalCollider_.size() > 0 ) {
-    hasCollider_  = true;
-    collider_ = originalCollider_;
-  }
-  
   return true;
 }
 
@@ -48,7 +51,7 @@ void Enemy::update( float dt ) {
   
   updatePosition( velocity_, dt );
   
-  if( position_.z > 0.0f ) {
+  if( position_.z > -3.0f ) {
     velocity_.z = 0.0f;
   }
   
@@ -57,10 +60,25 @@ void Enemy::update( float dt ) {
     yAngle_ -= 360.0f;
   rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   
-  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
   modelMatrix_ *= rotationMatrix_;
   
-  GameObject::updateCollider();
+  //std::cout << "dfas;ldfa has collider is " << hasCollider_ << std::endl;
+  
+  GameObject::updateCollider( 1 );
+  
+  // for( unsigned int i = 0; i < collider_.size(); i++ ) {
+<<<<<<< HEAD
+  //   std::cout << "x is " << collider_[ i ].x << std::endl;
+  //   std::cout << "y is " << collider_[ i ].y << std::endl;
+  //   std::cout << "z is " << collider_[ i ].z << std::endl;
+  // }
+  
+  // printf( "##################\n" );
+=======
+  //   std::cout << "x is " << collider_[i].x << std::endl;
+  // }
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
   
 }
 
@@ -74,12 +92,18 @@ void Enemy::render( glm::mat4 viewProjectionMatrix ) {
   
   vb_.bind();
   texture_.bind();
-  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 ) );
-  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) ) );
-  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) ) );
+<<<<<<< HEAD
+  GLCall( glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
+=======
+  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
+  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 4 ) ) );
+  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 7 ) ) );
   ib_.bind();
     
   GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
+  
+  GameObject::render( viewProjectionMatrix );
 }
 
 Enemy::~Enemy() {

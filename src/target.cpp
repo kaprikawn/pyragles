@@ -6,27 +6,27 @@
 
 Target::Target() {
   
-  //    x       y    z     r     g     b     a
+  //    x       y    z     ?     r     g     b     a
   vertexData_ = {
-      -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -1.0f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+      -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
     
-    ,  0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  0.8f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  0.8f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  0.8f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
     
-    , -1.0f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -0.8f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -1.0f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -0.8f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -0.8f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
     
-    , -1.0f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f,  0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    ,  1.0f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-    , -1.0f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f,  0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    ,  1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
+    , -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
     
   };
   
@@ -52,7 +52,7 @@ Target::Target() {
   GLCall( glEnableVertexAttribArray( colourID_ ) );
 }
 
-void Target::update( float dt, glm::vec3 shipPosition, float shipAngleX, float shipAngleY ) {
+void Target::update( float dt, glm::vec4 shipPosition, float shipAngleX, float shipAngleY ) {
   
   float distanceFromShip = 7.0f;
   
@@ -62,7 +62,7 @@ void Target::update( float dt, glm::vec3 shipPosition, float shipAngleX, float s
   position_.x = -( distanceFromShip * tan( glm::radians( shipAngleY ) ) ) + shipPosition.x;
   position_.y = distanceFromShip * tan( glm::radians( shipAngleX ) ) + shipPosition.y;
   
-  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
 }
 
 void Target::render( glm::mat4 viewProjectionMatrix ) {
@@ -73,8 +73,8 @@ void Target::render( glm::mat4 viewProjectionMatrix ) {
   shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
   
   vb_.bind();
-  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( GLvoid* ) 0 ) );
-  GLCall( glVertexAttribPointer( colourID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( GLvoid* ) ( sizeof( float ) * 3 ) ) );
+  GLCall( glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 ) );
+  GLCall( glVertexAttribPointer( colourID_  , 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) ( sizeof( float ) * 4 ) ) );
   ib_.bind();
     
   GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );

@@ -36,7 +36,7 @@ bool Ship::init( std::string modelName ) {
   //GLCall( glEnableVertexAttribArray( normalID_ ) );
   GLCall( glEnableVertexAttribArray( texCoordID_ ) );
   
-  originalCollider_ = model_ -> getCollider();
+  originalCollider_ = model_ -> collider();
   if( originalCollider_.size() > 0 ) {
     hasCollider_  = true;
     collider_ = originalCollider_;
@@ -218,7 +218,7 @@ void Ship::update( float dt ) {
   calculateRotation( dt );
   updatePosition( velocity_, dt );
   
-  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), position_ );
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
   modelMatrix_ *= rotationMatrix_;
   
   GameObject::updateCollider();
@@ -230,7 +230,7 @@ void Ship::update( float dt ) {
   particleTimer_ += ( dt * 60 );
   
   while( particleTimer_ > 0.0f ) {
-    glm::vec3 particleStart = position_;
+    glm::vec4 particleStart = position_;
     particles_ -> spawnParticle( particleStart, xAngle_, yAngle_ );
     particleTimer_ -= 1.0f;
   }
@@ -246,15 +246,21 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   
   vb_.bind();
   texture_.bind();
-  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 ) );
-  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) ) );
-  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) ) );
+<<<<<<< HEAD
+  GLCall( glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
+=======
+  GLCall( glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
+  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 4 ) ) );
+  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 7 ) ) );
   ib_.bind();
     
   GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
   
   target_     -> render( viewProjectionMatrix );
   particles_  -> render( viewProjectionMatrix );
+  
+  GameObject::render( viewProjectionMatrix );
   
 }
 

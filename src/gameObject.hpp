@@ -34,16 +34,21 @@ class GameObject {
     glm::mat4 modelMatrix_;
     glm::mat4 rotationMatrix_;
     glm::mat4 mvp_;
-    glm::vec3 acceleration_;
-    glm::vec3 velocity_;
-    glm::vec3 position_;
+    glm::vec4 acceleration_;
+    glm::vec4 velocity_;
+    glm::vec4 position_;
     
     unsigned int  indexCount_ = 0;
     
-    std::vector<glm::vec3>  originalCollider_; // at start before any transformations
-    std::vector<glm::vec3>  collider_; // current collider (add position and rotation)
+    std::vector<glm::vec4>  originalCollider_; // at start before any transformations
+    std::vector<glm::vec4>  collider_; // current collider (add position and rotation)
     bool hasCollider_ = false;
-    float minX_, maxX_, minY_, maxY_, minZ_, maxZ_;
+    
+    bool          debugCollider_ = false; // show collider on screen
+    VertexBuffer  vbCol_;
+    Shader        shaderCol_;
+    int           positionIDCol_;
+    int           mvpIDCol_;
     
   public:
     
@@ -51,7 +56,7 @@ class GameObject {
     virtual ~GameObject();
     
     bool  loadModelFromGltf( std::string modelName );
-    void  updatePosition( glm::vec3 velocity, float dt, bool skip = false );
+    void  updatePosition( glm::vec4 velocity, float dt, bool skip = false );
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
     
@@ -62,7 +67,9 @@ class GameObject {
     
     unsigned int indexCount() const { return indexCount_; }
     
-    void updateCollider();
+    void updateCollider( int debug = 1 );
+    std::vector<glm::vec4> collider() { return collider_; }
+    bool hasCollider() { return hasCollider_; }
     
 };
 

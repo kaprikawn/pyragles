@@ -14,7 +14,7 @@ class Target : public GameObject {
     Target();
     virtual ~Target();
     
-    virtual void update( float dt, glm::vec3 shipPosition, float shipAngleX, float shipAngleY );
+    virtual void update( float dt, glm::vec4 shipPosition, float shipAngleX, float shipAngleY );
     virtual void render( glm::mat4 viewProjectionMatrix );
     
 };

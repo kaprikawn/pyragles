@@ -1,8 +1,8 @@
 add_executable( ${PROJECT_NAME}
   inputHandler.cpp camera.cpp glCallLog.cpp stb_image.cpp
-  hud.cpp
+  hud.cpp collision.cpp
   texture.cpp indexBuffer.cpp vertexBuffer.cpp shaderCache.cpp shader.cpp
-  gameObject.cpp
+  gameObject.cpp collision.cpp
   gameStateMachine.cpp playState.cpp
   model.cpp
   ship.cpp target.cpp floor.cpp exhaust.cpp

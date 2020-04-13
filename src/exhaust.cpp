@@ -7,9 +7,9 @@ Exhaust::Exhaust() {
   
   loadShader( "shaderParticles.glsl" );
   
-  // 252 vertices per cube - two triangles per side, six sides, six vertices per side, seven floats per vertex
-  // 6 * 6 * 7
-  vb_.init( nullptr, sizeof( float ) * 252 * PARTICLE_COUNT, GL_DYNAMIC_DRAW );
+  // 288 vertices per cube - two triangles per side, six sides, six vertices per side, eight floats per vertex
+  // 6 * 6 * 8
+  vb_.init( nullptr, sizeof( float ) * 288 * PARTICLE_COUNT, GL_DYNAMIC_DRAW );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
   colourID_   = glGetAttribLocation( shader_.rendererID(),  "aColour" );
@@ -43,7 +43,7 @@ void Exhaust::update( float dt ) {
       if( particles_[ i ].colour.g < 0.0f )
         particles_[ i ].active = false;
       
-      glm::vec3 position = particles_[ i ].position;
+      glm::vec4 position = particles_[ i ].position;
       position += ( particles_[ i ].direction * ( dt * 50 ) );
       
       particles_[ i ].position = position;
@@ -53,6 +53,7 @@ void Exhaust::update( float dt ) {
         bufferData.push_back( ( cubeVertices_[ j ] * particles_[ i ].scale ) + position.x );
         bufferData.push_back( ( cubeVertices_[ j + 1 ] * particles_[ i ].scale ) + position.y );
         bufferData.push_back( ( cubeVertices_[ j + 2 ] * particles_[ i ].scale ) + position.z );
+        bufferData.push_back( 1.0f );
         bufferData.push_back( particles_[ i ].colour.r );
         bufferData.push_back( particles_[ i ].colour.g );
         bufferData.push_back( particles_[ i ].colour.b );
@@ -72,6 +73,7 @@ void Exhaust::update( float dt ) {
         bufferData.push_back( 1.0f );
         bufferData.push_back( 1.0f );
         bufferData.push_back( 1.0f );
+        bufferData.push_back( 1.0f );
       }
       
     }
@@ -87,8 +89,8 @@ void Exhaust::render( glm::mat4 viewProjectionMatrix ) {
   shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
   
   vb_.bind();
-  glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, 0 );
-  glVertexAttribPointer( colourID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 7, ( const void* )( sizeof( float ) * 3 ) );
+  glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, 0 );
+  glVertexAttribPointer( colourID_  , 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( const void* )( sizeof( float ) * 4 ) );
   
   glDrawArrays( GL_TRIANGLES, 0, 36 * PARTICLE_COUNT );
   
@@ -111,7 +113,7 @@ bool Exhaust::randomBool() {
   return false;
 }
 
-void Exhaust::spawnParticle( glm::vec3 newPosition, float xAngle, float yAngle ) {
+void Exhaust::spawnParticle( glm::vec4 newPosition, float xAngle, float yAngle ) {
   
   //newPosition.y += 1.7f; // ship isn't totally centre
   newPosition.z += 1.3f; // move to back of ship
@@ -166,7 +168,7 @@ void Exhaust::spawnParticle( glm::vec3 newPosition, float xAngle, float yAngle )
       particles_[ i ].position  = newPosition;
       particles_[ i ].colour    = { 1.0f, 1.0f, 0.0f, 1.0f };
       particles_[ i ].scale     = 0.1f;
-      particles_[ i ].direction = newDirection;
+      particles_[ i ].direction = glm::vec4( newDirection, 1.0f );
       particles_[ i ].active    = true;
       break;
     }

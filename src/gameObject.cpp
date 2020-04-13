@@ -6,9 +6,9 @@ GameObject::GameObject() {
   modelMatrix_    = glm::mat4( 1.0f );
   rotationMatrix_ = glm::mat4( 1.0f );
   mvp_            = glm::mat4( 1.0f );
-  acceleration_   = glm::vec3{ 0.0f, 0.0f, 0.0f };
-  velocity_       = glm::vec3{ 0.0f, 0.0f, 0.0f };
-  position_       = glm::vec3{ 0.0f, 0.0f, 0.0f };
+  acceleration_   = glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f };
+  velocity_       = glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f };
+  position_       = glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f };
   vb_             = VertexBuffer();
   ib_             = IndexBuffer();
   shader_         = Shader();
@@ -16,7 +16,7 @@ GameObject::GameObject() {
   texture_        = Texture();
 }
 
-void GameObject::updatePosition(  glm::vec3 velocity, GLfloat dt, bool skip ) {
+void GameObject::updatePosition(  glm::vec4 velocity, GLfloat dt, bool skip ) {
   if( !skip )
     position_ += velocity * dt;
 }
@@ -27,7 +27,7 @@ void GameObject::update( float dt ) {
 
 void GameObject::render( glm::mat4 viewProjectionMatrix ) {
   
-  // mvp_ = viewProjectionMatrix * modelMatrix_;
+  mvp_ = viewProjectionMatrix * modelMatrix_;
   
   // shader_.bind();
   // shader_.setUniform1i( "uTexture", 0 );
@@ -41,6 +41,18 @@ void GameObject::render( glm::mat4 viewProjectionMatrix ) {
   // ib_.bind();
     
   // glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
+  
+  if( debugCollider_ ) {
+    shaderCol_.bind();
+    shaderCol_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
+    vbCol_.bind();
+<<<<<<< HEAD
+    glVertexAttribPointer( positionIDCol_, 4, GL_FLOAT, GL_FALSE, 0, 0 );
+=======
+    glVertexAttribPointer( positionIDCol_, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
+    glDrawArrays( GL_TRIANGLES, 0, model_ -> colliderVertexCount() );
+  }
   
 }
 
@@ -67,6 +79,15 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   bool modelLoaded = model_ -> loadFromGltf( modelName );
   if( !modelLoaded )
     return false;
+  if( model_ -> hasCollider() ) {
+<<<<<<< HEAD
+    hasCollider_      = true;
+=======
+    hasCollider_ = true;
+>>>>>>> 8dfd2ca90e05b58fd3497c968b0c437a51bc8539
+    originalCollider_ = model_ -> collider();
+    collider_         = originalCollider_;
+  }
   
   indexCount_ = model_ -> indexCount();
   
@@ -84,57 +105,39 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   glEnableVertexAttribArray( normalID_ );
   glEnableVertexAttribArray( texCoordID_ );
   
+  if( debugCollider_ ) {
+    vbCol_.init( &originalCollider_[ 0 ], sizeof( originalCollider_[ 0 ] ) * originalCollider_.size() );
+    shaderCol_.init( "shaderDebug.glsl" );
+    positionIDCol_ = glGetAttribLocation( shaderCol_.rendererID(),  "aPosition" );
+    mvpIDCol_      = glGetUniformLocation( shaderCol_.rendererID(), "uMVP" );
+  }
+  
   return true;
 }
 
-void GameObject::updateCollider() {
+void GameObject::updateCollider( int debug ) {
+  
   if( !hasCollider_ )
     return;
-    
-  float minX, maxX, minY, maxY, minZ, maxZ;
-  bool firstRun = true;
   
-  for( unsigned int v = 0; v < collider_.size(); v++ ) {
+  glm::mat4 modelMatrix = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
+  modelMatrix *= rotationMatrix_;
     
-    glm::mat4 updateMatrix = glm::translate( modelMatrix_, originalCollider_[ v ] );
-    glm::vec4 transformed = updateMatrix * glm::vec4( originalCollider_[ v ], 1.0f );
+  for( unsigned int v = 0; v < originalCollider_.size(); v++ ) {
     
-    collider_[ v ].x = transformed.x;
-    collider_[ v ].y = transformed.y;
-    collider_[ v ].z = transformed.z;
+    glm::vec4 originalPosition = glm::vec4( originalCollider_[ v ] );
+    glm::vec4 newPosition = modelMatrix_ * originalPosition;
     
-    // for AABB - get max bounds
-    if( firstRun ) {
-      minX = maxX = transformed.x;
-      minY = maxY = transformed.y;
-      minZ = maxZ = transformed.z;
-    } else {
-      if( transformed.x < minX )
-        minX = transformed.x;
-      if( transformed.x > maxX )
-        maxX = transformed.x;
-      if( transformed.y < minY )
-        minY = transformed.y;
-      if( transformed.y > maxY )
-        maxY = transformed.y;
-      if( transformed.x < minZ )
-        minZ = transformed.x;
-      if( transformed.x > maxZ )
-        maxZ = transformed.x;
-    }
+    collider_[ v ] = newPosition;
     
-    minX_ = minX;
-    maxX_ = maxX;
-    minY_ = minY;
-    maxY_ = maxY;
-    minZ_ = minZ;
-    maxZ_ = maxZ;
+    // collider_[ v ].x = transformed.x;
+    // collider_[ v ].y = transformed.y;
+    // collider_[ v ].z = transformed.z;
     
-    // std::cout << "x is " << transformed.x << std::endl;
-    // std::cout << "y is " << transformed.y << std::endl;
-    // std::cout << "z is " << transformed.z << std::endl;
+    // std::cout << "x is " << collider_[ v ].x << std::endl;
+    // std::cout << "y is " << collider_[ v ].y << std::endl;
+    // std::cout << "z is " << collider_[ v ].z << std::endl;
     
-    firstRun = false;
   }
 }
 
