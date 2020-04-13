@@ -12,10 +12,7 @@ AABB getAABB( std::vector<glm::vec4> collider ) {
       myAABB.minX = myAABB.maxX = collider[ i ].x;
       myAABB.minY = myAABB.maxY = collider[ i ].y;
       myAABB.minZ = myAABB.maxZ = collider[ i ].z;
-        // printf( "fp############################\n" );
     } else {
-      
-      // std::cout << "hey x is " << collider[ i ].x << std::endl;
       
       if( collider[ i ].x < myAABB.minX )
         myAABB.minX = collider[ i ].x;
@@ -29,37 +26,18 @@ AABB getAABB( std::vector<glm::vec4> collider ) {
         myAABB.minZ = collider[ i ].z;
       if( collider[ i ].z > myAABB.maxZ )
         myAABB.maxZ = collider[ i ].z;
-        
-      // if( collider[ i ].x < -1000000.0f || collider[i].x > 1000000.0f )
-      //   printf( "############################\n" );
     }
     
     myAABB.firstPass = false;
   }
-  
-  // std::cout << "minX is " << myAABB.minX << std::endl;
-  // std::cout << "maxX is " << myAABB.maxX << std::endl;
   
   return myAABB;
 }
 
 bool areCollidingAABB( std::vector<glm::vec4> collider1, std::vector<glm::vec4> collider2 ) {
   
-  // do AABB detection as a first pass - is more efficient
-  
-  // for( unsigned int i = 0; i < collider2.size(); i++ ) {
-  //   printf( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" );
-    
-  //   std::cout << "x is " << collider2[ i ].x << std::endl;
-    
-  //   printf( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" );
-  // }
-  
   AABB myAABB1 = getAABB( collider1 );
   AABB myAABB2 = getAABB( collider2 );
-  
-  // std::cout << "myAABB1.maxX = " << myAABB1.maxX << std::endl;
-  // std::cout << "myAABB2.minX = " << myAABB2.minX << std::endl;
   
   if( myAABB1.maxX < myAABB2.minX )
     return false;
@@ -77,39 +55,19 @@ bool areCollidingAABB( std::vector<glm::vec4> collider1, std::vector<glm::vec4> 
   return true;
 }
 
-// bool areCollisingMesh( std::vector<std::array<glm::vec3, 3>> meshA, std::vector<std::array<glm::vec3, 3>> meshB ) {
-  
-//   for( unsigned int a = 0; a < meshA.size(); a++ ) {
-//     for( unsigned int b = 0; b < meshB.size(); b++ ) {
-      
-//       real p1[3] = { meshA[a][0].x, meshA[a][0].y, meshA[a][0].z };
-//       real q1[3] = { meshA[a][1].x, meshA[a][1].y, meshA[a][1].z };
-//       real r1[3] = { meshA[a][2].x, meshA[a][2].y, meshA[a][2].z };
-      
-//       real p2[3] = { meshB[b][0].x, meshB[b][0].y, meshB[b][0].z };
-//       real q2[3] = { meshB[b][1].x, meshB[b][1].y, meshB[b][1].z };
-//       real r2[3] = { meshB[b][2].x, meshB[b][2].y, meshB[b][2].z };
-      
-//       if( tri_tri_overlap_test_2d( p1, q1, r1, p2, q2, r2 ) == 1)
-//         return true;
-//     }
-//   }
-  
-//   return false;
-// }
 
 bool areCollidingActual( std::vector<glm::vec4> collider1, std::vector<glm::vec4> collider2 ) {
   
-  for( unsigned int i = 0; i < collider1.size(); i += 3 ) {
-    for( unsigned int j = 0; j < collider2.size(); j += 3 ) {
+  for( unsigned int i = 0; i < collider1.size(); i += 4 ) {
+    for( unsigned int j = 0; j < collider2.size(); j += 4 ) {
       
       real p1[ 3 ] = { collider1[ i + 0 ].x, collider1[ i + 0 ].y, collider1[ i + 0 ].z };
       real q1[ 3 ] = { collider1[ i + 1 ].x, collider1[ i + 1 ].y, collider1[ i + 1 ].z };
-      real r1[ 3 ] = { collider1[ i + 3 ].x, collider1[ i + 2 ].y, collider1[ i + 2 ].z };
+      real r1[ 3 ] = { collider1[ i + 2 ].x, collider1[ i + 2 ].y, collider1[ i + 2 ].z };
       
       real p2[ 3 ] = { collider2[ j + 0 ].x, collider2[ j + 0 ].y, collider2[ j + 0 ].z };
       real q2[ 3 ] = { collider2[ j + 1 ].x, collider2[ j + 1 ].y, collider2[ j + 1 ].z };
-      real r2[ 3 ] = { collider2[ j + 3 ].x, collider2[ j + 2 ].y, collider2[ j + 2 ].z };
+      real r2[ 3 ] = { collider2[ j + 2 ].x, collider2[ j + 2 ].y, collider2[ j + 2 ].z };
       
       if( tri_tri_overlap_test_2d( p1, q1, r1, p2, q2, r2 ) == 1 )
         return true;

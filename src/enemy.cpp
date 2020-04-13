@@ -2,6 +2,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "global.hpp"
 
 Enemy::Enemy() {
   
@@ -11,7 +12,11 @@ bool Enemy::init( std::string modelFilename ) {
   
   position_.z = -20.0f;
   position_.y =  5.0f;
-  position_.x =  5.0f;
+  position_.x =  4.5f;
+  
+  // position_.z = -3.0f;
+  // position_.y = START_Y;
+
   
   velocity_.z = 10.0f;
   
@@ -46,7 +51,7 @@ void Enemy::update( float dt ) {
   
   updatePosition( velocity_, dt );
   
-  if( position_.z > 0.0f ) {
+  if( position_.z > -3.0f ) {
     velocity_.z = 0.0f;
   }
   
