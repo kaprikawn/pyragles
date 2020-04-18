@@ -47,6 +47,9 @@ bool Ship::init( std::string modelName ) {
 
 void Ship::handleInput( float dt ) {
   
+  if( InputHandler::Instance() -> justPressed( FIRE ) )
+    spawnProjectile_ = true;
+  
   float multiplier      = 8.0f;
   float standstillSpeed = 4.0f;
   

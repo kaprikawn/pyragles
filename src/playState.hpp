@@ -1,6 +1,7 @@
 #ifndef PLAYSTATE_HPP
 #define PLAYSTATE_HPP
 
+#include <memory>
 #include "gameState.hpp"
 #include "glCallLog.hpp"
 #include "indexBuffer.hpp"
@@ -10,7 +11,7 @@
 #include "floor.hpp"
 #include "hud.hpp"
 #include "enemy.hpp"
-#include <memory>
+#include "projectile.hpp"
 
 class PlayState : public GameState {
   private:
@@ -26,7 +27,8 @@ class PlayState : public GameState {
     
     unsigned short int          bombCount_ = 9;
     
-    std::vector<std::unique_ptr<Enemy>> enemies_;
+    std::vector<std::unique_ptr<Enemy>>       enemies_;
+    std::vector<std::unique_ptr<Projectile>>  projectiles_;
     
   public:
     

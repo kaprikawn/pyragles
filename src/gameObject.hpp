@@ -31,6 +31,8 @@ class GameObject {
     float yAngle_ = 0.0f;
     float zAngle_ = 0.0f;
     
+    bool spawnProjectile_ = false;
+    
     glm::mat4 modelMatrix_;
     glm::mat4 rotationMatrix_;
     glm::mat4 mvp_;
@@ -70,6 +72,14 @@ class GameObject {
     void updateCollider( int debug = 1 );
     std::vector<glm::vec4> collider() { return collider_; }
     bool hasCollider() { return hasCollider_; }
+    
+    bool spawnProjectile() {
+      if( spawnProjectile_ ) {
+        spawnProjectile_ = false;
+        return true;
+      }
+      return spawnProjectile_;
+    }
     
 };
 

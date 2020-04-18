@@ -18,7 +18,7 @@ bool Enemy::init( std::string modelFilename ) {
   // position_.y = START_Y;
 
   
-  velocity_.z = 10.0f;
+  //velocity_.z = 10.0f;
   
   bool gltfLoaded = GameObject::loadModelFromGltf( modelFilename );
   if( !gltfLoaded )
@@ -51,9 +51,9 @@ void Enemy::update( float dt ) {
   
   updatePosition( velocity_, dt );
   
-  if( position_.z > -3.0f ) {
-    velocity_.z = 0.0f;
-  }
+  // if( position_.z > -3.0f ) {
+  //   velocity_.z = 0.0f;
+  // }
   
   yAngle_ += 100.0f * dt;
   if( yAngle_ > 360.0f )

@@ -10,9 +10,23 @@ Shader::Shader() {
   
 }
 
+bool file_exists( const std::string& name ) {
+  if( FILE *file = fopen( name.c_str(), "r" ) ) {
+    fclose( file );
+    return true;
+  }
+  return false;
+}
+
 void Shader::init( const std::string& filename ) {
   
-  std::string filepath = "./assets/" + filename;
+  std::string filepath = "assets/" + filename;
+  
+  if( !file_exists( filepath ) ) {
+    std::cout << filepath << " does not exist" << std::endl;
+    return;
+  }
+  
   ShaderProgramSource source = parseShader( filepath );
   
   rendererID_ = createShader( source.vertexSource, source.fragmentSource );

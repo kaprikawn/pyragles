@@ -39,6 +39,10 @@ void PlayState::update( GLfloat dt ) {
     }
   }
   
+  // spawn projectiles
+  if( ship_ -> spawnProjectile() )
+    std::cout << "spawn projectile\n";
+  
   if( enemies_.size() > 0 ) {
     for( unsigned int i = 0; i < enemies_.size(); i++ ) {
       enemies_[ i ] -> update( dt );
