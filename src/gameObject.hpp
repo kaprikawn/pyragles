@@ -57,7 +57,7 @@ class GameObject {
     GameObject();
     virtual ~GameObject();
     
-    bool  loadModelFromGltf( std::string modelName );
+    bool  loadModelFromGltf( const std::string modelName, std::string shaderName );
     void  updatePosition( glm::vec4 velocity, float dt, bool skip = false );
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );

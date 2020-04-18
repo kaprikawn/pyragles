@@ -20,31 +20,9 @@ bool Enemy::init( std::string modelFilename ) {
   
   //velocity_.z = 10.0f;
   
-  bool gltfLoaded = GameObject::loadModelFromGltf( modelFilename );
-  if( !gltfLoaded )
-    return false;
-    
-  // for( unsigned int i = 0; i < originalCollider_.size(); i++ ) {
-  //   std::cout << "x is " << originalCollider_[i].x << std::endl;
-  // }
+  bool gltfLoaded = GameObject::loadModelFromGltf( modelFilename, "shaderBasic" );
   
-  GameObject::loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
-  GameObject::loadIndexData( model_ -> indexData(), model_ -> indexCount() );
-  GameObject::loadShader( "shaderBasic.glsl" );
-  
-  texture_ = Texture();
-  texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
-  
-  positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
-  //normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
-  texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
-  mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
-  
-  GLCall( glEnableVertexAttribArray( positionID_ ) );
-  //GLCall( glEnableVertexAttribArray( normalID_ ) );
-  GLCall( glEnableVertexAttribArray( texCoordID_ ) );
-  
-  return true;
+  return gltfLoaded;
 }
 
 void Enemy::update( float dt ) {

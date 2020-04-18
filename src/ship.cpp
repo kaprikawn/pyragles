@@ -16,33 +16,9 @@ Ship::Ship() {
 
 bool Ship::init( std::string modelName ) {
   
-  bool gltfLoaded = GameObject::loadModelFromGltf( modelName );
-  if( !gltfLoaded )
-    return false;
+  bool loaded = GameObject::loadModelFromGltf( modelName, "shaderBasic" );
   
-  GameObject::loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
-  GameObject::loadIndexData( model_ -> indexData(), model_ -> indexCount() );
-  GameObject::loadShader( "shaderBasic.glsl" );
-  
-  texture_ = Texture();
-  texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
-  
-  positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
-  //normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
-  texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
-  mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
-  
-  GLCall( glEnableVertexAttribArray( positionID_ ) );
-  //GLCall( glEnableVertexAttribArray( normalID_ ) );
-  GLCall( glEnableVertexAttribArray( texCoordID_ ) );
-  
-  originalCollider_ = model_ -> collider();
-  if( originalCollider_.size() > 0 ) {
-    hasCollider_  = true;
-    collider_ = originalCollider_;
-  }
-  
-  return true;
+  return loaded;
 }
 
 void Ship::handleInput( float dt ) {

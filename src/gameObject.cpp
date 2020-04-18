@@ -70,11 +70,12 @@ void GameObject::loadTexture( unsigned char* textureData, int width, int height 
   texture_.init( textureData, width, height );
 }
 
-bool GameObject::loadModelFromGltf( std::string modelName ) {
+bool GameObject::loadModelFromGltf( const std::string modelName, std::string shaderName ) {
   
   bool modelLoaded = model_ -> loadFromGltf( modelName );
   if( !modelLoaded )
     return false;
+  
   if( model_ -> hasCollider() ) {
     hasCollider_ = true;
     originalCollider_ = model_ -> collider();
@@ -85,23 +86,23 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   
   loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
   loadIndexData( model_ -> indexData(), indexCount_ );
-  loadShader( "shaderBasic.glsl" );
+  std::string shaderFilename = shaderName + ".glsl";
+  loadShader( shaderFilename );
   loadTexture( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
-  normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
+  //normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
   texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
   mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
   
   glEnableVertexAttribArray( positionID_ );
-  glEnableVertexAttribArray( normalID_ );
+  //glEnableVertexAttribArray( normalID_ );
   glEnableVertexAttribArray( texCoordID_ );
   
-  if( debugCollider_ ) {
-    vbCol_.init( &originalCollider_[ 0 ], sizeof( originalCollider_[ 0 ] ) * originalCollider_.size() );
-    shaderCol_.init( "shaderDebug.glsl" );
-    positionIDCol_ = glGetAttribLocation( shaderCol_.rendererID(),  "aPosition" );
-    mvpIDCol_      = glGetUniformLocation( shaderCol_.rendererID(), "uMVP" );
+  originalCollider_ = model_ -> collider();
+  if( originalCollider_.size() > 0 ) {
+    hasCollider_  = true;
+    collider_ = originalCollider_;
   }
   
   return true;
