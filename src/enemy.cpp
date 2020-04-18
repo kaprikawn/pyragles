@@ -16,11 +16,9 @@ bool Enemy::init( std::string modelFilename ) {
   
   // position_.z = -3.0f;
   // position_.y = START_Y;
-
-  
   //velocity_.z = 10.0f;
   
-  bool gltfLoaded = GameObject::loadModelFromGltf( modelFilename, "shaderBasic" );
+  bool gltfLoaded = GameObject::loadModelFromGltf( modelFilename, "shaderBasic.glsl" );
   
   return gltfLoaded;
 }

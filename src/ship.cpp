@@ -16,7 +16,7 @@ Ship::Ship() {
 
 bool Ship::init( std::string modelName ) {
   
-  bool loaded = GameObject::loadModelFromGltf( modelName, "shaderBasic" );
+  bool loaded = GameObject::loadModelFromGltf( "ship.glb", "shaderBasic.glsl" );
   
   return loaded;
 }
@@ -217,25 +217,11 @@ void Ship::update( float dt ) {
 
 void Ship::render( glm::mat4 viewProjectionMatrix ) {
   
-  mvp_ = viewProjectionMatrix * modelMatrix_;
-  
-  shader_.bind();
-  shader_.setUniform1i( "uTexture", 0 );
-  shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
-  
-  vb_.bind();
-  texture_.bind();
-  GLCall( glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
-  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 4 ) ) );
-  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 7 ) ) );
-  ib_.bind();
-    
-  GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
+  GameObject::render( viewProjectionMatrix );
   
   target_     -> render( viewProjectionMatrix );
   particles_  -> render( viewProjectionMatrix );
   
-  GameObject::render( viewProjectionMatrix );
   
 }
 

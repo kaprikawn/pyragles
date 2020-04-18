@@ -10,7 +10,6 @@ bool PlayState::onEnter( int levelNumber ) {
   viewProjectionMatrix_ = Camera::Instance() -> viewProjectionMatrix();
   bool loadSuccessful;
   
-  
   floor_  = std::make_unique<Floor>();
   hud_    = std::make_unique<Hud>();
   
