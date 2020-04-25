@@ -25,6 +25,8 @@ class Ship : public GameObject {
     
     void  handleInput( float dt );
     void  calculateRotation( float dt );
+    
+    glm::vec4 targetPosition() { return target_ -> position(); }
   
 };
     

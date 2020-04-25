@@ -24,6 +24,15 @@ bool PlayState::onEnter( int levelNumber ) {
   loadSuccessful = ship_ -> init( "ship.glb" );
   if( !loadSuccessful )
     return false;
+    
+  // ProjectileParams params;
+  // params.active = true;
+  // params.startingPostion.z = -20.0f;
+  
+  // bullet_ = std::make_unique<Projectile>( params );
+  // bullet_ -> init();
+  
+  projectiles_ = std::make_unique<ProjectileManager>();
   
   return true;
 }
@@ -39,8 +48,15 @@ void PlayState::update( GLfloat dt ) {
   }
   
   // spawn projectiles
-  if( ship_ -> spawnProjectile() )
-    std::cout << "spawn projectile\n";
+  if( ship_ -> spawnProjectile() ) {
+    ProjectileParams params;
+    params.startingPostion      = ship_ -> position();
+    params.destinationPosition  = ship_ -> targetPosition();
+    params.speed                = 30.0f;
+    projectiles_ -> spawnProjectile( params );
+  }
+  
+  projectiles_ -> update( dt );
   
   if( enemies_.size() > 0 ) {
     for( unsigned int i = 0; i < enemies_.size(); i++ ) {
@@ -59,6 +75,8 @@ void PlayState::update( GLfloat dt ) {
     Collision myCollision( ship_ -> collider(), enemies_[ e ] -> collider() );
     //std::cout << "are colliding is " << myCollision.areColliding() << std::endl;
   }
+  
+  // bullet_ -> update( dt );
 }
 
 void PlayState::render() {
@@ -73,6 +91,8 @@ void PlayState::render() {
   
   floor_ -> render( viewProjectionMatrix_ );
   hud_ -> render();
+  projectiles_ -> render( viewProjectionMatrix_ );
+  // bullet_ -> render( viewProjectionMatrix_ );
 }
 
 int PlayState::nextLevel() {

@@ -25,20 +25,12 @@ bool Enemy::init( std::string modelFilename ) {
 
 void Enemy::update( float dt ) {
   
-  updatePosition( velocity_, dt );
-  
-  // if( position_.z > -3.0f ) {
-  //   velocity_.z = 0.0f;
-  // }
-  
   yAngle_ += 100.0f * dt;
   if( yAngle_ > 360.0f )
     yAngle_ -= 360.0f;
   rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   
-  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
-  modelMatrix_ *= rotationMatrix_;
-  
+  GameObject::update( dt );
   GameObject::updateCollider( 1 );
   
 }

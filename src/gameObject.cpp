@@ -22,7 +22,10 @@ void GameObject::updatePosition(  glm::vec4 velocity, GLfloat dt, bool skip ) {
 }
 
 void GameObject::update( float dt ) {
+  updatePosition( velocity_, dt );
   
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
+  modelMatrix_ *= rotationMatrix_;
 }
 
 void GameObject::render( glm::mat4 viewProjectionMatrix ) {

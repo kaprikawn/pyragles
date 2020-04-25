@@ -81,6 +81,8 @@ class GameObject {
       return spawnProjectile_;
     }
     
+    glm::vec4 position() { return position_; }
+    
 };
 
 #endif //GAMEOBJECT_HPP
