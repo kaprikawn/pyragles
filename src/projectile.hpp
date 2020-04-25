@@ -14,6 +14,8 @@ class Projectile : public GameObject {
   private :
     
     bool active_ = false;
+    glm::vec4 startingPosition_     = glm::vec4( 0.0f );
+    glm::vec4 destinationPosition_  = glm::vec4( 0.0f );
     
   public :
     Projectile( ProjectileParams params );
@@ -25,6 +27,7 @@ class Projectile : public GameObject {
     
     bool active() { return active_; }
     void activate( ProjectileParams params );
+    void calculateRotation();
     
 };
     
