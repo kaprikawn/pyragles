@@ -117,6 +117,10 @@ bool GameObject::loadModelFromGltf( const std::string modelName, std::string sha
   return true;
 }
 
+void GameObject::registerCollision() {
+  
+}
+
 void GameObject::updateCollider( int debug ) {
   
   if( !hasCollider_ )

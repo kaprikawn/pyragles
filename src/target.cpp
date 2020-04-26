@@ -81,6 +81,10 @@ void Target::render( glm::mat4 viewProjectionMatrix ) {
   
 }
 
+void Target::registerCollision() {
+  
+}
+
 Target::~Target() {
   
 }

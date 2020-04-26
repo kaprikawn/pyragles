@@ -15,13 +15,13 @@ bool Projectile::init() {
 
 void Projectile::update( float dt ) {
   
-  if( position_.z > 65.0f )
+  if( active_ && position_.z < -65.0f )
     active_ = false;
     
   if( !active_ )
     return;
   
-  
+  updateCollider();
   GameObject::update( dt );
   
 }
@@ -53,18 +53,28 @@ void Projectile::calculateRotation() {
 
 void Projectile::activate( ProjectileParams params ) {
   
+  if( params.damagesEnemies ) {
+    damagesEnemies_ = true;
+  } else {
+    damagesEnemies_ = false;
+  }
+  
   position_             = params.startingPostion;
   startingPosition_     = position_;
   destinationPosition_  = params.destinationPosition;
   glm::vec4 velocity1   = destinationPosition_ - startingPosition_;
   glm::vec3 velocity    = glm::normalize( glm::vec3( velocity1.x, velocity1.y, velocity1.z ) );
   
+  velocity *= params.speed;
   velocity_ = glm::vec4( velocity, 1.0f );
-  velocity_ *= params.speed;
   
   Projectile::calculateRotation();
   
   active_ = true;
+}
+
+void Projectile::registerCollision() {
+  active_ = false;
 }
 
 Projectile::~Projectile() {

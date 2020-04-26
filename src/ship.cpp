@@ -225,6 +225,10 @@ void Ship::render( glm::mat4 viewProjectionMatrix ) {
   
 }
 
+void Ship::registerCollision() {
+  
+}
+
 Ship::~Ship() {
   
 }

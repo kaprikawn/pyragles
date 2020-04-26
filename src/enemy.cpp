@@ -10,7 +10,7 @@ Enemy::Enemy() {
 
 bool Enemy::init( std::string modelFilename ) {
   
-  position_.z = -20.0f;
+  position_.z = -15.0f;
   position_.y =  5.0f;
   position_.x =  4.5f;
   
@@ -53,6 +53,10 @@ void Enemy::render( glm::mat4 viewProjectionMatrix ) {
   GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
   
   GameObject::render( viewProjectionMatrix );
+}
+
+void Enemy::registerCollision() {
+  health_ -= 1;
 }
 
 Enemy::~Enemy() {

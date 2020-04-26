@@ -53,6 +53,7 @@ void PlayState::update( GLfloat dt ) {
     params.startingPostion      = ship_ -> position();
     params.destinationPosition  = ship_ -> targetPosition();
     params.speed                = 30.0f;
+    params.damagesEnemies       = true;
     projectiles_ -> spawnProjectile( params );
   }
   
@@ -67,13 +68,32 @@ void PlayState::update( GLfloat dt ) {
   ship_ -> update( dt );
   hud_ -> update( dt, bombCount_ );
   
-  // check for collisions
+  // check for collisions on enemies
   for( unsigned int e = 0; e < enemies_.size(); e++ ) {
     
     std::vector<glm::vec4> collider = enemies_[ e ] -> collider();
     
     Collision myCollision( ship_ -> collider(), enemies_[ e ] -> collider() );
     //std::cout << "are colliding is " << myCollision.areColliding() << std::endl;
+    
+    // I want an array of colliders
+    // if hit, I want to tell the projectile to destroy itself
+    std::vector<std::vector<glm::vec4>> projectileColliders = projectiles_ -> colliers();
+    
+    for( unsigned int i = 0; i < projectileColliders.size(); i++ ) {
+      Collision bulletCollision( enemies_[ e ] -> collider(), projectileColliders[ i ] );
+      if( bulletCollision.areColliding() ) {
+        projectiles_ -> registerCollision( i );
+        enemies_[ e ] -> registerCollision();
+      }
+    }
+    
+  }
+  
+  // delete dead enemies
+  for( unsigned i = enemies_.size(); i-- > 0; ) {
+    if( enemies_[ i ] -> isDead() )
+      enemies_.erase( enemies_.begin() + i );
   }
   
   // bullet_ -> update( dt );
