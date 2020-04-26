@@ -1,6 +1,7 @@
 #ifndef PLAYSTATE_HPP
 #define PLAYSTATE_HPP
 
+#include <memory>
 #include "gameState.hpp"
 #include "glCallLog.hpp"
 #include "indexBuffer.hpp"
@@ -10,7 +11,8 @@
 #include "floor.hpp"
 #include "hud.hpp"
 #include "enemy.hpp"
-#include <memory>
+#include "projectile.hpp"
+#include "projectileManager.hpp"
 
 class PlayState : public GameState {
   private:
@@ -20,13 +22,15 @@ class PlayState : public GameState {
     
     glm::mat4                   viewProjectionMatrix_;
     
-    std::unique_ptr<Ship>       ship_;
-    std::unique_ptr<Floor>      floor_;
-    std::unique_ptr<Hud>        hud_;
+    std::unique_ptr<Ship>               ship_;
+    std::unique_ptr<Floor>              floor_;
+    std::unique_ptr<Hud>                hud_;
+    std::unique_ptr<Projectile>         bullet_;
+    std::unique_ptr<ProjectileManager>  projectiles_;
+    std::vector<std::unique_ptr<Enemy>> enemies_;
     
     unsigned short int          bombCount_ = 9;
     
-    std::vector<std::unique_ptr<Enemy>> enemies_;
     
   public:
     

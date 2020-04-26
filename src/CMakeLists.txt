@@ -7,6 +7,7 @@ add_executable( ${PROJECT_NAME}
   model.cpp
   ship.cpp target.cpp floor.cpp exhaust.cpp
   enemy.cpp
+  projectile.cpp projectileManager.cpp
   game.cpp main.cpp
 )
 

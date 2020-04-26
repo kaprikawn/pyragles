@@ -16,6 +16,7 @@ class Target : public GameObject {
     
     virtual void update( float dt, glm::vec4 shipPosition, float shipAngleX, float shipAngleY );
     virtual void render( glm::mat4 viewProjectionMatrix );
+    virtual void registerCollision();
     
 };
     

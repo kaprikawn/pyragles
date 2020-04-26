@@ -16,6 +16,7 @@ class Floor : public GameObject {
     
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
+    virtual void registerCollision() {}
   
 };
     

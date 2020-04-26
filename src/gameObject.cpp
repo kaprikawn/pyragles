@@ -22,25 +22,28 @@ void GameObject::updatePosition(  glm::vec4 velocity, GLfloat dt, bool skip ) {
 }
 
 void GameObject::update( float dt ) {
+  updatePosition( velocity_, dt );
   
+  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
+  modelMatrix_ *= rotationMatrix_;
 }
 
 void GameObject::render( glm::mat4 viewProjectionMatrix ) {
   
   mvp_ = viewProjectionMatrix * modelMatrix_;
   
-  // shader_.bind();
-  // shader_.setUniform1i( "uTexture", 0 );
-  // shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
+  shader_.bind();
+  shader_.setUniform1i( "uTexture", 0 );
+  shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
   
-  // vb_.bind();
-  // texture_.bind();
-  // glVertexAttribPointer( positionID_, 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* ) 0 );
-  // glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 3 ) );
-  // glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 8, ( GLvoid* )( sizeof( float ) * 6 ) );
-  // ib_.bind();
+  vb_.bind();
+  texture_.bind();
+  GLCall( glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
+  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 4 ) ) );
+  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 7 ) ) );
+  ib_.bind();
     
-  // glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 );
+  GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
   
   if( debugCollider_ ) {
     shaderCol_.bind();
@@ -70,11 +73,12 @@ void GameObject::loadTexture( unsigned char* textureData, int width, int height 
   texture_.init( textureData, width, height );
 }
 
-bool GameObject::loadModelFromGltf( std::string modelName ) {
+bool GameObject::loadModelFromGltf( const std::string modelName, std::string shaderFilename ) {
   
   bool modelLoaded = model_ -> loadFromGltf( modelName );
   if( !modelLoaded )
     return false;
+  
   if( model_ -> hasCollider() ) {
     hasCollider_ = true;
     originalCollider_ = model_ -> collider();
@@ -85,7 +89,7 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   
   loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
   loadIndexData( model_ -> indexData(), indexCount_ );
-  loadShader( "shaderBasic.glsl" );
+  loadShader( shaderFilename );
   loadTexture( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
   
   positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
@@ -94,8 +98,14 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
   
   glEnableVertexAttribArray( positionID_ );
-  glEnableVertexAttribArray( normalID_ );
+  //glEnableVertexAttribArray( normalID_ );
   glEnableVertexAttribArray( texCoordID_ );
+  
+  originalCollider_ = model_ -> collider();
+  if( originalCollider_.size() > 0 ) {
+    hasCollider_  = true;
+    collider_ = originalCollider_;
+  }
   
   if( debugCollider_ ) {
     vbCol_.init( &originalCollider_[ 0 ], sizeof( originalCollider_[ 0 ] ) * originalCollider_.size() );
@@ -105,6 +115,10 @@ bool GameObject::loadModelFromGltf( std::string modelName ) {
   }
   
   return true;
+}
+
+void GameObject::registerCollision() {
+  
 }
 
 void GameObject::updateCollider( int debug ) {

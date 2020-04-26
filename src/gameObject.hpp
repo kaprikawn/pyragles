@@ -14,7 +14,9 @@
 
 class GameObject {
   protected:
-  
+    
+    int health_ = 1;
+    
     VertexBuffer  vb_;
     IndexBuffer   ib_;
     Shader        shader_;
@@ -30,6 +32,8 @@ class GameObject {
     float xAngle_ = 0.0f;
     float yAngle_ = 0.0f;
     float zAngle_ = 0.0f;
+    
+    bool spawnProjectile_ = false;
     
     glm::mat4 modelMatrix_;
     glm::mat4 rotationMatrix_;
@@ -55,10 +59,12 @@ class GameObject {
     GameObject();
     virtual ~GameObject();
     
-    bool  loadModelFromGltf( std::string modelName );
+    bool  loadModelFromGltf( const std::string modelName, std::string shaderName );
     void  updatePosition( glm::vec4 velocity, float dt, bool skip = false );
+    
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
+    virtual void registerCollision();
     
     void loadVertexData( const void* data, unsigned int size, GLenum usage = GL_STATIC_DRAW );
     void loadIndexData( const void* data, unsigned int count );
@@ -70,6 +76,23 @@ class GameObject {
     void updateCollider( int debug = 1 );
     std::vector<glm::vec4> collider() { return collider_; }
     bool hasCollider() { return hasCollider_; }
+    
+    
+    bool spawnProjectile() {
+      if( spawnProjectile_ ) {
+        spawnProjectile_ = false;
+        return true;
+      }
+      return spawnProjectile_;
+    }
+    
+    glm::vec4 position() { return position_; }
+    
+    bool isDead() {
+      if( health_ <= 0 )
+        return true;
+      return false;
+    }
     
 };
 

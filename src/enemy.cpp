@@ -10,59 +10,27 @@ Enemy::Enemy() {
 
 bool Enemy::init( std::string modelFilename ) {
   
-  position_.z = -20.0f;
+  position_.z = -15.0f;
   position_.y =  5.0f;
   position_.x =  4.5f;
   
   // position_.z = -3.0f;
   // position_.y = START_Y;
-
+  //velocity_.z = 10.0f;
   
-  velocity_.z = 10.0f;
+  bool gltfLoaded = GameObject::loadModelFromGltf( modelFilename, "shaderBasic.glsl" );
   
-  bool gltfLoaded = GameObject::loadModelFromGltf( modelFilename );
-  if( !gltfLoaded )
-    return false;
-    
-  // for( unsigned int i = 0; i < originalCollider_.size(); i++ ) {
-  //   std::cout << "x is " << originalCollider_[i].x << std::endl;
-  // }
-  
-  GameObject::loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
-  GameObject::loadIndexData( model_ -> indexData(), model_ -> indexCount() );
-  GameObject::loadShader( "shaderBasic.glsl" );
-  
-  texture_ = Texture();
-  texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
-  
-  positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
-  //normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
-  texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
-  mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
-  
-  GLCall( glEnableVertexAttribArray( positionID_ ) );
-  //GLCall( glEnableVertexAttribArray( normalID_ ) );
-  GLCall( glEnableVertexAttribArray( texCoordID_ ) );
-  
-  return true;
+  return gltfLoaded;
 }
 
 void Enemy::update( float dt ) {
-  
-  updatePosition( velocity_, dt );
-  
-  if( position_.z > -3.0f ) {
-    velocity_.z = 0.0f;
-  }
   
   yAngle_ += 100.0f * dt;
   if( yAngle_ > 360.0f )
     yAngle_ -= 360.0f;
   rotationMatrix_ = glm::rotate( glm::mat4( 1.0f ), glm::radians( yAngle_ ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
   
-  modelMatrix_ = glm::translate( glm::mat4( 1.0f ), glm::vec3( position_ ) );
-  modelMatrix_ *= rotationMatrix_;
-  
+  GameObject::update( dt );
   GameObject::updateCollider( 1 );
   
 }
@@ -85,6 +53,10 @@ void Enemy::render( glm::mat4 viewProjectionMatrix ) {
   GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
   
   GameObject::render( viewProjectionMatrix );
+}
+
+void Enemy::registerCollision() {
+  health_ -= 1;
 }
 
 Enemy::~Enemy() {

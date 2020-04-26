@@ -16,36 +16,15 @@ Ship::Ship() {
 
 bool Ship::init( std::string modelName ) {
   
-  bool gltfLoaded = GameObject::loadModelFromGltf( modelName );
-  if( !gltfLoaded )
-    return false;
+  bool loaded = GameObject::loadModelFromGltf( "ship.glb", "shaderBasic.glsl" );
   
-  GameObject::loadVertexData( model_ -> vertexData(), model_ -> vertexDataSize() );
-  GameObject::loadIndexData( model_ -> indexData(), model_ -> indexCount() );
-  GameObject::loadShader( "shaderBasic.glsl" );
-  
-  texture_ = Texture();
-  texture_.init( model_ -> textureData(), model_ -> textureWidth(), model_ -> textureHeight() );
-  
-  positionID_ = glGetAttribLocation( shader_.rendererID(),  "aPosition" );
-  //normalID_   = glGetAttribLocation( shader_.rendererID(),  "aNormal" );
-  texCoordID_ = glGetAttribLocation( shader_.rendererID(),  "aTexCoord" );
-  mvpID_      = glGetUniformLocation( shader_.rendererID(), "uMVP" );
-  
-  GLCall( glEnableVertexAttribArray( positionID_ ) );
-  //GLCall( glEnableVertexAttribArray( normalID_ ) );
-  GLCall( glEnableVertexAttribArray( texCoordID_ ) );
-  
-  originalCollider_ = model_ -> collider();
-  if( originalCollider_.size() > 0 ) {
-    hasCollider_  = true;
-    collider_ = originalCollider_;
-  }
-  
-  return true;
+  return loaded;
 }
 
 void Ship::handleInput( float dt ) {
+  
+  if( InputHandler::Instance() -> justPressed( FIRE ) )
+    spawnProjectile_ = true;
   
   float multiplier      = 8.0f;
   float standstillSpeed = 4.0f;
@@ -141,8 +120,8 @@ float differenceBetween( float target, float current ) {
 void Ship::calculateRotation( float dt ) {
   
   float maxRotationZ_ = 20.0f; // tilt
-  float maxRotationY_ = 25.0f; // turn
-  float maxRotationX_ = 10.0f; // up/down pitch
+  float maxRotationY_ = 30.0f; // turn
+  float maxRotationX_ = 30.0f; // up/down pitch
   
   if( joyAxisX_ > 0.0f ) { // right
     
@@ -238,25 +217,15 @@ void Ship::update( float dt ) {
 
 void Ship::render( glm::mat4 viewProjectionMatrix ) {
   
-  mvp_ = viewProjectionMatrix * modelMatrix_;
-  
-  shader_.bind();
-  shader_.setUniform1i( "uTexture", 0 );
-  shader_.setUniform4fv( "uMVP", ( const float* )&mvp_ );
-  
-  vb_.bind();
-  texture_.bind();
-  GLCall( glVertexAttribPointer( positionID_, 4, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* ) 0 ) );
-  //GLCall( glVertexAttribPointer( normalID_  , 3, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 4 ) ) );
-  GLCall( glVertexAttribPointer( texCoordID_, 2, GL_FLOAT, GL_FALSE, sizeof( float ) * 9, ( GLvoid* )( sizeof( float ) * 7 ) ) );
-  ib_.bind();
-    
-  GLCall( glDrawElements( GL_TRIANGLES, indexCount_, GL_UNSIGNED_INT, 0 ) );
+  GameObject::render( viewProjectionMatrix );
   
   target_     -> render( viewProjectionMatrix );
   particles_  -> render( viewProjectionMatrix );
   
-  GameObject::render( viewProjectionMatrix );
+  
+}
+
+void Ship::registerCollision() {
   
 }
 

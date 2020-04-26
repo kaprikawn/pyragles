@@ -22,9 +22,12 @@ class Ship : public GameObject {
     bool init( std::string modelName );
     virtual void update( float dt );
     virtual void render( glm::mat4 viewProjectionMatrix );
+    virtual void registerCollision();
     
     void  handleInput( float dt );
     void  calculateRotation( float dt );
+    
+    glm::vec4 targetPosition() { return target_ -> position(); }
   
 };
     
