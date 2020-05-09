@@ -16,7 +16,7 @@ Ship::Ship() {
 
 bool Ship::init( std::string modelName ) {
   
-  bool loaded = GameObject::loadModelFromGltf( "ship.glb", "shaderBasic.glsl" );
+  bool loaded = GameObject::loadModelFromGltf( "modelShip.glb", "shaderBasic.glsl" );
   
   return loaded;
 }

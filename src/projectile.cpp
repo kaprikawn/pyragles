@@ -9,7 +9,7 @@ Projectile::Projectile( ProjectileParams params ) {
 }
 
 bool Projectile::init() {
-  bool loaded = GameObject::loadModelFromGltf( "projectile.glb", "shaderBasic.glsl" );
+  bool loaded = GameObject::loadModelFromGltf( "modelProjectile.glb", "shaderBasic.glsl" );
   return loaded;
 }
 

@@ -14,14 +14,14 @@ bool PlayState::onEnter( int levelNumber ) {
   hud_    = std::make_unique<Hud>();
   
   std::unique_ptr<Enemy> enemy = std::make_unique<Enemy>();
-  loadSuccessful = enemy -> init( "enemyPod.glb" );
+  loadSuccessful = enemy -> init( "modelEnemyPod.glb" );
   if( !loadSuccessful )
     return false;
   
   enemies_.push_back( std::move( enemy ) );
   
   ship_ = std::make_unique<Ship>();
-  loadSuccessful = ship_ -> init( "ship.glb" );
+  loadSuccessful = ship_ -> init( "modelShip.glb" );
   if( !loadSuccessful )
     return false;
     
