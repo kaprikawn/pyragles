@@ -1,4 +1,7 @@
+
+
 add_executable( ${PROJECT_NAME}
+  ${SUBDIR_SOURCES}
   inputHandler.cpp camera.cpp glCallLog.cpp stb_image.cpp
   hud.cpp collision.cpp
   texture.cpp indexBuffer.cpp vertexBuffer.cpp shaderCache.cpp shader.cpp
@@ -8,6 +11,9 @@ add_executable( ${PROJECT_NAME}
   ship.cpp target.cpp floor.cpp exhaust.cpp
   enemy.cpp
   projectile.cpp projectileManager.cpp
+  entity.cpp component.cpp
+  components/physicsComponent.cpp
+  rendering/renderer.cpp
   game.cpp main.cpp
 )
 

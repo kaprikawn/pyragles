@@ -1,118 +1,29 @@
 #include "playState.hpp"
 #include <iostream>
-#include "inputHandler.hpp"
-#include "collision.hpp"
+#include "rendering/renderable.hpp"
 
 const std::string PlayState::s_playID = "PLAY";
 
 bool PlayState::onEnter( int levelNumber ) {
   
-  viewProjectionMatrix_ = Camera::Instance() -> viewProjectionMatrix();
-  bool loadSuccessful;
+  shipPhysics_.setVelocity( 1.0f, 0.0f, 0.0f );
+  ship_.addComponent( &shipPhysics_ );
   
-  floor_  = std::make_unique<Floor>();
-  hud_    = std::make_unique<Hud>();
-  
-  std::unique_ptr<Enemy> enemy = std::make_unique<Enemy>();
-  loadSuccessful = enemy -> init( "modelEnemyPod.glb" );
-  if( !loadSuccessful )
+  if( ! ship_.initalize() ) {
     return false;
-  
-  enemies_.push_back( std::move( enemy ) );
-  
-  ship_ = std::make_unique<Ship>();
-  loadSuccessful = ship_ -> init( "modelShip.glb" );
-  if( !loadSuccessful )
-    return false;
-    
-  // ProjectileParams params;
-  // params.active = true;
-  // params.startingPostion.z = -20.0f;
-  
-  // bullet_ = std::make_unique<Projectile>( params );
-  // bullet_ -> init();
-  
-  projectiles_ = std::make_unique<ProjectileManager>();
+  }
   
   return true;
 }
 
 void PlayState::update( GLfloat dt ) {
+
+  ship_.update( dt );
   
-  floor_ -> update( dt );
-  
-  if( bombCount_ > 0 ) {
-    if( InputHandler::Instance() -> justPressed( BOMB ) ) {
-      bombCount_--;
-    }
-  }
-  
-  // spawn projectiles
-  if( ship_ -> spawnProjectile() ) {
-    ProjectileParams params;
-    params.startingPostion      = ship_ -> position();
-    params.destinationPosition  = ship_ -> targetPosition();
-    params.speed                = 30.0f;
-    params.damagesEnemies       = true;
-    projectiles_ -> spawnProjectile( params );
-  }
-  
-  projectiles_ -> update( dt );
-  
-  if( enemies_.size() > 0 ) {
-    for( unsigned int i = 0; i < enemies_.size(); i++ ) {
-      enemies_[ i ] -> update( dt );
-    }
-  }
-  
-  ship_ -> update( dt );
-  hud_ -> update( dt, bombCount_ );
-  
-  // check for collisions on enemies
-  for( unsigned int e = 0; e < enemies_.size(); e++ ) {
-    
-    std::vector<glm::vec4> collider = enemies_[ e ] -> collider();
-    
-    Collision myCollision( ship_ -> collider(), enemies_[ e ] -> collider() );
-    //std::cout << "are colliding is " << myCollision.areColliding() << std::endl;
-    
-    // I want an array of colliders
-    // if hit, I want to tell the projectile to destroy itself
-    std::vector<std::vector<glm::vec4>> projectileColliders = projectiles_ -> colliers();
-    
-    for( unsigned int i = 0; i < projectileColliders.size(); i++ ) {
-      Collision bulletCollision( enemies_[ e ] -> collider(), projectileColliders[ i ] );
-      if( bulletCollision.areColliding() ) {
-        projectiles_ -> registerCollision( i );
-        enemies_[ e ] -> registerCollision();
-      }
-    }
-    
-  }
-  
-  // delete dead enemies
-  for( unsigned i = enemies_.size(); i-- > 0; ) {
-    if( enemies_[ i ] -> isDead() )
-      enemies_.erase( enemies_.begin() + i );
-  }
-  
-  // bullet_ -> update( dt );
 }
 
 void PlayState::render() {
   
-  ship_ -> render( viewProjectionMatrix_ );
-  
-  if( enemies_.size() > 0 ) {
-    for( unsigned int i = 0; i < enemies_.size(); i++ ) {
-      enemies_[ i ] -> render( viewProjectionMatrix_ );
-    }
-  }
-  
-  floor_ -> render( viewProjectionMatrix_ );
-  hud_ -> render();
-  projectiles_ -> render( viewProjectionMatrix_ );
-  // bullet_ -> render( viewProjectionMatrix_ );
 }
 
 int PlayState::nextLevel() {

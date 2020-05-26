@@ -19,12 +19,11 @@ class GameState {
     virtual ~GameState() {}
     
     virtual bool onEnter( int levelNumber ) = 0;
-    virtual void update ( GLfloat dt ) = 0;
-    virtual void render () = 0;
-    virtual bool onExit () = 0;
-    virtual std::string getStateID() const = 0;
-    
-    virtual int nextLevel() = 0;
+    virtual void update ( GLfloat dt )      = 0;
+    virtual void render ()                  = 0;
+    virtual bool onExit ()                  = 0;
+    virtual std::string getStateID() const  = 0;
+    virtual int nextLevel()                 = 0;
     
 };
 
