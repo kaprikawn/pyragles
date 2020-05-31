@@ -18,7 +18,9 @@ class Renderer {
     
     unsigned int vertexBufferID_;
     unsigned int indexBufferID_;
-  
+    
+    static const unsigned int MAX_VERTS = 10;
+    
   protected :
     
     void initializeGL();
@@ -32,7 +34,7 @@ class Renderer {
     bool initialize();
     bool shutdown();
     
-    Geometry*   addGeometry( glm::vec4* vertices, unsigned int numVerts, unsigned short* indices, unsigned int numIndices );
+    Geometry* addGeometry( glm::vec4* vertices, unsigned int numVerts, unsigned short* indices, unsigned int numIndices, unsigned int rendermode );
     Renderable* addRenderable( Geometry* geometry );
     
 };

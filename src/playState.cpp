@@ -13,6 +13,9 @@ bool PlayState::onEnter( int levelNumber ) {
     return false;
   }
   
+  renderer_ = Renderer();
+  renderer_.initialize();
+  
   return true;
 }
 
