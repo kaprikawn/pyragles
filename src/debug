@@ -1,7 +1,0 @@
-#!/bin/sh
-
-echo run pyragles
-
-gdb ../build/pyragles
-
-exit 0

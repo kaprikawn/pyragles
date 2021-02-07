@@ -1,4 +1,4 @@
-# Pyra GLES
+## Pyra GLES
 Companion git for following along with blog :
 
 https://kaprikawn.wordpress.com/2018/01/07/learning-to-learn-opengl-es-2-0-part-01/
@@ -6,18 +6,36 @@ https://kaprikawn.wordpress.com/2018/01/07/learning-to-learn-opengl-es-2-0-part-
 Acknowledgements
 
 - glm header files used by terms of MIT license from https://github.com/g-truc/glm
-- json.hpp license details in the header of that file (MIT licensed). File used as per the terms of that license
 - Project uses SDL2 http://libsdl.org/
-- CMake find files obtained from  
-https://github.com/Cloudef/wlc/blob/master/CMake/FindGLESv2.cmake  
-https://github.com/tcbrindle/sdl2-cmake-scripts
+- Project uses GLEW (Windows only) http://glew.sourceforge.net/
 
 - stb_image.h (MIT licensed) obtained from   
 https://github.com/nothings/stb/blob/master/stb_image.h
 
-- triangleOverlap.h obtained from  
-https://github.com/benardp/contours/blob/master/freestyle/view_map/triangle_triangle_intersection.c
-I tried to find a license for this code but there does not appear to be any
+# Build on Linux
 
-Music used under Creative Commons license obtained from :
-https://soundcloud.com/punch-deck/organic-to-synthetic
+Dependencies : `git`, `git-lfs`, `sdl2` (development library), `glm`
+
+To install on Debian (including the Pyra) :
+
+`sudo apt install git git-lfs libsdl2-dev libglm-dev`
+
+- Run misc/build.sh using `bash` e.g. :
+
+`cd pyragles/misc`
+
+`/bin/bash build.sh`
+
+# Build on Windows
+
+- Download and install Visual Studio
+- Download and unpack [SDL2](https://libsdl.org/release/SDL2-devel-2.0.14-VC.zip) for Visual Studio
+- Download and extract [GLEW](https://sourceforge.net/projects/glew/files/glew/2.1.0/glew-2.1.0-win32.zip/download) (You want `Binaries Windows 32-bit and 64-bit`, sorry for sending you to Sourceforge)
+- Open `misc\build.bat` in a text editor
+- Change the following lines to reflect the directories on your machine
+  - `SET SDL_ROOT_DIR=C:\dev\SDL2-2.0.14` - Should be pointed to where you extracted SDL
+  - `SET GLEW_ROOT_DIR=C:\dev\glew-2.2.0` - Should be pointed to where you extracted GLEW
+  - `SET VCVARS_DIR=C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\` should reflect the directory of where the file `vcvarsall.bat` has been installed on your machine by Visual Studio
+- Open a command line, cd into the `misc` directory, and run the build.bat file after you have saved it
+
+In both cases, the built binary will be in the `build` directory

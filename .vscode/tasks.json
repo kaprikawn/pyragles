@@ -1,25 +1,18 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-      {
-          "label"   : "cmake build standard"
-        , "type"    : "shell"
-        , "command" : "${workspaceFolder}/projectBuild.sh"
-      }
-    , {
-          "label"   : "cmake build clean"
-        , "type"    : "shell"
-        , "command" : "${workspaceFolder}/projectBuild.sh --clean"
-      }
-    , {
-          "label"   : "meson build"
-        , "type"    : "shell"
-        , "command" : "${workspaceFolder}/projectBuild.sh --meson"
-      }
-    , {
-          "label"   : "meson build clean"
-        , "type"    : "shell"
-        , "command" : "${workspaceFolder}/projectBuild.sh --meson --clean"
-      }
-  ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Build",
+			"command": "${workspaceFolder}\\misc\\build.bat",
+			"options": {
+				"cwd": "${workspaceFolder}\\misc"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		}
+	]
 }
