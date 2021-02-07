@@ -1,145 +1,235 @@
 #include "game.hpp"
-#include <iostream>
-#include <GLES2/gl2.h>
-#include "gameStateMachine.hpp"
-#include "camera.hpp"
-#include "inputHandler.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "../vendor/stb_image.h"
+#include "json.hpp"
 
-Game::Game( bool fullscreen, bool invertY ) {
-  
-  int windowWidth   = 1280;
-  int windowHeight  = 720;
-  
-  int windowX       = 10;
-  int windowY       = 10;
-  
-  Uint32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-  if( fullscreen ) {
-    sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN;
-    
-    // create window to native desktop size to query screen dimensions
-    SDL_Init( SDL_INIT_VIDEO );
-    SDL_Window* nullWindow = SDL_CreateWindow( "undef", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_FULLSCREEN );
-    SDL_DisplayMode dm;
-    SDL_GetDesktopDisplayMode( 0, &dm );
-    windowWidth   = dm.w;
-    windowHeight  = dm.h;
-    SDL_DestroyWindow( nullWindow );
-    
-    windowX       = SDL_WINDOWPOS_UNDEFINED;
-    windowY       = SDL_WINDOWPOS_UNDEFINED;
-    
-    SDL_ShowCursor( SDL_DISABLE );
-  }
-  
-  bool init = Game::init( "GLES2 Test", windowX, windowY, windowWidth, windowHeight, sdlFlags, invertY );
-  
-  if( !init )
-    std::cout << "Error - game failed to start" << std::endl;
-  
+/*
+void GLClearError() {
+  while( glGetError() != GL_NO_ERROR );
 }
 
-bool Game::init( const char* title, int xpos, int ypos, int windowWidth, int windowHeight, int flags, bool invertY ) {
-  
-  if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO ) != 0 ) {
-    std::cout << "Failed to load SDL : " << SDL_GetError() << std::endl;
+bool GLLogCall( const char* function, const char* file, int line ) {
+  while( GLenum error = glGetError() ) {
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "[OpenGL error] %s\n%s\n%s\n%s\n", error, function, file, line );
     return false;
   }
-  
-  window_ = SDL_CreateWindow( title, xpos, ypos, windowWidth, windowHeight, flags );
-  if( !window_ ) {
-    std::cout << "Failed to create window : " << SDL_GetError() << std::endl;
-    return false;
-  }
-  
-  glContext_ = SDL_GL_CreateContext( window_ );
-  if( !glContext_ ) {
-    std::cout << "Failed to create GL context : " << SDL_GetError() << std::endl;
-    return false;
-  }
-  SDL_GL_SetSwapInterval( 1 );
-  
-  glClearColor( 0.0f, 0.65f, 1.0f, 1.0f );
-  glEnable( GL_DEPTH_TEST );
-  glEnable( GL_BLEND );
-  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-  glDepthFunc( GL_LESS );
-  
-  gameStateMachine_ = std::make_unique<GameStateMachine>();
-  InputHandler::Instance() -> init( invertY );
-  
-  Camera::Instance() -> init( windowWidth, windowHeight );
-  
-  InputHandler::Instance() -> initialiseGamepads();
-  
-  bool loadSuccessful = Game::changeGameState( PLAY, 0 );
-  if( !loadSuccessful )
-    return false;
-  
-  running_ = true;
-  //running_ = false;
-  
   return true;
 }
+*/
 
-void Game::run() {
+struct GameObject {
+  glm::vec4 position        = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f );
+  glm::mat4 model_matrix    = glm::mat4( 1.0f );
+  glm::mat4 mvp             = glm::mat4( 1.0f );
+  glm::mat4 rotation_matrix = glm::mat4( 1.0f );
+  real32    rotation_x      = 12.7f;
+  real32    rotation_y      = 0.0f;
+  real32    rotation_z      = 0.0f;
+  int32     position_id;
+  int32     tex_coord0_id;
+  uint32    mesh_count;
+  uint32    tbo;
+  MeshData* mesh_data;
+  uint32*   indices;
+  uint32    shader_program_id;
+  int32     mvp_id;
+};
+
+uint32 vertex_buffer_current_offset = 0;
+uint32 index_buffer_current_offset  = 0;
+
+void load_game_object( GameObject* game_object, const char* model_filename, const char* shader_filename ) {
   
-  Uint32  currentTime = SDL_GetTicks();
-  Uint32  previousTime;
-  GLfloat dt;
+  ReadFileResult shader_file = read_entire_file( shader_filename );
   
-  if( !running_ )
-    return;
+  game_object -> shader_program_id = createShader( ( const char* )shader_file.contents, shader_file.contentsSize );
+  free_memory( shader_file.contents, shader_file.contentsSize );
   
-  do {
+  ReadFileResult gltf_file = read_entire_file( model_filename );
+  uint32 json_string_length = json_size_in_bytes( &gltf_file ); // including padding
+  
+  char* json_string = ( char* )malloc( json_string_length + 1 );
+  
+  pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
+  // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "json is %s\n", json_string );
+  game_object -> mesh_count = count_meshes( json_string, json_string_length );
+  game_object -> mesh_data = ( MeshData* )malloc( sizeof( MeshData ) * game_object -> mesh_count );
+  
+  for( uint32 i = 0; i < game_object -> mesh_count; i++ ) {
     
-    previousTime  = currentTime;
-    currentTime   = SDL_GetTicks();
-    dt = ( currentTime - previousTime ) / 1000.0f;
-    if( dt > 0.15f )
-      dt = 0.15f;
+    MeshData this_mesh = populate_mesh_data( i, json_string, &gltf_file );
+    uint32 index_count = this_mesh.index_count;
     
-    SDL_Event event;
-    while( SDL_PollEvent( &event ) ) {
-      InputHandler::Instance() -> processEvent( event, currentTime );
+    this_mesh.index_data = ( uint32* )malloc( sizeof( uint32 ) * index_count );
+    
+    // TODO : this is broken
+    uint16* src   = this_mesh.index_data_raw;
+    uint32* dest  = this_mesh.index_data;
+    for( uint32 j = 0; j < index_count; j++ ) {
+      uint16 this_index = *src;
+      uint32 index_value = ( uint32 )this_index;
+      *dest = index_value;
+      src++;
+      dest++;
+    }
+    this_mesh.index_data_in_bytes = sizeof( this_mesh.index_data[ 0 ] ) * this_mesh.index_count;
+    
+    // determine where to copy data into - if we're on the second mesh, move the pointer along by one etc.
+    MeshData* mesh_dest = game_object -> mesh_data;
+    for( uint32 j = 0; j < i; j++ ) {
+      mesh_dest++;
     }
     
-    if( InputHandler::Instance() -> quit() )
-      running_ = false;
+    this_mesh.gl_vertex_offset      = vertex_buffer_current_offset;
+    vertex_buffer_current_offset   += this_mesh.vertex_data_in_bytes;
+    this_mesh.gl_tex_coord0_offset  = vertex_buffer_current_offset;
+    vertex_buffer_current_offset   += this_mesh.tex_coord0_data_in_bytes;
+    this_mesh.gl_index_offset       = index_buffer_current_offset;
+    index_buffer_current_offset    += this_mesh.index_data_in_bytes;
+    
+    // upload data to GL
+    glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_vertex_offset, this_mesh.vertex_data_in_bytes, this_mesh.vertex_data );
+    glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_tex_coord0_offset, this_mesh.tex_coord0_data_in_bytes, this_mesh.tex_coord0_data );
+    glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, this_mesh.gl_index_offset, this_mesh.index_data_in_bytes, this_mesh.index_data );
+    
+    // copy data into object
+    memcpy( mesh_dest, &this_mesh, sizeof( MeshData ) );
+    
+  }
+  
+  int32 texture_width, texture_height, texture_bpp;
+  
+  uchar* texture_data = stbi_load_from_memory( ( const uchar* )game_object -> mesh_data[ 0 ].image_data, game_object -> mesh_data[ 0 ].image_data_in_bytes, &texture_width, &texture_height, &texture_bpp, 4 );
+  
+  glGenTextures( 1, &game_object -> tbo );
+  glBindTexture( GL_TEXTURE_2D, game_object -> tbo );
+  
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+  // https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
+  glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data );
+  glBindTexture( GL_TEXTURE_2D, game_object -> tbo );
+  
+  game_object -> position_id   = glGetAttribLocation( game_object -> shader_program_id,  "aPosition" );
+  game_object -> tex_coord0_id = glGetAttribLocation( game_object -> shader_program_id,  "aTexCoord" );
+  
+  game_object -> mvp_id = glGetUniformLocation( game_object -> shader_program_id, "uMVP" );
+  
+  glEnableVertexAttribArray( game_object -> position_id );
+  glEnableVertexAttribArray( game_object -> tex_coord0_id );
+  
+  glVertexAttribPointer( game_object -> position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_vertex_offset );
+  glVertexAttribPointer( game_object -> tex_coord0_id , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_tex_coord0_offset );
+  
+  
+}
+
+
+uint32 init_game( game_memory* memory ) {
+  
+  SDLObjects sdlObjects;
+  
+  game_input  input   = {};
+  
+  init_sdl( &sdlObjects );
+  
+  SDL_Window* window = sdlObjects.window;
+  
+  glm::mat4 projection_matrix;
+  glm::mat4 view_matrix;
+  
+  real32  aspect = ( real32 ) sdlObjects.windowWidth / ( real32 ) sdlObjects.windowHeight;
+  
+  uint32  vbo;
+  uint32  ibo;
+  
+  const uint32 object_count = 2;
+  GameObject game_objects[ object_count ];
+  
+  bool32  running = true;
+  
+  do {
+    SDL_Event event;
+    while( SDL_PollEvent( &event ) ) {
+      handle_sdl_input_event( &event, &input );
+    }
+    
+    if( input.quitJustPressed )
+      running = false;
+    
+    int32 mvpID;
+    
+    // update and render
+    
+    if( !memory -> isInitialized ) {
       
-    gameStateMachine_ -> update( dt );
+      glGenBuffers( 1, &vbo );
+      glBindBuffer( GL_ARRAY_BUFFER, vbo );
+      glBufferData( GL_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
+      
+      glGenBuffers( 1, &ibo );
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
+      glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
+      
+      GameObject ship;
+      load_game_object( &game_objects[ 0 ], "modelShip.glb"    , "shaderBasic.glsl" );
+      load_game_object( &game_objects[ 1 ], "modelEnemyPod.glb", "shaderBasic.glsl" );
+      
+      game_objects[ 0 ].position.x -= 2.0f;
+      game_objects[ 1 ].position.x += 2.0f;
+      
+      projection_matrix = glm::perspective( glm::radians( 70.0f ), aspect, 0.1f, 100.0f );
+      
+      view_matrix = glm::lookAt(
+          glm::vec3( 4, 3, 3 )
+        , glm::vec3( 0, 0, 0 )
+        , glm::vec3( 0, 1, 0 )
+      );
+      
+      memory -> isInitialized = true;
+    }
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
-    gameStateMachine_ -> render();
+    game_objects[ 0 ].rotation_y += 0.5f;
+    if( game_objects[ 0 ].rotation_y > 360.0f )
+      game_objects[ 0 ].rotation_y -= 360.0f;
     
-    Game::render();
+    game_objects[ 1 ].rotation_y -= 0.8f;
+    if( game_objects[ 1 ].rotation_y < 0.0f )
+      game_objects[ 1 ].rotation_y += 360.0f;
     
-    InputHandler::Instance() -> reset();
-  } while( running_ );
+    
+    for( uint32 i = 0; i < object_count; i++ ) {
+      
+      game_objects[ i ].rotation_matrix = glm::rotate( glm::mat4( 1.0f )   , glm::radians( game_objects[ i ].rotation_x ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+      game_objects[ i ].rotation_matrix = glm::rotate( game_objects[ i ].rotation_matrix, glm::radians( game_objects[ i ].rotation_y ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+      game_objects[ i ].rotation_matrix = glm::rotate( game_objects[ i ].rotation_matrix, glm::radians( game_objects[ i ].rotation_z ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+      
+      game_objects[ i ].model_matrix = glm::translate( glm::mat4( 1.0f ), glm::vec3( game_objects[ i ].position ) );
+      game_objects[ i ].model_matrix *= game_objects[ i ].rotation_matrix;
+    
+      game_objects[ i ].mvp = projection_matrix * view_matrix * game_objects[ i ].model_matrix;
+      
+      glUseProgram( game_objects[ i ].shader_program_id );
+      glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &game_objects[ i ].mvp[0][0] );
+      
+      glVertexAttribPointer( game_objects[ i ].position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_vertex_offset );
+      glVertexAttribPointer( game_objects[ i ].tex_coord0_id , 2, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_tex_coord0_offset );
+      
+      glBindTexture( GL_TEXTURE_2D, game_objects[ i ].tbo );
+      
+      glDrawElements( GL_TRIANGLES, game_objects[ i ].mesh_data[ 0 ].index_count, GL_UNSIGNED_INT, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_index_offset );
+      
+    }
+    
+    
+    SDL_GL_SwapWindow( window );
+    
+  } while( running );
   
-  SDL_GL_DeleteContext( glContext_ );
-  SDL_DestroyWindow( window_ );
-  SDL_Quit();
-  
-}
-
-void Game::render() {
-  SDL_GL_SwapWindow( window_ );
-}
-
-void Game::setNewState( int newState, int transitionType = 0 ) {
-  newState_ = newState;
-  transitionType_ = transitionType;
-}
-
-bool Game::changeGameState( int newState, int transitionType ) {
-  if( newState == PLAY ) {
-    std::unique_ptr<GameState> playState ( std::make_unique<PlayState>() );
-    bool changeSuccessful = gameStateMachine_ -> changeState( std::move( playState ) );
-    if( !changeSuccessful )
-      return false;
-  }
-  newState_ = -1;
-  return true;
+  return 0;
 }
