@@ -1,7 +1,7 @@
 @echo off
 
 SET VCVARS_DIR=C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\
-SET GAME_DIR=C:\dev\AlphaFlight
+SET GAME_DIR=C:\dev\pyragles
 
 rem add scripts dir to path
 set path=%GAME_DIR%\misc;%path%
@@ -11,4 +11,4 @@ call %VCVARS_DIR%\vcvarsall.bat x64
 
 rem change into game dir
 C:
-cd \dev\AlphaFlight
+cd \dev\pyragles

@@ -173,11 +173,9 @@ bool32 fileExists( const char* filepath ) {
   return result;
 }
 
-
 #elif __linux__
 
 #include <sys/stat.h>
-
 
 bool fileExists( const char* filepath ) {
   if( FILE *file = fopen( filepath, "r" ) ) {
@@ -256,12 +254,6 @@ struct SDLObjects {
   SDL_GLContext glContext;
   int windowWidth;
   int windowHeight;
-};
-
-struct game_input {
-  bool32 quitJustPressed = false;
-  
-  real32 secondsElapsed;
 };
 
 enum game_memory_type {
@@ -353,23 +345,6 @@ bool32 strings_are_equal( const char* str1, const char* str2 ) {
   return true;
 }
 
-void handle_sdl_input_event( SDL_Event* event, game_input* input ) {
-  
-  switch( event -> type ) {
-    
-    case SDL_QUIT : {
-      input -> quitJustPressed = true;
-    } break;
-    
-    case SDL_KEYDOWN : {
-      if( event -> key.repeat == 0 && event -> key.keysym.scancode == SDL_SCANCODE_ESCAPE ) {
-        input -> quitJustPressed = true;
-      }
-    } break;
-    
-    default : break;
-  }
-}
 
 uint32 compileShader( uint32 type, const char* source ) {
   
@@ -474,7 +449,5 @@ uint32 createShader( const char* shaderSource, uint32 filesizeMax ) {
   
   return shaderProgramID;
 }
-
-
 
 #endif //GAME_HPP
