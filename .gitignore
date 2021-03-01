@@ -2,3 +2,4 @@ builddir/
 *.mtl
 build/
 zz*
+.vscode/settings.json
