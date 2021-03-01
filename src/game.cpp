@@ -2,6 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../vendor/stb_image.h"
 #include "json.hpp"
+#include "input.hpp"
 
 /*
 void GLClearError() {
@@ -123,8 +124,6 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   
   glVertexAttribPointer( game_object -> position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_vertex_offset );
   glVertexAttribPointer( game_object -> tex_coord0_id , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_tex_coord0_offset );
-  
-  
 }
 
 
@@ -132,7 +131,8 @@ uint32 init_game( game_memory* memory ) {
   
   SDLObjects sdlObjects;
   
-  game_input  input   = {};
+  Buttons_pressed old_buttons;
+  Buttons_pressed new_buttons;
   
   init_sdl( &sdlObjects );
   
@@ -152,12 +152,17 @@ uint32 init_game( game_memory* memory ) {
   bool32  running = true;
   
   do {
+    
+    reset_game_inputs_pressed( &old_buttons, &new_buttons );
+    
     SDL_Event event;
     while( SDL_PollEvent( &event ) ) {
-      handle_sdl_input_event( &event, &input );
+      handle_sdl_input_event( &event, &old_buttons, &new_buttons );
     }
     
-    if( input.quitJustPressed )
+    Game_input game_input = get_game_input_state( old_buttons, new_buttons );
+        
+    if( game_input.quit )
       running = false;
     
     int32 mvpID;
@@ -194,16 +199,30 @@ uint32 init_game( game_memory* memory ) {
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
-    game_objects[ 0 ].rotation_y += 0.5f;
-    if( game_objects[ 0 ].rotation_y > 360.0f )
-      game_objects[ 0 ].rotation_y -= 360.0f;
+    if( game_input.a_held ) {
+      game_objects[ 0 ].rotation_y += 0.5f;
+    } else if( game_input.d_held ) {
+      game_objects[ 0 ].rotation_y -= 0.5f;
+    }
+    
+    if( game_input.w_held ) {
+      game_objects[ 0 ].rotation_x += 0.5f;
+    } else if( game_input.s_held ) {
+      game_objects[ 0 ].rotation_x -= 0.5f;
+    }
+    
     
     game_objects[ 1 ].rotation_y -= 0.8f;
-    if( game_objects[ 1 ].rotation_y < 0.0f )
-      game_objects[ 1 ].rotation_y += 360.0f;
     
     
     for( uint32 i = 0; i < object_count; i++ ) {
+      
+      if( game_objects[ i ].rotation_x > 360.0f ) game_objects[ i ].rotation_x -= 360.0f;
+      if( game_objects[ i ].rotation_y > 360.0f ) game_objects[ i ].rotation_y -= 360.0f;
+      if( game_objects[ i ].rotation_z > 360.0f ) game_objects[ i ].rotation_z -= 360.0f;
+      if( game_objects[ i ].rotation_x < 0.0f )   game_objects[ i ].rotation_x += 360.0f;
+      if( game_objects[ i ].rotation_y < 0.0f )   game_objects[ i ].rotation_y += 360.0f;
+      if( game_objects[ i ].rotation_z < 0.0f )   game_objects[ i ].rotation_z += 360.0f;
       
       game_objects[ i ].rotation_matrix = glm::rotate( glm::mat4( 1.0f )   , glm::radians( game_objects[ i ].rotation_x ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
       game_objects[ i ].rotation_matrix = glm::rotate( game_objects[ i ].rotation_matrix, glm::radians( game_objects[ i ].rotation_y ), glm::vec3( 0.0f, 1.0f, 0.0f ) );

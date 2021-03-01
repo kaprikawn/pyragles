@@ -1,4 +1,4 @@
 @echo off
 
 C:
-devenv \dev\AlphaFlight\build\AlphaFlight.exe
+devenv \dev\pyragles\build\AlphaFlight.exe
