@@ -5,7 +5,9 @@
           "includePath": [
                 "${workspaceFolder}/**"
               , "${workspaceFolder}/src"
+              , "${workspaceFolder}\\src"
               , "${workspaceFolder}/vendor"
+              , "${workspaceFolder}\\vendor"
               , "C:\\dev\\SDL2-2.0.14\\include"
               , "C:\\dev\\glew-2.2.0\\include"
           ],

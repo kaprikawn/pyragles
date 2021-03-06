@@ -146,6 +146,8 @@ uint32 init_game( game_memory* memory ) {
   uint32  vbo;
   uint32  ibo;
   
+  initialise_gamepads();
+  
   const uint32 object_count = 2;
   GameObject game_objects[ object_count ];
   
@@ -161,6 +163,9 @@ uint32 init_game( game_memory* memory ) {
     }
     
     Game_input game_input = get_game_input_state( old_buttons, new_buttons );
+    
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "x is %f\n", game_input.joy_axis_x );
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "y is %f\n", game_input.joy_axis_y );
         
     if( game_input.quit )
       running = false;
@@ -199,17 +204,20 @@ uint32 init_game( game_memory* memory ) {
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
-    if( game_input.a_held ) {
-      game_objects[ 0 ].rotation_y += 0.5f;
-    } else if( game_input.d_held ) {
-      game_objects[ 0 ].rotation_y -= 0.5f;
-    }
+    // if( game_input.a_held ) {
+    //   game_objects[ 0 ].rotation_y += 0.5f;
+    // } else if( game_input.d_held ) {
+    //   game_objects[ 0 ].rotation_y -= 0.5f;
+    // }
     
-    if( game_input.w_held ) {
-      game_objects[ 0 ].rotation_x += 0.5f;
-    } else if( game_input.s_held ) {
-      game_objects[ 0 ].rotation_x -= 0.5f;
-    }
+    // if( game_input.w_held ) {
+    //   game_objects[ 0 ].rotation_x += 0.5f;
+    // } else if( game_input.s_held ) {
+    //   game_objects[ 0 ].rotation_x -= 0.5f;
+    // }
+    
+    game_objects[ 0 ].rotation_y += game_input.joy_axis_x;
+    game_objects[ 0 ].rotation_x += game_input.joy_axis_y;
     
     
     game_objects[ 1 ].rotation_y -= 0.8f;
