@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/usr/bin/dash
 
+CWD=$( pwd -P )
 SCRIPT_DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 ROOT_DIR="$( cd $SCRIPT_DIR/.. ; pwd -P )"
 BUILD_DIR=$ROOT_DIR/build
@@ -12,10 +13,10 @@ echo src is $SRC_DIR
 
 mkdir -p $BUILD_DIR
 
-pushd $BUILD_DIR
+cd $BUILD_DIR
 
 c++ `pkg-config --cflags --libs sdl2 glesv2` -DFULLSCREEN_ONLY $SRC_DIR/main_linux.cpp -o AlphaFlight
 
-popd
+cd $CWD
 
 exit 0
