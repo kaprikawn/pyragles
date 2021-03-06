@@ -309,6 +309,10 @@ void init_sdl( SDLObjects* sdlObjects ) {
     SDL_LogError( SDL_LOG_CATEGORY_ERROR, "The window could not be created! SDL_Error : %s\n", SDL_GetError() );
   }
   
+  if( launch_fullscreen ) {
+    SDL_SetWindowFullscreen( sdlObjects -> window, SDL_WINDOW_FULLSCREEN );
+  }
+  
   sdlObjects -> glContext = SDL_GL_CreateContext( sdlObjects -> window );
   if( !( sdlObjects -> glContext ) ) {
     SDL_LogError( SDL_LOG_CATEGORY_ERROR, "Failed to create GL context : %s\n", SDL_GetError());
