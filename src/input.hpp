@@ -172,15 +172,9 @@ void input_on_key_up( SDL_Event* event, Buttons_pressed* old_buttons, Buttons_pr
 
 uint32 gamepad_count          = 0;
 const uint32 MAX_CONTROLLERS  = 4;
-SDL_GameController* gamepads[ MAX_CONTROLLERS ];
+SDL_Joystick* gamepads[ MAX_CONTROLLERS ];
 
 void initialise_gamepads() {
-  
-  // SDL_Joystick;
-  
-  if( SDL_WasInit( SDL_INIT_GAMECONTROLLER ) == 0 ) {
-    SDL_InitSubSystem( SDL_INIT_GAMECONTROLLER );
-  }
   
   gamepad_count = SDL_NumJoysticks();
   
@@ -188,17 +182,14 @@ void initialise_gamepads() {
   
   if( gamepad_count == 0 ) return;
   
-  SDL_GameController* gamepad = NULL;
+  SDL_Joystick* gamepad = NULL;
   
   for( uint32 i = 0; i < gamepad_count && i < MAX_CONTROLLERS; i++ ) {
-    if( SDL_IsGameController( i ) ) {
-      gamepad = SDL_GameControllerOpen( i );
-      if( gamepad ) {
-        gamepads[ i ] = gamepad;
-        SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Added controller %s\n", SDL_GameControllerName( gamepad ) );
-      } else {
-        SDL_LogInfo( SDL_LOG_CATEGORY_ERROR, "Could not open gamecontroller %i: %s\n", i, SDL_GetError());
-      }
+    gamepad = SDL_JoystickOpen( i );
+    if( gamepad ) {
+      gamepads[ i ] = gamepad;
+    } else {
+      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Could not open gamecontroller %d, %s\n", i, SDL_GetError());
     }
   }
 }
