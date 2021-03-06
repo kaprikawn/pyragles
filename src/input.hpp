@@ -13,29 +13,32 @@
 
 #endif
 
-
 struct Buttons_pressed {
-  bool32 quit = false;
-  bool32 w    = false;
-  bool32 a    = false;
-  bool32 s    = false;
-  bool32 d    = false;
+  bool32 quit       = false;
+  bool32 w          = false;
+  bool32 a          = false;
+  bool32 s          = false;
+  bool32 d          = false;
+  real32 joy_axis_x = 0.0f;
+  real32 joy_axis_y = 0.0f;
 };
 
 struct Game_input {
-  bool w_pressed  = false;
-  bool w_held     = false;
-  bool w_released = false;
-  bool a_pressed  = false;
-  bool a_held     = false;
-  bool a_released = false;
-  bool s_pressed  = false;
-  bool s_held     = false;
-  bool s_released = false;
-  bool d_pressed  = false;
-  bool d_held     = false;
-  bool d_released = false;
-  bool quit       = false;
+  bool w_pressed    = false;
+  bool w_held       = false;
+  bool w_released   = false;
+  bool a_pressed    = false;
+  bool a_held       = false;
+  bool a_released   = false;
+  bool s_pressed    = false;
+  bool s_held       = false;
+  bool s_released   = false;
+  bool d_pressed    = false;
+  bool d_held       = false;
+  bool d_released   = false;
+  bool quit         = false;
+  real32 joy_axis_x = 0.0f;
+  real32 joy_axis_y = 0.0f;
 };
 
 void reset_game_inputs_pressed( Buttons_pressed* old_buttons, Buttons_pressed* new_buttons ) {
@@ -87,6 +90,9 @@ Game_input get_game_input_state( Buttons_pressed old_buttons, Buttons_pressed ne
   } else if( old_buttons.d && !new_buttons.d ) {
     result.d_released = true;
   }
+  
+  result.joy_axis_x = new_buttons.joy_axis_x;
+  result.joy_axis_y = new_buttons.joy_axis_y;
   
   return result;
 }
@@ -164,9 +170,106 @@ void input_on_key_up( SDL_Event* event, Buttons_pressed* old_buttons, Buttons_pr
   }
 }
 
+uint32 gamepad_count          = 0;
+const uint32 MAX_CONTROLLERS  = 4;
+SDL_GameController* gamepads[ MAX_CONTROLLERS ];
+
+void initialise_gamepads() {
+  
+  // SDL_Joystick;
+  
+  if( SDL_WasInit( SDL_INIT_JOYSTICK ) == 0 ) {
+    SDL_InitSubSystem( SDL_INIT_JOYSTICK );
+  }
+  
+  gamepad_count = SDL_NumJoysticks();
+  
+  if( gamepad_count == 0 ) return;
+  
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Detected %d attached gamepads\n", gamepad_count );
+  
+  SDL_GameController* gamepad = NULL;
+  
+  for( uint32 i = 0; i < gamepad_count && i < MAX_CONTROLLERS; i++ ) {
+    if( SDL_IsGameController( i ) ) {
+      gamepad = SDL_GameControllerOpen( i );
+      if( gamepad ) {
+        gamepads[ i ] = gamepad;
+        SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Added controller %s\n", SDL_GameControllerName( gamepad ) );
+      } else {
+        SDL_LogInfo( SDL_LOG_CATEGORY_ERROR, "Could not open gamecontroller %i: %s\n", i, SDL_GetError());
+      }
+    }
+  }
+}
+
+int16 deadzone = 100;
+
+// INFO: raw -12033 = norm -0.367229
+// INFO: raw -12801 = norm -0.390667
+// INFO: raw -12033 = norm -0.367229
+// INFO: raw -6144 = norm -0.187505
+// INFO: raw -6912 = norm -0.210943
+// INFO: raw -6144 = norm -0.187505
+// INFO: raw -6912 = norm -0.210943
+// INFO: raw -6144 = norm -0.187505
+// INFO: raw -6912 = norm -0.210943
+// INFO: raw -6144 = norm -0.187505
+// INFO: raw -6912 = norm -0.210943
+// INFO: raw -6144 = norm -0.187505
+// INFO: raw -6912 = norm -0.210943
+// INFO: raw -6144 = norm -0.187505
+// INFO: raw -6912 = norm -0.210943
+// INFO: raw -6144 = norm -0.187505
+// INFO: raw -6912 = norm -0.210943
+// INFO: raw -11265 = norm -0.343791
+// INFO: raw -9729 = norm -0.296914
+// INFO: raw -8961 = norm -0.273476
+// INFO: raw -6144 = norm -0.187505
+// INFO: raw -6657 = norm -0.203161
+// INFO: raw -5376 = norm -0.164067
+// INFO: raw -5121 = norm -0.156285
+// INFO: raw -4353 = norm -0.132847
+
+void on_joy_axis_move( SDL_Event* event, Buttons_pressed* new_buttons ) {
+  
+  int16   axis_value  = event -> jaxis.value;
+  real32  normalised_value;
+  
+  if( axis_value < deadzone && axis_value > -deadzone ) {
+    normalised_value = 0.0f;
+  } else if( axis_value > 0 ) {
+    normalised_value = ( real32 )axis_value / 32767.0f;
+  } else if( axis_value < 0 ) {
+    normalised_value = ( real32 )axis_value / 32768.0f;
+  } else {
+    normalised_value = 0.0f;
+  }
+  
+  // if( axis_value > 100 || axis_value < -100 ) {
+  //   real32 norm = ( real32 )axis_value / 32767.0f;
+  //   SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "raw %d = norm %f...norm orig %f\n", axis_value, norm, normalised_value );
+  // }
+  
+  if( event -> jaxis.axis == 0 ) { // left and right
+    new_buttons -> joy_axis_x = normalised_value;
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis raw reading %d\n", axis_value );
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis norm reading %f\n", normalised_value );
+  } else if( event -> jaxis.axis == 1 ) { // up and down
+    new_buttons -> joy_axis_y = normalised_value;
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis raw reading %d\n", axis_value );
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis norm reading %f\n", normalised_value );
+  }
+  
+}
+
 void handle_sdl_input_event( SDL_Event* event, Buttons_pressed* old_buttons, Buttons_pressed* new_buttons ) {
   
   switch( event -> type ) {
+    
+    case SDL_JOYAXISMOTION : {
+      on_joy_axis_move( event, new_buttons );
+    } break;
     
     case SDL_QUIT : {
       new_buttons -> quit = true;
