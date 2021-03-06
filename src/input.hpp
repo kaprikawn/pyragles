@@ -178,15 +178,15 @@ void initialise_gamepads() {
   
   // SDL_Joystick;
   
-  if( SDL_WasInit( SDL_INIT_JOYSTICK ) == 0 ) {
-    SDL_InitSubSystem( SDL_INIT_JOYSTICK );
+  if( SDL_WasInit( SDL_INIT_GAMECONTROLLER ) == 0 ) {
+    SDL_InitSubSystem( SDL_INIT_GAMECONTROLLER );
   }
   
   gamepad_count = SDL_NumJoysticks();
   
-  if( gamepad_count == 0 ) return;
-  
   SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Detected %d attached gamepads\n", gamepad_count );
+  
+  if( gamepad_count == 0 ) return;
   
   SDL_GameController* gamepad = NULL;
   
@@ -204,32 +204,6 @@ void initialise_gamepads() {
 }
 
 int16 deadzone = 100;
-
-// INFO: raw -12033 = norm -0.367229
-// INFO: raw -12801 = norm -0.390667
-// INFO: raw -12033 = norm -0.367229
-// INFO: raw -6144 = norm -0.187505
-// INFO: raw -6912 = norm -0.210943
-// INFO: raw -6144 = norm -0.187505
-// INFO: raw -6912 = norm -0.210943
-// INFO: raw -6144 = norm -0.187505
-// INFO: raw -6912 = norm -0.210943
-// INFO: raw -6144 = norm -0.187505
-// INFO: raw -6912 = norm -0.210943
-// INFO: raw -6144 = norm -0.187505
-// INFO: raw -6912 = norm -0.210943
-// INFO: raw -6144 = norm -0.187505
-// INFO: raw -6912 = norm -0.210943
-// INFO: raw -6144 = norm -0.187505
-// INFO: raw -6912 = norm -0.210943
-// INFO: raw -11265 = norm -0.343791
-// INFO: raw -9729 = norm -0.296914
-// INFO: raw -8961 = norm -0.273476
-// INFO: raw -6144 = norm -0.187505
-// INFO: raw -6657 = norm -0.203161
-// INFO: raw -5376 = norm -0.164067
-// INFO: raw -5121 = norm -0.156285
-// INFO: raw -4353 = norm -0.132847
 
 void on_joy_axis_move( SDL_Event* event, Buttons_pressed* new_buttons ) {
   

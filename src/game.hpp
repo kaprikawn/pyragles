@@ -278,17 +278,19 @@ void init_sdl( SDLObjects* sdlObjects ) {
   int windowHeight  = 720;
   int windowX       = 50;
   int windowY       = 50;
-  uint32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+  uint32 sdlFlags = SDL_WINDOW_OPENGL;
   
 #ifdef FULLSCREEN_ONLY
   launch_fullscreen = true;
 #endif
   
+  SDL_Init( SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER );
+  
   if( launch_fullscreen ) {
-    uint32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_FULLSCREEN;
+    uint32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN;
     
     // create window to native desktop size to query screen dimensions
-    SDL_Init( SDL_INIT_VIDEO );
+    
     SDL_Window* nullWindow = SDL_CreateWindow( "undef", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_FULLSCREEN );
     SDL_DisplayMode dm;
     SDL_GetDesktopDisplayMode( 0, &dm );
