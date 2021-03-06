@@ -13,6 +13,16 @@
 				"isDefault": true
 			},
 			"problemMatcher": []
+		},
+		{
+		  "type": "shell",
+		  "label": "Build Linux",
+		  "command": "${workspaceFolder}/misc/build.sh"
+		},
+		{
+		  "type": "shell",
+		  "label": "Build Pyra",
+		  "command": "/bin/bash ${workspaceFolder}/misc/pyra_build.sh"
 		}
 	]
 }
