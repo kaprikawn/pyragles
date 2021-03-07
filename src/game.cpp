@@ -300,51 +300,7 @@ uint32 init_game( game_memory* memory ) {
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
-    // if( game_input.a_held ) {
-    //   game_objects[ 0 ].rotation_y += 0.5f;
-    // } else if( game_input.d_held ) {
-    //   game_objects[ 0 ].rotation_y -= 0.5f;
-    // }
-    
-    // if( game_input.w_held ) {
-    //   game_objects[ 0 ].rotation_x += 0.5f;
-    // } else if( game_input.s_held ) {
-    //   game_objects[ 0 ].rotation_x -= 0.5f;
-    // }
-    
-    // game_objects[ 0 ].rotation_y -= game_input.joy_axis_x;
-    // game_objects[ 0 ].rotation_x -= game_input.joy_axis_y;
-    
-    // real32 max_rotation_x = 30.0f; // up/down pitch
-    // real32 current_x      = game_objects[ 0 ].rotation_x;
-    // real32 joy_y          = game_input.joy_axis_y;
-    // real32 destination_x;
-    // real32 new_rotation_x;
-    // real32 lerp_smoothing = 0.05f;
-    
-    // if( current_x > max_rotation_x )
-    //   current_x -= 360.0f;
-    // if( current_x < -max_rotation_x )
-    //   current_x += 360.0f;
-    
-    
-    // if( joy_y < 0.0f ) { // up on the stick
-    //   destination_x = -( max_rotation_x * joy_y );
-    // } else if( joy_y > 0.0f ) { // down on the stick
-    //   destination_x = ( -max_rotation_x * joy_y );
-    // } else {
-    //   destination_x = 0.0f;
-    // }
-    
-    // new_rotation_x = lerp_dt( current_x, destination_x, lerp_smoothing, dt );
-    // // if( joy_y != 0.0f )
-    // //   SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy_y = %f, max = %f, dest = %f, lerp = %f, cur = %f\n", joy_y, max_rotation_x, destination_x, lerp_x, current_x );
-    
-    // game_objects[ 0 ].rotation_x = new_rotation_x;
-    
     calculate_ship_rotation( &game_input, &game_objects[ 0 ], dt );
-    
-    
     
     game_objects[ 1 ].rotation_y -= 0.8f;
     
