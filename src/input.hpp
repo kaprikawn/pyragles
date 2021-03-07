@@ -23,7 +23,7 @@ struct Buttons_pressed {
   real32 joy_axis_y = 0.0f;
 };
 
-struct Game_input {
+struct GameInput {
   real32 joy_axis_x = 0.0f;
   real32 joy_axis_y = 0.0f;
   
@@ -50,9 +50,9 @@ void reset_game_inputs_pressed( Buttons_pressed* old_buttons, Buttons_pressed* n
   old_buttons -> d = new_buttons -> d;
 }
 
-Game_input get_game_input_state( Buttons_pressed old_buttons, Buttons_pressed new_buttons, bool32 invert_y ) {
+GameInput get_game_input_state( Buttons_pressed old_buttons, Buttons_pressed new_buttons, bool32 invert_y ) {
   
-  Game_input result;
+  GameInput result;
   
   if( old_buttons.quit || new_buttons.quit )
     result.quit = true;
