@@ -23,22 +23,24 @@ struct Buttons_pressed {
   real32 joy_axis_y = 0.0f;
 };
 
-struct Game_input {
-  bool w_pressed    = false;
-  bool w_held       = false;
-  bool w_released   = false;
-  bool a_pressed    = false;
-  bool a_held       = false;
-  bool a_released   = false;
-  bool s_pressed    = false;
-  bool s_held       = false;
-  bool s_released   = false;
-  bool d_pressed    = false;
-  bool d_held       = false;
-  bool d_released   = false;
-  bool quit         = false;
+struct GameInput {
   real32 joy_axis_x = 0.0f;
   real32 joy_axis_y = 0.0f;
+  
+  bool quit         = false;
+  
+  // bool w_pressed    = false;
+  // bool w_held       = false;
+  // bool w_released   = false;
+  // bool a_pressed    = false;
+  // bool a_held       = false;
+  // bool a_released   = false;
+  // bool s_pressed    = false;
+  // bool s_held       = false;
+  // bool s_released   = false;
+  // bool d_pressed    = false;
+  // bool d_held       = false;
+  // bool d_released   = false;
 };
 
 void reset_game_inputs_pressed( Buttons_pressed* old_buttons, Buttons_pressed* new_buttons ) {
@@ -48,51 +50,73 @@ void reset_game_inputs_pressed( Buttons_pressed* old_buttons, Buttons_pressed* n
   old_buttons -> d = new_buttons -> d;
 }
 
-Game_input get_game_input_state( Buttons_pressed old_buttons, Buttons_pressed new_buttons ) {
+GameInput get_game_input_state( Buttons_pressed old_buttons, Buttons_pressed new_buttons, bool32 invert_y ) {
   
-  Game_input result;
+  GameInput result;
   
   if( old_buttons.quit || new_buttons.quit )
     result.quit = true;
   
-  if( !old_buttons.w && new_buttons.w ) {
-    result.w_pressed  = true;
-    result.w_held     = true;
-  } else if( old_buttons.w && new_buttons.w ) {
-    result.w_held     = true;
-  } else if( old_buttons.w && !new_buttons.w ) {
-    result.w_released = true;
+  // if( !old_buttons.w && new_buttons.w ) {
+  //   result.w_pressed  = true;
+  //   result.w_held     = true;
+  // } else if( old_buttons.w && new_buttons.w ) {
+  //   result.w_held     = true;
+  // } else if( old_buttons.w && !new_buttons.w ) {
+  //   result.w_released = true;
+  // }
+  
+  // if( !old_buttons.a && new_buttons.a ) {
+  //   result.a_pressed  = true;
+  //   result.a_held     = true;
+  // } else if( old_buttons.a && new_buttons.a ) {
+  //   result.a_held     = true;
+  // } else if( old_buttons.a && !new_buttons.a ) {
+  //   result.a_released = true;
+  // }
+  
+  // if( !old_buttons.s && new_buttons.s ) {
+  //   result.s_pressed  = true;
+  //   result.s_held     = true;
+  // } else if( old_buttons.s && new_buttons.s ) {
+  //   result.s_held     = true;
+  // } else if( old_buttons.s && !new_buttons.s ) {
+  //   result.s_released = true;
+  // }
+  
+  // if( !old_buttons.d && new_buttons.d ) {
+  //   result.d_pressed  = true;
+  //   result.d_held     = true;
+  // } else if( old_buttons.d && new_buttons.d ) {
+  //   result.d_held     = true;
+  // } else if( old_buttons.d && !new_buttons.d ) {
+  //   result.d_released = true;
+  // }
+  
+  real32 joy_axis_x = new_buttons.joy_axis_x;
+  real32 joy_axis_y = new_buttons.joy_axis_y;
+  
+  if( joy_axis_x == 0.0f ) {
+    if( new_buttons.d ) {
+      joy_axis_x = 1.0f;
+    } else if( new_buttons.a ) {
+      joy_axis_x = -1.0f;
+    }
+  }
+  if( joy_axis_y == 0.0f ) {
+    if( new_buttons.s ) {
+      joy_axis_y = 1.0f;
+    } else if( new_buttons.w ) {
+      joy_axis_y = -1.0f;
+    }
+  }
+    
+  if( invert_y ) {
+    joy_axis_y = -joy_axis_y;
   }
   
-  if( !old_buttons.a && new_buttons.a ) {
-    result.a_pressed  = true;
-    result.a_held     = true;
-  } else if( old_buttons.a && new_buttons.a ) {
-    result.a_held     = true;
-  } else if( old_buttons.a && !new_buttons.a ) {
-    result.a_released = true;
-  }
-  
-  if( !old_buttons.s && new_buttons.s ) {
-    result.s_pressed  = true;
-    result.s_held     = true;
-  } else if( old_buttons.s && new_buttons.s ) {
-    result.s_held     = true;
-  } else if( old_buttons.s && !new_buttons.s ) {
-    result.s_released = true;
-  }
-  
-  if( !old_buttons.d && new_buttons.d ) {
-    result.d_pressed  = true;
-    result.d_held     = true;
-  } else if( old_buttons.d && new_buttons.d ) {
-    result.d_held     = true;
-  } else if( old_buttons.d && !new_buttons.d ) {
-    result.d_released = true;
-  }
-  
-  result.joy_axis_x = new_buttons.joy_axis_x;
-  result.joy_axis_y = new_buttons.joy_axis_y;
+  result.joy_axis_x = joy_axis_x;
+  result.joy_axis_y = joy_axis_y;
   
   return result;
 }
