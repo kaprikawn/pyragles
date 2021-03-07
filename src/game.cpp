@@ -23,7 +23,7 @@ struct GameObject {
   glm::mat4 model_matrix    = glm::mat4( 1.0f );
   glm::mat4 mvp             = glm::mat4( 1.0f );
   glm::mat4 rotation_matrix = glm::mat4( 1.0f );
-  real32    rotation_x      = 12.7f;
+  real32    rotation_x      = 0.0f;
   real32    rotation_y      = 0.0f;
   real32    rotation_z      = 0.0f;
   int32     position_id;
@@ -39,6 +39,9 @@ struct GameObject {
 uint32 vertex_buffer_current_offset = 0;
 uint32 index_buffer_current_offset  = 0;
 
+// for delta time ( dt )
+uint32 current_time, previous_time, before_frame_flip_time;
+    
 void load_game_object( GameObject* game_object, const char* model_filename, const char* shader_filename ) {
   
   ReadFileResult shader_file = read_entire_file( shader_filename );
@@ -126,6 +129,13 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   glVertexAttribPointer( game_object -> tex_coord0_id , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_tex_coord0_offset );
 }
 
+inline real32 lerp( real32 src, real32 dest, real32 alpha ) {
+  return ( ( src * ( 1 - alpha ) ) + ( dest * alpha ) );
+}
+
+inline real32 lerp_dt( real32 src, real32 dest, real32 smoothing, real32 dt ) {
+  return lerp( src, dest, 1 - pow( smoothing, dt ) );
+}
 
 uint32 init_game( game_memory* memory ) {
   
@@ -153,28 +163,9 @@ uint32 init_game( game_memory* memory ) {
   
   bool32  running = true;
   
-  do {
+  do { // start main loop
     
-    reset_game_inputs_pressed( &old_buttons, &new_buttons );
-    
-    SDL_Event event;
-    while( SDL_PollEvent( &event ) ) {
-      handle_sdl_input_event( &event, &old_buttons, &new_buttons );
-    }
-    
-    Game_input game_input = get_game_input_state( old_buttons, new_buttons );
-    
-    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "x is %f\n", game_input.joy_axis_x );
-    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "y is %f\n", game_input.joy_axis_y );
-        
-    if( game_input.quit )
-      running = false;
-    
-    int32 mvpID;
-    
-    // update and render
-    
-    if( !memory -> isInitialized ) {
+    if( !memory -> isInitialized ) { // on first run
       
       glGenBuffers( 1, &vbo );
       glBindBuffer( GL_ARRAY_BUFFER, vbo );
@@ -200,7 +191,40 @@ uint32 init_game( game_memory* memory ) {
       );
       
       memory -> isInitialized = true;
+      
+      current_time = 1; // so dt calc doesn't do weird things
     }
+    
+    previous_time = current_time;
+    current_time = SDL_GetTicks();
+    
+    uint32 ms_since_last_frame  = current_time - previous_time;
+    real32 dt = ( real32 )ms_since_last_frame / 1000.0f;
+    
+    if( dt > 0.15f ) dt = 0.15f; // prevent weird outliers e.g. first frame
+    
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "%d ms == %f dt\n", ms_since_last_frame, dt );
+    
+    reset_game_inputs_pressed( &old_buttons, &new_buttons );
+    
+    SDL_Event event;
+    while( SDL_PollEvent( &event ) ) {
+      handle_sdl_input_event( &event, &old_buttons, &new_buttons );
+    }
+    
+    bool32 invert_y = false;
+    
+    Game_input game_input = get_game_input_state( old_buttons, new_buttons, invert_y );
+    
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "x is %f\n", game_input.joy_axis_x );
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "y is %f\n", game_input.joy_axis_y );
+        
+    if( game_input.quit )
+      running = false;
+    
+    int32 mvpID;
+    
+    // update and render
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
@@ -216,12 +240,43 @@ uint32 init_game( game_memory* memory ) {
     //   game_objects[ 0 ].rotation_x -= 0.5f;
     // }
     
-    game_objects[ 0 ].rotation_y += game_input.joy_axis_x;
-    game_objects[ 0 ].rotation_x += game_input.joy_axis_y;
+    // game_objects[ 0 ].rotation_y -= game_input.joy_axis_x;
+    // game_objects[ 0 ].rotation_x -= game_input.joy_axis_y;
+    
+    real32 max_rotation_x = 30.0f; // up/down pitch
+    real32 current_x      = game_objects[ 0 ].rotation_x;
+    real32 joy_y          = game_input.joy_axis_y;
+    real32 destination_x;
+    real32 lerp_x;
+    real32 lerp_smoothing = 0.05f;
+    
+    if( current_x > max_rotation_x )
+      current_x -= 360.0f;
+    if( current_x < -max_rotation_x )
+      current_x += 360.0f;
+    
+    
+    if( joy_y < 0.0f ) { // up on the stick
+      destination_x = -( max_rotation_x * joy_y );
+      lerp_x        = lerp_dt( current_x, destination_x, lerp_smoothing, dt );
+    } else if( joy_y > 0.0f ) { // down on the stick
+      //max_rotation_x = -max_rotation_x;
+      destination_x = ( -max_rotation_x * joy_y );
+      lerp_x        = lerp_dt( current_x, destination_x, lerp_smoothing, dt );
+    } else {
+      destination_x = 0.0f;
+      lerp_x        = lerp_dt( current_x, destination_x, lerp_smoothing, dt );
+    }
+    
+    if( joy_y != 0.0f )
+      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy_y = %f, max = %f, dest = %f, lerp = %f, cur = %f\n", joy_y, max_rotation_x, destination_x, lerp_x, current_x );
+    
+    
+    game_objects[ 0 ].rotation_x = lerp_x;
+    
     
     
     game_objects[ 1 ].rotation_y -= 0.8f;
-    
     
     for( uint32 i = 0; i < object_count; i++ ) {
       
@@ -253,8 +308,11 @@ uint32 init_game( game_memory* memory ) {
       
     }
     
+    uint64 before_frame_flip_ticks = SDL_GetTicks();
     
     SDL_GL_SwapWindow( window );
+    
+    uint64 end_frame_ticks = SDL_GetTicks();
     
   } while( running );
   
