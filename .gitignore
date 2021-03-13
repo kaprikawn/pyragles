@@ -3,3 +3,4 @@ builddir/
 build/
 zz*
 .vscode/settings.json
+.vscode/tasks.json
