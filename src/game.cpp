@@ -31,6 +31,7 @@ struct GameObject {
   uint32    mesh_count;
   uint32    tbo;
   MeshData* mesh_data;
+  MeshData* collider_mesh_data;
   uint32*   indices;
   uint32    shader_program_id;
   int32     mvp_id;
@@ -57,7 +58,25 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
   // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "json is %s\n", json_string );
   game_object -> mesh_count = count_meshes( json_string, json_string_length );
-  game_object -> mesh_data = ( MeshData* )malloc( sizeof( MeshData ) * game_object -> mesh_count );
+  
+  uint32 collider_count = 0; // TODO : replace by actually reading the json
+  
+  for( uint32 i = 0; i < game_object -> mesh_count; i++ ) {
+    const uint32 char_buffer_size = 100;
+    char mesh_name[ char_buffer_size ];
+    for( uint32 j = 0; j < char_buffer_size; j++ ) {
+      mesh_name[ j ] = '\0';
+    }
+    populate_mesh_name( i, json_string, json_string_length, mesh_name );
+    if( strings_are_equal( mesh_name, "Collider" ) ) {
+      collider_count++;
+    }
+  }
+  
+  game_object -> mesh_data = ( MeshData* )malloc( sizeof( MeshData ) * ( game_object -> mesh_count - collider_count ) );
+  if( collider_count > 0 ) {
+    game_object -> collider_mesh_data = ( MeshData* )malloc( sizeof( MeshData ) * collider_count );
+  }
   
   for( uint32 i = 0; i < game_object -> mesh_count; i++ ) {
     
@@ -91,10 +110,14 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
     this_mesh.gl_index_offset       = index_buffer_current_offset;
     index_buffer_current_offset    += this_mesh.index_data_in_bytes;
     
-    // upload data to GL
-    glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_vertex_offset, this_mesh.vertex_data_in_bytes, this_mesh.vertex_data );
-    glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_tex_coord0_offset, this_mesh.tex_coord0_data_in_bytes, this_mesh.tex_coord0_data );
-    glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, this_mesh.gl_index_offset, this_mesh.index_data_in_bytes, this_mesh.index_data );
+    if( this_mesh.is_collider ) {
+      mesh_dest = game_object -> collider_mesh_data;
+    } else {
+      // upload data to GL
+      glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_vertex_offset, this_mesh.vertex_data_in_bytes, this_mesh.vertex_data );
+      glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_tex_coord0_offset, this_mesh.tex_coord0_data_in_bytes, this_mesh.tex_coord0_data );
+      glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, this_mesh.gl_index_offset, this_mesh.index_data_in_bytes, this_mesh.index_data );
+    }
     
     // copy data into object
     memcpy( mesh_dest, &this_mesh, sizeof( MeshData ) );
