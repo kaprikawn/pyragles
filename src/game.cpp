@@ -303,6 +303,22 @@ void dump_mat4( real32* mat ) {
   SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "#############################################\n" );
 }
 
+inline void translate( real32* matrix, Position position ) {
+  
+  // real32 x = position.x;
+  // real32 y = position.y;
+  // real32 z = position.z;
+  
+  // real32* matrix_pos = matrix;
+  matrix += 12;
+  
+  *matrix = position.x;
+  matrix++;
+  *matrix = position.y;
+  matrix++;
+  *matrix = position.z;
+}
+
 uint32 init_game( game_memory* memory ) {
   
   SDLObjects sdlObjects;
@@ -329,6 +345,13 @@ uint32 init_game( game_memory* memory ) {
   mat4_multiply( &view_projection_matrix[ 0 ], &view_matrix[ 0 ], &projection_matrix[ 0 ] );
   
   real32  aspect = ( real32 ) sdlObjects.windowWidth / ( real32 ) sdlObjects.windowHeight;
+  
+  glm::mat4 model = glm::mat4( 1.0f );
+  glm::vec3 position = glm::vec3( 1.0f, 2.0f, 3.0f );
+  model = glm::translate( model, position );
+  
+  int y = 7;
+  
   
   uint32  vbo;
   uint32  ibo;
@@ -359,8 +382,8 @@ uint32 init_game( game_memory* memory ) {
       game_objects[ 0 ].position.x -= 2.0f;
       game_objects[ 1 ].position.x += 2.0f;
       
-      // game_objects[ 0 ].model_matrix[ 12 ] = -2.0f;
-      // game_objects[ 1 ].model_matrix[ 12 ] = 2.0f;
+      game_objects[ 0 ].model_matrix[ 12 ] = -2.0f;
+      game_objects[ 1 ].model_matrix[ 12 ] = 2.0f;
       
       glmprojection_matrix = glm::perspective( glm::radians( 70.0f ), aspect, 0.1f, 100.0f );
       
@@ -416,8 +439,8 @@ uint32 init_game( game_memory* memory ) {
     
     game_objects[ 1 ].rotation_y -= 0.8f;
     
-    //for( uint32 i = 0; i < object_count; i++ ) {
-    for( uint32 i = 0; i < 1; i++ ) {
+    for( uint32 i = 0; i < object_count; i++ ) {
+    // for( uint32 i = 0; i < 1; i++ ) {
       
       if( game_objects[ i ].rotation_x > 360.0f ) game_objects[ i ].rotation_x -= 360.0f;
       if( game_objects[ i ].rotation_y > 360.0f ) game_objects[ i ].rotation_y -= 360.0f;
@@ -433,11 +456,11 @@ uint32 init_game( game_memory* memory ) {
       game_objects[ i ].glmmodel_matrix = glm::translate( glm::mat4( 1.0f ), glm::vec3( game_objects[ i ].glmposition ) );
       game_objects[ i ].glmmodel_matrix *= game_objects[ i ].glmrotation_matrix;
       
-      glm::mat4 m = game_objects[ i ].glmmodel_matrix;
-      glm::mat4 v = glmview_matrix;
-      glm::mat4 p = glmprojection_matrix;
-      glm::mat4 vp = p * v;
-      glm::mat4 mvp = vp * m;
+      // glm::mat4 m = game_objects[ i ].glmmodel_matrix;
+      // glm::mat4 v = glmview_matrix;
+      // glm::mat4 p = glmprojection_matrix;
+      // glm::mat4 vp = p * v;
+      // glm::mat4 mvp = vp * m;
     
       // real32 m[ 16 ] = game_objects[ i ].model_matrix;
       // real32 v[ 16 ] = view_matrix;
