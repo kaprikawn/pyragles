@@ -381,9 +381,7 @@ uint32 init_game( game_memory* memory ) {
       
       game_objects[ 0 ].position.x -= 2.0f;
       game_objects[ 1 ].position.x += 2.0f;
-      
-      game_objects[ 0 ].model_matrix[ 12 ] = -2.0f;
-      game_objects[ 1 ].model_matrix[ 12 ] = 2.0f;
+      game_objects[ 1 ].position.z -= 5.0f;
       
       glmprojection_matrix = glm::perspective( glm::radians( 70.0f ), aspect, 0.1f, 100.0f );
       
@@ -441,6 +439,8 @@ uint32 init_game( game_memory* memory ) {
     
     for( uint32 i = 0; i < object_count; i++ ) {
     // for( uint32 i = 0; i < 1; i++ ) {
+      
+      translate( &game_objects[ i ].model_matrix[ 0 ], game_objects[ i ].position );
       
       if( game_objects[ i ].rotation_x > 360.0f ) game_objects[ i ].rotation_x -= 360.0f;
       if( game_objects[ i ].rotation_y > 360.0f ) game_objects[ i ].rotation_y -= 360.0f;
