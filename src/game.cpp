@@ -20,6 +20,8 @@ bool GLLogCall( const char* function, const char* file, int line ) {
 
 real32 view_matrix[ 16 ] = { 0.59f, -0.41f, 0.68f, 0.0f, 0.0f, 0.86f, 0.51f, 0.0f, -0.8f, -0.31f, 0.51f, 0.0f, 0.0f, 0.0f, -5.8f, 1.0f };
 real32 projection_matrix[ 16 ] = { 0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.43f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, -0.2f, 0.0f };
+real32 base_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+
 
 struct Position {
   real32 x;
@@ -264,7 +266,7 @@ void calculate_ship_rotation( GameInput* game_input, GameObject* ship, real32 dt
 }
 
 //                                      view         proj
-void mat4_multiply( real32* dest, real32* mat1, real32* mat2 ) {
+inline void mat4_multiply( real32* dest, real32* mat1, real32* mat2 ) {
   
   real32 result[ 16 ] = {
       mat1[ 0 ] * mat2[ 0 ] + mat1[ 1 ] * mat2[ 4 ] + mat1[ 2 ] * mat2[ 8 ]  + mat1[ 3 ] * mat2[ 12 ]
@@ -317,6 +319,59 @@ inline void translate( real32* matrix, Position position ) {
   *matrix = position.y;
   matrix++;
   *matrix = position.z;
+}
+
+const real32 DEGREES_TO_RADIANS_FACTOR = 0.01745329251994329576923690768489f;
+
+inline void rotate_x( real32* dest, real32 degrees ) {
+  // https://math.stackexchange.com/questions/72014/given-an-angle-in-radians-how-could-i-calculate-a-4x4-rotation-matrix-about-the
+  // https://en.wikipedia.org/wiki/Rotation_matrix ( In three dimensions )
+  real32 radians = degrees * DEGREES_TO_RADIANS_FACTOR; // theta
+  real32 c1r1, c2r1, c1r2, c2r2;
+  c1r1  = cos( radians );
+  c2r1  = sin( radians );
+  c1r2  = -( sin( radians ) );
+  c2r2  = cos( radians );
+  dest += 5;
+  *dest = c1r1;
+  dest++;
+  *dest = c2r1;
+  dest += 3;
+  *dest = c1r2;
+  dest++;
+  *dest = c2r2;
+}
+
+inline void rotate_y( real32* dest, real32 degrees ) {
+  real32 radians = degrees * DEGREES_TO_RADIANS_FACTOR; // theta
+  real32 c0r0, c2r0, c0r2, c2r2;
+  c0r0  = cos( radians );
+  c2r0  = -( sin( radians ) );
+  c0r2  = sin( radians );
+  c2r2  = cos( radians );
+  *dest = c0r0;
+  dest += 2;
+  *dest = c2r0;
+  dest += 6;
+  *dest = c0r2;
+  dest += 2;
+  *dest = c2r2;
+}
+
+inline void rotate_z( real32* dest, real32 degrees ) {
+  real32 radians = degrees * DEGREES_TO_RADIANS_FACTOR; // theta
+  real32 c0r0, c1r0, c0r1, c1r1;
+  c0r0  = cos( radians );
+  c1r0  = sin( radians );
+  c0r1  = -( sin( radians ) );
+  c1r1  = cos( radians );
+  *dest = c0r0;
+  dest++;
+  *dest = c1r0;
+  dest += 3;
+  *dest = c0r1;
+  dest++;
+  *dest = c1r1;
 }
 
 uint32 init_game( game_memory* memory ) {
@@ -435,12 +490,11 @@ uint32 init_game( game_memory* memory ) {
     
     calculate_ship_rotation( &game_input, &game_objects[ 0 ], dt );
     
-    game_objects[ 1 ].rotation_y -= 0.8f;
+    game_objects[ 1 ].rotation_x += 0.02f;
+    game_objects[ 1 ].rotation_y += 2.0f;
+    // game_objects[ 1 ].rotation_z += 6.0f;
     
     for( uint32 i = 0; i < object_count; i++ ) {
-    // for( uint32 i = 0; i < 1; i++ ) {
-      
-      translate( &game_objects[ i ].model_matrix[ 0 ], game_objects[ i ].position );
       
       if( game_objects[ i ].rotation_x > 360.0f ) game_objects[ i ].rotation_x -= 360.0f;
       if( game_objects[ i ].rotation_y > 360.0f ) game_objects[ i ].rotation_y -= 360.0f;
@@ -449,9 +503,37 @@ uint32 init_game( game_memory* memory ) {
       if( game_objects[ i ].rotation_y < 0.0f )   game_objects[ i ].rotation_y += 360.0f;
       if( game_objects[ i ].rotation_z < 0.0f )   game_objects[ i ].rotation_z += 360.0f;
       
-      game_objects[ i ].glmrotation_matrix = glm::rotate( glm::mat4( 1.0f )   , glm::radians( game_objects[ i ].rotation_x ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
-      game_objects[ i ].glmrotation_matrix = glm::rotate( game_objects[ i ].glmrotation_matrix, glm::radians( game_objects[ i ].rotation_y ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-      game_objects[ i ].glmrotation_matrix = glm::rotate( game_objects[ i ].glmrotation_matrix, glm::radians( game_objects[ i ].rotation_z ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+      real32 model_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      real32 rot_mat_x[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      real32 rot_mat_y[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      real32 rot_mat_z[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      
+      translate( &model_matrix[ 0 ], game_objects[ i ].position );
+      rotate_x( &rot_mat_x[ 0 ], game_objects[ i ].rotation_x );
+      rotate_y( &rot_mat_y[ 0 ], game_objects[ i ].rotation_y );
+      rotate_z( &rot_mat_z[ 0 ], game_objects[ i ].rotation_z );
+      
+      real32 rot_mat_xy[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      real32 rot_mat_xyz[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      mat4_multiply( &rot_mat_xy[ 0 ], &rot_mat_y[ 0 ], &rot_mat_x[ 0 ] );
+      mat4_multiply( &rot_mat_xyz[ 0 ], &rot_mat_z[ 0 ], &rot_mat_xy[ 0 ] );
+      
+      mat4_multiply( &model_matrix[ 0 ], &rot_mat_xyz[ 0 ], &model_matrix[ 0 ] );
+      
+      glm::mat4 r = glm::mat4( 1.0f );
+      glm::mat4 glmrx = glm::rotate( r, glm::radians( game_objects[ i ].rotation_x ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+      glm::mat4 glmry = glm::rotate( r, glm::radians( game_objects[ i ].rotation_y ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+      glm::mat4 glmrz = glm::rotate( r, glm::radians( game_objects[ i ].rotation_z ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+      
+      glm::mat4 glmrxy = glmrx * glmry;
+      glm::mat4 glmrxyz = glmrxy * glmrz;
+      
+      
+      int z = 7;
+      
+      // game_objects[ i ].glmrotation_matrix = glm::rotate( glm::mat4( 1.0f )   , glm::radians( game_objects[ i ].rotation_x ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+      // game_objects[ i ].glmrotation_matrix = glm::rotate( game_objects[ i ].glmrotation_matrix, glm::radians( game_objects[ i ].rotation_y ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+      // game_objects[ i ].glmrotation_matrix = glm::rotate( game_objects[ i ].glmrotation_matrix, glm::radians( game_objects[ i ].rotation_z ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
       
       game_objects[ i ].glmmodel_matrix = glm::translate( glm::mat4( 1.0f ), glm::vec3( game_objects[ i ].glmposition ) );
       game_objects[ i ].glmmodel_matrix *= game_objects[ i ].glmrotation_matrix;
@@ -471,7 +553,7 @@ uint32 init_game( game_memory* memory ) {
       game_objects[ i ].glmmvp = glmprojection_matrix * glmview_matrix * game_objects[ i ].glmmodel_matrix;
       
       // multiply model matrix with the view-projection matrix to get the mvp matrix
-      mat4_multiply( &game_objects[ i ].mvp[ 0 ], &game_objects[ i ].model_matrix[ 0 ], &view_projection_matrix[ 0 ] );
+      mat4_multiply( &game_objects[ i ].mvp[ 0 ], &model_matrix[ 0 ], &view_projection_matrix[ 0 ] );
       
       glUseProgram( game_objects[ i ].shader_program_id );
       // glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &game_objects[ i ].glmmvp[0][0] );
