@@ -374,6 +374,22 @@ inline void rotate_z( real32* dest, real32 degrees ) {
   *dest = c1r1;
 }
 
+void populate_perspective_matrix( real32* dest, real32 fov_degrees, real32 aspect, real32 near_plane, real32 far_plane ) {
+  
+  real32 fov_radians = fov_degrees * DEGREES_TO_RADIANS_FACTOR;
+  const real32 tan_half_fov = tan( fov_radians / 2.0f );
+  
+  *dest = 1.0f / ( aspect * tan_half_fov );
+  dest += 5;
+  *dest = 1.0f / tan_half_fov;
+  dest += 5;
+  *dest = -( far_plane + near_plane ) / ( far_plane - near_plane );
+  dest++;
+  *dest = -1.0f;
+  dest += 3;
+  *dest = -( 2.0f * far_plane * near_plane ) / ( far_plane - near_plane );
+}
+
 uint32 init_game( game_memory* memory ) {
   
   SDLObjects sdlObjects;
@@ -448,11 +464,21 @@ uint32 init_game( game_memory* memory ) {
       
       glm_projection_view_matrix = glmprojection_matrix * glmview_matrix;
       
+      // projection matrix
+      real32 p[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+      real32 fov = 70.0f;
+      real32 near_plane = 0.1f;
+      real32 far_plane = 100.0f;
+      populate_perspective_matrix( &p[ 0 ], fov, aspect, near_plane, far_plane );
+      
+      
       // dump_mat4( &glm_projection_view_matrix[ 0 ] );
       
       memory -> isInitialized = true;
       
       current_time = 1; // so dt calc doesn't do weird things
+      
+      
     }
     
     previous_time = current_time;
