@@ -22,6 +22,8 @@ real32 view_matrix[ 16 ] = { 0.59f, -0.41f, 0.68f, 0.0f, 0.0f, 0.86f, 0.51f, 0.0
 real32 projection_matrix[ 16 ] = { 0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.43f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, -0.2f, 0.0f };
 real32 base_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
+real32 vp[ 16 ];
+real32 mvp[ 16 ];
 
 struct Position {
   real32 x;
@@ -555,6 +557,8 @@ uint32 init_game( game_memory* memory ) {
       populate_view_matrix( &v[ 0 ], eye, centre );
       // dump_mat4( &glm_projection_view_matrix[ 0 ] );
       
+      mat4_multiply( &vp[ 0 ], &v[ 0 ], &p[ 0 ] );
+      
       memory -> isInitialized = true;
       
       current_time = 1; // so dt calc doesn't do weird things
@@ -660,7 +664,8 @@ uint32 init_game( game_memory* memory ) {
       game_objects[ i ].glmmvp = glmprojection_matrix * glmview_matrix * game_objects[ i ].glmmodel_matrix;
       
       // multiply model matrix with the view-projection matrix to get the mvp matrix
-      mat4_multiply( &game_objects[ i ].mvp[ 0 ], &model_matrix[ 0 ], &view_projection_matrix[ 0 ] );
+      // mat4_multiply( &game_objects[ i ].mvp[ 0 ], &model_matrix[ 0 ], &view_projection_matrix[ 0 ] );
+      mat4_multiply( &game_objects[ i ].mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
       
       glUseProgram( game_objects[ i ].shader_program_id );
       // glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &game_objects[ i ].glmmvp[0][0] );
