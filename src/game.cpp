@@ -22,9 +22,6 @@ real32 view_matrix[ 16 ] = { 0.59f, -0.41f, 0.68f, 0.0f, 0.0f, 0.86f, 0.51f, 0.0
 real32 projection_matrix[ 16 ] = { 0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.43f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, -0.2f, 0.0f };
 real32 base_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
-real32 vp[ 16 ];
-real32 mvp[ 16 ];
-
 struct Position {
   real32 x;
   real32 y;
@@ -32,22 +29,22 @@ struct Position {
 };
 
 struct Mat4 {
-  real32  r1c1 = 1.0f;
-  real32  r1c2 = 0.0f;
-  real32  r1c3 = 0.0f;
-  real32  r1c4 = 0.0f;
-  real32  r2c1 = 0.0f;
-  real32  r2c2 = 1.0f;
-  real32  r2c3 = 0.0f;
-  real32  r2c4 = 0.0f;
-  real32  r3c1 = 0.0f;
-  real32  r3c2 = 0.0f;
-  real32  r3c3 = 1.0f;
-  real32  r3c4 = 0.0f;
-  real32  r4c1 = 0.0f;
-  real32  r4c2 = 0.0f;
-  real32  r4c3 = 0.0f;
-  real32  r4c4 = 1.0f;
+  real32  m00 = 1.0f;
+  real32  m01 = 0.0f;
+  real32  m02 = 0.0f;
+  real32  m03 = 0.0f;
+  real32  m10 = 0.0f;
+  real32  m11 = 1.0f;
+  real32  m12 = 0.0f;
+  real32  m13 = 0.0f;
+  real32  m20 = 0.0f;
+  real32  m21 = 0.0f;
+  real32  m22 = 1.0f;
+  real32  m23 = 0.0f;
+  real32  m30 = 0.0f;
+  real32  m31 = 0.0f;
+  real32  m32 = 0.0f;
+  real32  m33 = 1.0f;
 };
 
 struct GameObject {
@@ -482,11 +479,9 @@ uint32 init_game( game_memory* memory ) {
   // real32 view_matrix[ 16 ]        = { 0.59f, -4.11f, 0.68f, 0.0f, 0.0f, 0.86f, 0.51f, 0.0f, -0.8f, -0.31f, 0.51f, 0.0f, 0.0f, 0.0f, -5.8f, 1.0f };
   // real32 projection_matrix[ 16 ]  = { 0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.43f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, -0.2f, 0.0f };
   
-  real32 view_projection_matrix[ 16 ];
-  
-  mat4_multiply( &view_projection_matrix[ 0 ], &view_matrix[ 0 ], &projection_matrix[ 0 ] );
-  
   real32  aspect = ( real32 ) sdlObjects.windowWidth / ( real32 ) sdlObjects.windowHeight;
+  
+  real32 vp[ 16 ] = {};
   
   uint32  vbo;
   uint32  ibo;
@@ -611,13 +606,13 @@ uint32 init_game( game_memory* memory ) {
       // real32 vp[ 16 ] = p * v;
       // real32 mvp[ 16 ] = vp * m;
     
-      
+      real32 mvp[ 16 ] = {};
       // multiply model matrix with the view-projection matrix to get the mvp matrix
       // mat4_multiply( &game_objects[ i ].mvp[ 0 ], &model_matrix[ 0 ], &view_projection_matrix[ 0 ] );
-      mat4_multiply( &game_objects[ i ].mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
+      mat4_multiply( &mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
       
       glUseProgram( game_objects[ i ].shader_program_id );
-      glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &game_objects[i].mvp[0] );
+      glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &mvp[0] );
       // glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
       
       glVertexAttribPointer( game_objects[ i ].position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_vertex_offset );
