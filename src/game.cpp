@@ -51,11 +51,7 @@ struct Mat4 {
 };
 
 struct GameObject {
-  glm::vec4 glmposition        = glm::vec4( 0.0f, 0.0f, 0.0f, 1.0f );
-  glm::mat4 glmmodel_matrix    = glm::mat4( 1.0f );
-  glm::mat4 glmmvp             = glm::mat4( 1.0f );
-  glm::mat4 glmrotation_matrix = glm::mat4( 1.0f );
-  real32    model_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+  uint32    id;
   real32    mvp[ 16 ];
   Position  position;
   real32    rotation_x      = 0.0f;
@@ -480,10 +476,6 @@ uint32 init_game( game_memory* memory ) {
   
   SDL_Window* window = sdlObjects.window;
   
-  glm::mat4 glmprojection_matrix;
-  glm::mat4 glmview_matrix;
-  glm::mat4 glm_projection_view_matrix;
-  
   // Mat4 view_matrix;
   // Mat4 projection_matrix;
   
@@ -495,13 +487,6 @@ uint32 init_game( game_memory* memory ) {
   mat4_multiply( &view_projection_matrix[ 0 ], &view_matrix[ 0 ], &projection_matrix[ 0 ] );
   
   real32  aspect = ( real32 ) sdlObjects.windowWidth / ( real32 ) sdlObjects.windowHeight;
-  
-  glm::mat4 model = glm::mat4( 1.0f );
-  glm::vec3 position = glm::vec3( 1.0f, 2.0f, 3.0f );
-  model = glm::translate( model, position );
-  
-  int y = 7;
-  
   
   uint32  vbo;
   uint32  ibo;
@@ -533,16 +518,6 @@ uint32 init_game( game_memory* memory ) {
       game_objects[ 1 ].position.x += 2.0f;
       game_objects[ 1 ].position.z -= 5.0f;
       
-      glmprojection_matrix = glm::perspective( glm::radians( 70.0f ), aspect, 0.1f, 100.0f );
-      
-      glmview_matrix = glm::lookAt(
-          glm::vec3( 4, 3, 3 )
-        , glm::vec3( 1, 1, 1 )
-        , glm::vec3( 0, 1, 0 )
-      );
-      
-      glm_projection_view_matrix = glmprojection_matrix * glmview_matrix;
-      
       // projection matrix
       real32 p[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
       real32 fov = 70.0f;
@@ -555,7 +530,6 @@ uint32 init_game( game_memory* memory ) {
       
       real32 v[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
       populate_view_matrix( &v[ 0 ], eye, centre );
-      // dump_mat4( &glm_projection_view_matrix[ 0 ] );
       
       mat4_multiply( &vp[ 0 ], &v[ 0 ], &p[ 0 ] );
       
@@ -631,44 +605,18 @@ uint32 init_game( game_memory* memory ) {
       
       mat4_multiply( &model_matrix[ 0 ], &rot_mat_xyz[ 0 ], &model_matrix[ 0 ] );
       
-      glm::mat4 r = glm::mat4( 1.0f );
-      glm::mat4 glmrx = glm::rotate( r, glm::radians( game_objects[ i ].rotation_x ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
-      glm::mat4 glmry = glm::rotate( r, glm::radians( game_objects[ i ].rotation_y ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-      glm::mat4 glmrz = glm::rotate( r, glm::radians( game_objects[ i ].rotation_z ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
-      
-      glm::mat4 glmrxy = glmrx * glmry;
-      glm::mat4 glmrxyz = glmrxy * glmrz;
-      
-      
-      int z = 7;
-      
-      // game_objects[ i ].glmrotation_matrix = glm::rotate( glm::mat4( 1.0f )   , glm::radians( game_objects[ i ].rotation_x ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
-      // game_objects[ i ].glmrotation_matrix = glm::rotate( game_objects[ i ].glmrotation_matrix, glm::radians( game_objects[ i ].rotation_y ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
-      // game_objects[ i ].glmrotation_matrix = glm::rotate( game_objects[ i ].glmrotation_matrix, glm::radians( game_objects[ i ].rotation_z ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
-      
-      game_objects[ i ].glmmodel_matrix = glm::translate( glm::mat4( 1.0f ), glm::vec3( game_objects[ i ].glmposition ) );
-      game_objects[ i ].glmmodel_matrix *= game_objects[ i ].glmrotation_matrix;
-      
-      // glm::mat4 m = game_objects[ i ].glmmodel_matrix;
-      // glm::mat4 v = glmview_matrix;
-      // glm::mat4 p = glmprojection_matrix;
-      // glm::mat4 vp = p * v;
-      // glm::mat4 mvp = vp * m;
-    
       // real32 m[ 16 ] = game_objects[ i ].model_matrix;
       // real32 v[ 16 ] = view_matrix;
       // real32 p[ 16 ] = projection_matrix;
       // real32 vp[ 16 ] = p * v;
       // real32 mvp[ 16 ] = vp * m;
     
-      game_objects[ i ].glmmvp = glmprojection_matrix * glmview_matrix * game_objects[ i ].glmmodel_matrix;
       
       // multiply model matrix with the view-projection matrix to get the mvp matrix
       // mat4_multiply( &game_objects[ i ].mvp[ 0 ], &model_matrix[ 0 ], &view_projection_matrix[ 0 ] );
       mat4_multiply( &game_objects[ i ].mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
       
       glUseProgram( game_objects[ i ].shader_program_id );
-      // glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &game_objects[ i ].glmmvp[0][0] );
       glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &game_objects[i].mvp[0] );
       // glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
       

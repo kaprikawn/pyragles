@@ -9,8 +9,6 @@
 #include <GL/glew.h>
 #include "SDL.h"
 #include "SDL_opengl.h"
-#include "../vendor/glm/glm.hpp"
-#include "../vendor/glm/gtc/matrix_transform.hpp"
 #include <shlwapi.h>
 
 #elif __linux__
@@ -18,9 +16,6 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengles2.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include <sys/stat.h>
 #include <fcntl.h>
