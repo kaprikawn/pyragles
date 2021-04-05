@@ -390,6 +390,83 @@ void populate_perspective_matrix( real32* dest, real32 fov_degrees, real32 aspec
   *dest = -( 2.0f * far_plane * near_plane ) / ( far_plane - near_plane );
 }
 
+void normalise_vec3( real32* x, real32* y, real32* z ) {
+  // https://www.google.com/search?q=normalize+3d+vector&rlz=1C1CHBD_en-GBGB936GB936&oq=normalize+3d+vector&aqs=chrome..69i57.5830j0j7&sourceid=chrome&ie=UTF-8#kpvalbx=_DqBpYLTWLoe0gQblyLGIDQ21
+  
+  real32 temp_x = *x;
+  real32 temp_y = *y;
+  real32 temp_z = *z;
+  
+  real32 length = sqrt( ( temp_x * temp_x ) + ( temp_y * temp_y ) + ( temp_z * temp_z ) );
+  
+  real32 set_x = temp_x / length;
+  real32 set_y = temp_y / length;
+  real32 set_z = temp_z / length;
+  
+  *x = set_x;
+  *y = set_y;
+  *z = set_z;
+}
+
+void populate_view_matrix( real32* dest, Position eye, Position centre ) {
+  // https://www.3dgep.com/understanding-the-view-matrix/
+  // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/cross.xhtml
+  
+  Position up = { 0.0f, 1.0f, 0.0f };
+  
+  Position f;
+  Position s;
+  Position u;
+  
+  f.x = centre.x - eye.x;
+  f.y = centre.y - eye.y;
+  f.z = centre.z - eye.z;
+  
+  normalise_vec3( &f.x, &f.y, &f.z );
+  
+  s.x = f.y * up.z - up.y * f.z;
+  s.y = f.z * up.x - up.z * f.x;
+  s.z = f.x * up.y - up.x * f.y;
+  
+  normalise_vec3( &s.x, &s.y, &s.z );
+  
+  u.x = s.y * f.z - f.y * s.z;
+  u.y = s.z * f.x - f.z * s.x;
+  u.z = s.x * f.y - f.x * s.y;
+  
+  // Result[0][0] = s.x;
+  // Result[0][1] = u.x;
+  // Result[0][2] =-f.x;
+  // Result[1][0] = s.y;
+  // Result[1][1] = u.y;
+  // Result[1][2] =-f.y;
+  // Result[2][0] = s.z;
+  // Result[2][1] = u.z;
+  // Result[2][2] =-f.z;
+  // Result[3][0] =-dot(s, eye);
+  // Result[3][1] =-dot(u, eye);
+  // Result[3][2] = dot(f, eye);
+
+  
+  *dest = s.x; dest++;
+  *dest = u.x; dest++;
+  *dest = -f.x; dest++;
+  dest++;
+  *dest = s.y; dest++;
+  *dest = u.y; dest++;
+  *dest = -f.y; dest++;
+  dest++;
+  *dest = s.z; dest++;
+  *dest = u.z; dest++;
+  *dest = -f.z; dest++;
+  dest++;
+  *dest = -( s.x * eye.x + s.y * eye.y + s.z * eye.z ); dest++;
+  *dest = -( u.x * eye.x + u.y * eye.y + u.z * eye.z ); dest++;
+  *dest = f.x * eye.x + f.y * eye.y + f.z * eye.z;
+  
+  int y = 7;
+}
+
 uint32 init_game( game_memory* memory ) {
   
   SDLObjects sdlObjects;
@@ -458,7 +535,7 @@ uint32 init_game( game_memory* memory ) {
       
       glmview_matrix = glm::lookAt(
           glm::vec3( 4, 3, 3 )
-        , glm::vec3( 0, 0, 0 )
+        , glm::vec3( 1, 1, 1 )
         , glm::vec3( 0, 1, 0 )
       );
       
@@ -471,7 +548,11 @@ uint32 init_game( game_memory* memory ) {
       real32 far_plane = 100.0f;
       populate_perspective_matrix( &p[ 0 ], fov, aspect, near_plane, far_plane );
       
+      Position eye = { 4.0f, 3.0f, 3.0f };
+      Position centre = { 1.0f, 1.0f, 1.0f };
       
+      real32 v[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      populate_view_matrix( &v[ 0 ], eye, centre );
       // dump_mat4( &glm_projection_view_matrix[ 0 ] );
       
       memory -> isInitialized = true;
