@@ -46,6 +46,7 @@ struct GameObject {
   real32    rotation_y      = 0.0f;
   real32    rotation_z      = 0.0f;
   int32     position_id;
+  int32     normal_id;
   int32     tex_coord0_id;
   uint32    mesh_count;
   uint32    tbo;
@@ -124,6 +125,10 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
     
     this_mesh.gl_vertex_offset      = vertex_buffer_current_offset;
     vertex_buffer_current_offset   += this_mesh.vertex_data_in_bytes;
+    this_mesh.gl_normal_offset      = vertex_buffer_current_offset;
+    vertex_buffer_current_offset   += this_mesh.normal_data_in_bytes;
+    this_mesh.gl_tex_coord0_offset  = vertex_buffer_current_offset;
+    vertex_buffer_current_offset   += this_mesh.tex_coord0_data_in_bytes;
     this_mesh.gl_tex_coord0_offset  = vertex_buffer_current_offset;
     vertex_buffer_current_offset   += this_mesh.tex_coord0_data_in_bytes;
     this_mesh.gl_index_offset       = index_buffer_current_offset;
@@ -134,6 +139,7 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
     } else {
       // upload data to GL
       glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_vertex_offset, this_mesh.vertex_data_in_bytes, this_mesh.vertex_data );
+      glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_normal_offset, this_mesh.normal_data_in_bytes, this_mesh.normal_data );
       glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_tex_coord0_offset, this_mesh.tex_coord0_data_in_bytes, this_mesh.tex_coord0_data );
       glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, this_mesh.gl_index_offset, this_mesh.index_data_in_bytes, this_mesh.index_data );
     }
@@ -160,14 +166,17 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   glBindTexture( GL_TEXTURE_2D, game_object -> tbo );
   
   game_object -> position_id   = glGetAttribLocation( game_object -> shader_program_id,  "aPosition" );
+  game_object -> normal_id     = glGetAttribLocation( game_object -> shader_program_id,  "aNormal" );
   game_object -> tex_coord0_id = glGetAttribLocation( game_object -> shader_program_id,  "aTexCoord" );
   
   game_object -> mvp_id = glGetUniformLocation( game_object -> shader_program_id, "uMVP" );
   
   glEnableVertexAttribArray( game_object -> position_id );
+  glEnableVertexAttribArray( game_object -> normal_id );
   glEnableVertexAttribArray( game_object -> tex_coord0_id );
   
   glVertexAttribPointer( game_object -> position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_vertex_offset );
+  glVertexAttribPointer( game_object -> normal_id     , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_normal_offset );
   glVertexAttribPointer( game_object -> tex_coord0_id , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_tex_coord0_offset );
 }
 
@@ -323,8 +332,8 @@ uint32 init_game( game_memory* memory ) {
       glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
       
       GameObject ship;
-      load_game_object( &game_objects[ 0 ], "modelShip.glb"    , "shaderBasic.glsl" );
-      load_game_object( &game_objects[ 1 ], "modelEnemyPod.glb", "shaderBasic.glsl" );
+      load_game_object( &game_objects[ 0 ], "modelPlane.glb"   , "shaderLight.glsl" );
+      load_game_object( &game_objects[ 1 ], "modelEnemyPod.glb", "shaderLight.glsl" );
       
       game_objects[ 0 ].position.x -= 2.0f;
       game_objects[ 1 ].position.x += 2.0f;
@@ -433,6 +442,7 @@ uint32 init_game( game_memory* memory ) {
       // glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
       
       glVertexAttribPointer( game_objects[ i ].position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_vertex_offset );
+      glVertexAttribPointer( game_objects[ i ].normal_id     , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_normal_offset );
       glVertexAttribPointer( game_objects[ i ].tex_coord0_id , 2, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_tex_coord0_offset );
       
       glBindTexture( GL_TEXTURE_2D, game_objects[ i ].tbo );
