@@ -899,7 +899,7 @@ BufferViewData get_buffer_view_data( uint32 target_buffer_view_index, const char
   return result;
 }
 
-MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, ReadFileResult* gltf_file ) {
+MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, ReadFileResult* gltf_file, real32 scale ) {
   
   MeshData result;
   
@@ -964,6 +964,19 @@ MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, 
     result.image_data_in_bytes            = image_buffer_view_data.byte_length;
     uint32 image_data_total_offset        = bin_start_offset + image_buffer_view_data.byte_offset;
     result.image_data                     = ( uint8* )( ( char* )gltf_contents + image_data_total_offset );
+  }
+  
+  if( scale != 1.0f ) {
+    real32* value = result.vertex_data;
+    
+    for( uint32 i = 0; i < result.vertex_count; i++ ) {
+      real32 this_float = *value;
+      
+      this_float *= scale;
+      *value = this_float;
+      
+      value++;
+    }
   }
   
   return result;

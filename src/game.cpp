@@ -55,6 +55,8 @@ struct GameObject {
   uint32*   indices;
   uint32    shader_program_id;
   int32     mvp_id;
+  int32     model_id;
+  int32     model_view_id;
 };
 
 uint32 vertex_buffer_current_offset = 0;
@@ -63,7 +65,7 @@ uint32 index_buffer_current_offset  = 0;
 // for delta time ( dt )
 uint32 current_time, previous_time, before_frame_flip_time;
     
-void load_game_object( GameObject* game_object, const char* model_filename, const char* shader_filename ) {
+void load_game_object( GameObject* game_object, const char* model_filename, const char* shader_filename, real32 scale = 1.0f ) {
   
   ReadFileResult shader_file = read_entire_file( shader_filename );
   
@@ -100,7 +102,7 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   
   for( uint32 i = 0; i < game_object -> mesh_count; i++ ) {
     
-    MeshData this_mesh = populate_mesh_data( i, json_string, &gltf_file );
+    MeshData this_mesh = populate_mesh_data( i, json_string, &gltf_file, scale );
     uint32 index_count = this_mesh.index_count;
     
     this_mesh.index_data = ( uint32* )malloc( sizeof( uint32 ) * index_count );
@@ -169,7 +171,9 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   game_object -> normal_id     = glGetAttribLocation( game_object -> shader_program_id,  "aNormal" );
   game_object -> tex_coord0_id = glGetAttribLocation( game_object -> shader_program_id,  "aTexCoord" );
   
-  game_object -> mvp_id = glGetUniformLocation( game_object -> shader_program_id, "uMVP" );
+  game_object -> mvp_id         = glGetUniformLocation( game_object -> shader_program_id, "uMVP" );
+  game_object -> model_view_id  = glGetUniformLocation( game_object -> shader_program_id, "uModelViewMatrix" );
+  //game_object -> model_id = glGetUniformLocation( game_object -> shader_program_id, "uModel" );
   
   glEnableVertexAttribArray( game_object -> position_id );
   glEnableVertexAttribArray( game_object -> normal_id );
@@ -307,7 +311,8 @@ uint32 init_game( game_memory* memory ) {
   
   real32  aspect = ( real32 ) sdlObjects.windowWidth / ( real32 ) sdlObjects.windowHeight;
   
-  real32 vp[ 16 ] = {};
+  real32 vp[ 16 ] = {}; // view projection matrix
+  real32 v[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
   
   uint32  vbo;
   uint32  ibo;
@@ -332,12 +337,13 @@ uint32 init_game( game_memory* memory ) {
       glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
       
       GameObject ship;
-      load_game_object( &game_objects[ 0 ], "modelPlane.glb"   , "shaderLight.glsl" );
-      load_game_object( &game_objects[ 1 ], "modelEnemyPod.glb", "shaderLight.glsl" );
+      load_game_object( &game_objects[ 0 ], "modelPlane2.glb"   , "shaderLight.glsl", 1.0f );
+      load_game_object( &game_objects[ 1 ], "modelEnemyPod.glb" , "shaderLight.glsl" );
       
       game_objects[ 0 ].position.x -= 2.0f;
       game_objects[ 1 ].position.x += 2.0f;
       game_objects[ 1 ].position.z -= 5.0f;
+      game_objects[ 1 ].position.y += 5.0f;
       
       // projection matrix
       real32 p[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
@@ -346,10 +352,9 @@ uint32 init_game( game_memory* memory ) {
       real32 far_plane = 100.0f;
       populate_perspective_matrix( &p[ 0 ], fov, aspect, near_plane, far_plane );
       
-      Position eye = { 4.0f, 3.0f, 3.0f };
+      Position eye = { 20.0f, 15.0f, 12.0f };
       Position centre = { 1.0f, 1.0f, 1.0f };
       
-      real32 v[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
       populate_view_matrix( &v[ 0 ], eye, centre );
       
       mat4_multiply( &vp[ 0 ], &v[ 0 ], &p[ 0 ] );
@@ -432,13 +437,18 @@ uint32 init_game( game_memory* memory ) {
       // real32 vp[ 16 ] = p * v;
       // real32 mvp[ 16 ] = vp * m;
     
-      real32 mvp[ 16 ] = {};
+      real32 mvp[ 16 ]  = {}; // model view projection matrix
+      real32 mv[ 16 ]   = {}; // model view matrix
+      
       // multiply model matrix with the view-projection matrix to get the mvp matrix
       // mat4_multiply( &game_objects[ i ].mvp[ 0 ], &model_matrix[ 0 ], &view_projection_matrix[ 0 ] );
       mat4_multiply( &mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
+      mat4_multiply( &mv[ 0 ] , &model_matrix[ 0 ], &v[ 0 ] );
       
       glUseProgram( game_objects[ i ].shader_program_id );
-      glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &mvp[0] );
+      glUniformMatrix4fv( game_objects[ i ].mvp_id        , 1, GL_FALSE, &mvp[0] );
+      glUniformMatrix4fv( game_objects[ i ].model_view_id , 1, GL_FALSE, &mv[0] );
+      //glUniformMatrix4fv( game_objects[ i ].model_id, 1, GL_FALSE, &model_matrix[0] );
       // glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
       
       glVertexAttribPointer( game_objects[ i ].position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_vertex_offset );
