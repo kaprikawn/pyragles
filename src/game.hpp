@@ -349,6 +349,8 @@ bool32 strings_are_equal( const char* str1, const char* str2 ) {
 
 uint32 compileShader( uint32 type, const char* source ) {
   
+  // std::cout << "##source is " << "\n\n" << source << std::endl;
+  
   uint32 id = glCreateShader( type );
   glShaderSource( id, 1, &source, nullptr );
   glCompileShader( id );

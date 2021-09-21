@@ -342,7 +342,7 @@ uint32 init_game( game_memory* memory ) {
       glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
       
       GameObject ship;
-      load_game_object( &game_objects[ 0 ], "modelShip.glb"   , "shaderLight.glsl", 1.0f );
+      load_game_object( &game_objects[ 0 ], "modelShip.glb"     , "shaderLight.glsl" );
       load_game_object( &game_objects[ 1 ], "modelEnemyPod.glb" , "shaderLight.glsl" );
       
       game_objects[ 0 ].position.x -= 2.0f;
