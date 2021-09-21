@@ -1,3 +1,4 @@
+
 #shader vertex
 #version 100
 
@@ -28,7 +29,7 @@ void main() {
   
   vec3  normal = normalize( vec3( uModelMatrix * vec4( aNormal, 0 ) ) ); // the '0' after aNormal makes sure we don't apply position transform
   
-  float diffuse = clamp( dot( lightVector, normal ), 0, 1 );
+  float diffuse = clamp( dot( lightVector, normal ), 0.0, 1.0 );
   brightness    = diffuse + uAmbientLight; // send brighness to fs
 }
 
