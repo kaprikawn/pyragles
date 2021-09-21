@@ -57,6 +57,7 @@ struct GameObject {
   int32     mvp_id;
   int32     model_id;
   int32     model_view_id;
+  int32     light_position_id;
 };
 
 uint32 vertex_buffer_current_offset = 0;
@@ -64,6 +65,7 @@ uint32 index_buffer_current_offset  = 0;
 
 // for delta time ( dt )
 uint32 current_time, previous_time, before_frame_flip_time;
+
     
 void load_game_object( GameObject* game_object, const char* model_filename, const char* shader_filename, real32 scale = 1.0f ) {
   
@@ -167,13 +169,12 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data );
   glBindTexture( GL_TEXTURE_2D, game_object -> tbo );
   
-  game_object -> position_id   = glGetAttribLocation( game_object -> shader_program_id,  "aPosition" );
-  game_object -> normal_id     = glGetAttribLocation( game_object -> shader_program_id,  "aNormal" );
-  game_object -> tex_coord0_id = glGetAttribLocation( game_object -> shader_program_id,  "aTexCoord" );
-  
-  game_object -> mvp_id         = glGetUniformLocation( game_object -> shader_program_id, "uMVP" );
-  game_object -> model_view_id  = glGetUniformLocation( game_object -> shader_program_id, "uModelViewMatrix" );
-  //game_object -> model_id = glGetUniformLocation( game_object -> shader_program_id, "uModel" );
+  game_object -> position_id        = glGetAttribLocation( game_object -> shader_program_id,  "aPosition" );
+  game_object -> normal_id          = glGetAttribLocation( game_object -> shader_program_id,  "aNormal" );
+  game_object -> tex_coord0_id      = glGetAttribLocation( game_object -> shader_program_id,  "aTexCoord" );
+  game_object -> mvp_id             = glGetUniformLocation( game_object -> shader_program_id, "uMVP" );
+  game_object -> model_view_id      = glGetUniformLocation( game_object -> shader_program_id, "uModelViewMatrix" );
+  game_object -> light_position_id  = glGetUniformLocation( game_object -> shader_program_id, "uLightPosition" );
   
   glEnableVertexAttribArray( game_object -> position_id );
   glEnableVertexAttribArray( game_object -> normal_id );
@@ -308,6 +309,8 @@ uint32 init_game( game_memory* memory ) {
   
   // real32 view_matrix[ 16 ]        = { 0.59f, -4.11f, 0.68f, 0.0f, 0.0f, 0.86f, 0.51f, 0.0f, -0.8f, -0.31f, 0.51f, 0.0f, 0.0f, 0.0f, -5.8f, 1.0f };
   // real32 projection_matrix[ 16 ]  = { 0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.43f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, -0.2f, 0.0f };
+  
+  real32 light_position[ 3 ] = { 0.0f, 5.0f, 0.0f };
   
   real32  aspect = ( real32 ) sdlObjects.windowWidth / ( real32 ) sdlObjects.windowHeight;
   
@@ -448,6 +451,7 @@ uint32 init_game( game_memory* memory ) {
       glUseProgram( game_objects[ i ].shader_program_id );
       glUniformMatrix4fv( game_objects[ i ].mvp_id        , 1, GL_FALSE, &mvp[0] );
       glUniformMatrix4fv( game_objects[ i ].model_view_id , 1, GL_FALSE, &mv[0] );
+      glUniform3f( game_objects[ i ].light_position_id, light_position[ 0 ], light_position[ 1 ], light_position[ 2 ] );
       //glUniformMatrix4fv( game_objects[ i ].model_id, 1, GL_FALSE, &model_matrix[0] );
       // glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
       

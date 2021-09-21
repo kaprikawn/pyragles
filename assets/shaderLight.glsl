@@ -1,51 +1,52 @@
 #shader vertex
 #version 100
 
-attribute vec4  aPosition;
+attribute vec3  aPosition;
 attribute vec3  aNormal;
 attribute vec2  aTexCoord;
-varying   vec2  vTexCoord;
 varying   vec3  vNormal;
-varying   float vDiffuse;
+varying   vec2  vTexCoord;
 uniform   mat4  uMVP;
 uniform   mat4  uModelViewMatrix;
-float           diffuse;
-float           distance;
+uniform   mat4  uModelMatrix;
+uniform   vec3  uLightPosition;
+varying   vec3  theColour;
+varying   float brightness;
 
 void main() {
-  vTexCoord   = aTexCoord;
-  vNormal     = aNormal;
+  vTexCoord         = aTexCoord;
+  vNormal           = aNormal;
   
-  vec3 modelViewVertex = vec3( uModelViewMatrix * aPosition );
-  vec3 modelViewNormal = vec3( uModelViewMatrix * vec4( aNormal, 0.0 ) );
+  vec4  position    = vec4( aPosition, 1.0 );
   
-  vec3 u_LightPos = vec3( 0, 10, 0 );
+  gl_Position       = uMVP * position;
   
-  distance = length( u_LightPos - modelViewVertex );
+  // vertex position in world space
+  vec3 vertexPosition = vec3( uModelMatrix * position );
   
-  vec3 lightVector = normalize( u_LightPos - modelViewVertex );
+  // vec3  vertexColor = vec3( 1.0, 0.0, 0.0 );
   
-  diffuse = max( dot( modelViewNormal, lightVector ), 0.1 );
+  vec3  lightVector = normalize( uLightPosition - vertexPosition );
   
-  vDiffuse = diffuse * ( 1.0 / ( 1.0 + ( 0.25 * distance * distance ) ) );
+  brightness        = dot( lightVector, vNormal );
   
-  gl_Position = uMVP * aPosition, 1.0;
 }
-
-// https://www.learnopengles.com/android-lesson-two-ambient-and-diffuse-lighting/
 
 #shader fragment
 #version 100
 
 precision mediump float;
 
+uniform sampler2D uTexture;
 varying vec2      vTexCoord;
 varying vec3      vNormal;
-varying float     vDiffuse;
-uniform sampler2D uTexture;
+varying vec3      theColour;
+varying float     brightness;
+
 
 void main() {
   
-  gl_FragColor          = texture2D( uTexture, vTexCoord ) * vec4( 1.0, 1.0, 1.0, 1.0 );
+  gl_FragColor = texture2D( uTexture, vTexCoord ) * vec4( 1.0, 1.0, 1.0, 1.0 );
+  gl_FragColor = texture2D( uTexture, vTexCoord ) * brightness;
   
 }
