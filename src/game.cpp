@@ -174,6 +174,7 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   game_object -> tex_coord0_id      = glGetAttribLocation( game_object -> shader_program_id,  "aTexCoord" );
   game_object -> mvp_id             = glGetUniformLocation( game_object -> shader_program_id, "uMVP" );
   game_object -> model_view_id      = glGetUniformLocation( game_object -> shader_program_id, "uModelViewMatrix" );
+  game_object -> model_id           = glGetUniformLocation( game_object -> shader_program_id, "uModelMatrix" );
   game_object -> light_position_id  = glGetUniformLocation( game_object -> shader_program_id, "uLightPosition" );
   
   glEnableVertexAttribArray( game_object -> position_id );
@@ -449,10 +450,10 @@ uint32 init_game( game_memory* memory ) {
       mat4_multiply( &mv[ 0 ] , &model_matrix[ 0 ], &v[ 0 ] );
       
       glUseProgram( game_objects[ i ].shader_program_id );
-      glUniformMatrix4fv( game_objects[ i ].mvp_id        , 1, GL_FALSE, &mvp[0] );
-      glUniformMatrix4fv( game_objects[ i ].model_view_id , 1, GL_FALSE, &mv[0] );
+      glUniformMatrix4fv( game_objects[ i ].mvp_id        , 1, GL_FALSE, &mvp[ 0 ] );
+      glUniformMatrix4fv( game_objects[ i ].model_view_id , 1, GL_FALSE, &mv[ 0 ] );
       glUniform3f( game_objects[ i ].light_position_id, light_position[ 0 ], light_position[ 1 ], light_position[ 2 ] );
-      //glUniformMatrix4fv( game_objects[ i ].model_id, 1, GL_FALSE, &model_matrix[0] );
+      glUniformMatrix4fv( game_objects[ i ].model_id, 1, GL_FALSE, &model_matrix[ 0 ] );
       // glUniformMatrix4fv( game_objects[ i ].mvp_id, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
       
       glVertexAttribPointer( game_objects[ i ].position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_vertex_offset );
@@ -464,6 +465,8 @@ uint32 init_game( game_memory* memory ) {
       glDrawElements( GL_TRIANGLES, game_objects[ i ].mesh_data[ 0 ].index_count, GL_UNSIGNED_INT, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_index_offset );
       
     }
+    
+    // light_position[ 1 ] += 0.05f;
     
     uint64 before_frame_flip_ticks = SDL_GetTicks();
     

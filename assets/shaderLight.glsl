@@ -2,9 +2,8 @@
 #version 100
 
 attribute vec3  aPosition;
-attribute vec3  aNormal;
+attribute vec3  aNormal; // model space
 attribute vec2  aTexCoord;
-varying   vec3  vNormal;
 varying   vec2  vTexCoord;
 uniform   mat4  uMVP;
 uniform   mat4  uModelViewMatrix;
@@ -15,7 +14,6 @@ varying   float brightness;
 
 void main() {
   vTexCoord         = aTexCoord;
-  vNormal           = aNormal;
   
   vec4  position    = vec4( aPosition, 1.0 );
   
@@ -28,7 +26,9 @@ void main() {
   
   vec3  lightVector = normalize( uLightPosition - vertexPosition );
   
-  brightness        = dot( lightVector, vNormal );
+  vec3  normal = vec3( uModelMatrix * vec4( aNormal, 0 ) );
+  
+  brightness        = dot( lightVector, normalize( normal ) );
   
 }
 
@@ -39,7 +39,6 @@ precision mediump float;
 
 uniform sampler2D uTexture;
 varying vec2      vTexCoord;
-varying vec3      vNormal;
 varying vec3      theColour;
 varying float     brightness;
 
@@ -48,5 +47,6 @@ void main() {
   
   gl_FragColor = texture2D( uTexture, vTexCoord ) * vec4( 1.0, 1.0, 1.0, 1.0 );
   gl_FragColor = texture2D( uTexture, vTexCoord ) * brightness;
+  gl_FragColor = vec4( brightness, brightness, brightness, 1.0 );
   
 }
