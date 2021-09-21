@@ -45,17 +45,10 @@ varying float     brightness;
 
 void main() {
   
-  // gl_FragColor = texture2D( uTexture, vTexCoord ) * vec4( 1.0, 1.0, 1.0, 1.0 );
-  // gl_FragColor = texture2D( uTexture, vTexCoord ) * brightness;
-  //gl_FragColor = vec4( brightness, brightness, brightness, 1.0 );
-  
   vec4 pixelColour = texture2D( uTexture, vTexCoord );
   
-  float r = pixelColour.r * brightness;
-  float g = pixelColour.g * brightness;
-  float b = pixelColour.b * brightness;
-  float a = pixelColour.a;
+  pixelColour.rgb *= brightness;
   
-  gl_FragColor = vec4( r, g, b, a );
+  gl_FragColor = pixelColour;
   
 }
