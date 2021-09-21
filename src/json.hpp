@@ -49,15 +49,19 @@ struct MeshData {
   uint32  index_data_raw_in_bytes;
   uint32  index_data_in_bytes;
   uint32  index_count;
+  uint32  normal_data_in_bytes;
+  uint32  normal_count;
   uint32  tex_coord0_data_in_bytes;
   uint32  tex_coord0_count;
   uint32  image_data_in_bytes;
   real32* vertex_data;
+  real32* normal_data;
   uint16* index_data_raw;
   uint32* index_data;
   real32* tex_coord0_data;
   uint8*  image_data;
   uint32  gl_vertex_offset;
+  uint32  gl_normal_offset;
   uint32  gl_tex_coord0_offset;
   uint32  gl_index_offset;
 };
@@ -895,7 +899,7 @@ BufferViewData get_buffer_view_data( uint32 target_buffer_view_index, const char
   return result;
 }
 
-MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, ReadFileResult* gltf_file ) {
+MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, ReadFileResult* gltf_file, real32 scale ) {
   
   MeshData result;
   
@@ -927,24 +931,30 @@ MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, 
   MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
   
   AccessorData vertex_accessor_data     = get_accessor_data( mesh_position_indices.vertices, json_string, json_char_count );
+  AccessorData normal_accessor_data     = get_accessor_data( mesh_position_indices.normals, json_string, json_char_count );
   AccessorData index_accessor_data      = get_accessor_data( mesh_position_indices.indices, json_string, json_char_count );
   AccessorData tex_coord0_accessor_data = get_accessor_data( mesh_position_indices.texcoord_0, json_string, json_char_count );
   
   BufferViewData vertex_buffer_view_data      = get_buffer_view_data( vertex_accessor_data.buffer_view, json_string, json_char_count );
+  BufferViewData normal_buffer_view_data      = get_buffer_view_data( normal_accessor_data.buffer_view, json_string, json_char_count );
   BufferViewData index_buffer_view_data       = get_buffer_view_data( index_accessor_data.buffer_view, json_string, json_char_count );
   BufferViewData tex_coord0_buffer_view_data  = get_buffer_view_data( tex_coord0_accessor_data.buffer_view, json_string, json_char_count );
   
   uint32 vertex_data_total_offset     = bin_start_offset + vertex_buffer_view_data.byte_offset;
+  uint32 normal_data_total_offset     = bin_start_offset + normal_buffer_view_data.byte_offset;
   uint32 index_data_total_offset      = bin_start_offset + index_buffer_view_data.byte_offset;
   uint32 tex_coord0_data_total_offset = bin_start_offset + tex_coord0_buffer_view_data.byte_offset;
   
   result.vertex_data_in_bytes     = vertex_buffer_view_data.byte_length;
+  result.normal_data_in_bytes     = normal_buffer_view_data.byte_length;
   result.index_data_raw_in_bytes  = index_buffer_view_data.byte_length;
   result.tex_coord0_data_in_bytes = tex_coord0_buffer_view_data.byte_length;
   result.vertex_count             = vertex_accessor_data.count;
+  result.normal_count             = normal_accessor_data.count;
   result.index_count              = index_accessor_data.count;
   result.tex_coord0_count         = tex_coord0_accessor_data.count;
   result.vertex_data              = ( real32* )( ( char* )gltf_contents + vertex_data_total_offset );
+  result.normal_data              = ( real32* )( ( char* )gltf_contents + normal_data_total_offset );
   result.tex_coord0_data          = ( real32* )( ( char* )gltf_contents + tex_coord0_data_total_offset );
   result.index_data_raw           = ( uint16* )( ( char* )gltf_contents + index_data_total_offset );
   
@@ -954,6 +964,19 @@ MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, 
     result.image_data_in_bytes            = image_buffer_view_data.byte_length;
     uint32 image_data_total_offset        = bin_start_offset + image_buffer_view_data.byte_offset;
     result.image_data                     = ( uint8* )( ( char* )gltf_contents + image_data_total_offset );
+  }
+  
+  if( scale != 1.0f ) {
+    real32* value = result.vertex_data;
+    
+    for( uint32 i = 0; i < result.vertex_count; i++ ) {
+      real32 this_float = *value;
+      
+      this_float *= scale;
+      *value = this_float;
+      
+      value++;
+    }
   }
   
   return result;

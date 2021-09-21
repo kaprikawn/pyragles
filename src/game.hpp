@@ -361,8 +361,8 @@ uint32 compileShader( uint32 type, const char* source ) {
     char* message = ( char* )alloca( length * sizeof( char ) );
     glGetShaderInfoLog( id, length, &length, message );
     
-    SDL_LogError( SDL_LOG_CATEGORY_ERROR, "Failed to complile %s shader : %s\n", ( type == GL_VERTEX_SHADER ? "vertex" : "fragment" ), message );
-    SDL_LogError( SDL_LOG_CATEGORY_ERROR, "### SOURCE ### \n %s \n", source );
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Failed to complile %s shader : %s\n", ( type == GL_VERTEX_SHADER ? "vertex" : "fragment" ), message );
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "### SOURCE ### \n %s \n", source );
     glDeleteShader( id );
     return 0;
   }
