@@ -3,6 +3,7 @@
 
 #include "types.hpp"
 #include "game.hpp"
+#include "object_data.hpp"
 
 #ifdef _WIN32
 
@@ -957,6 +958,11 @@ MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, 
   result.normal_data              = ( real32* )( ( char* )gltf_contents + normal_data_total_offset );
   result.tex_coord0_data          = ( real32* )( ( char* )gltf_contents + tex_coord0_data_total_offset );
   result.index_data_raw           = ( uint16* )( ( char* )gltf_contents + index_data_total_offset );
+  
+  // int32 vertex_logged_position      = log_vertex_data( result.vertex_data, result.vertex_count );
+  // int32 index_logged_position       = log_vertex_data( result.vertex_data, result.vertex_count );
+  // int32 normal_logged_position      = log_normal_data( result.normal_data, result.normal_count );
+  // int32 tex_coord0_logged_position  = log_tex_coord0_data( result.tex_coord0_data, result.tex_coord0_count );
   
   int32 image_buffer_view_index = get_image_buffer_view_index( json_string, json_char_count );
   if( image_buffer_view_index >= 0  ) {

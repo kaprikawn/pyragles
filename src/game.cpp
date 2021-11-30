@@ -4,6 +4,7 @@
 #include "json.hpp"
 #include "input.hpp"
 #include "vector_maths.hpp"
+// #include "object_data.hpp"
 /*
 void GLClearError() {
   while( glGetError() != GL_NO_ERROR );
@@ -17,7 +18,6 @@ bool GLLogCall( const char* function, const char* file, int line ) {
   return true;
 }
 */
-
 
 struct Mat4 {
   real32  m00 = 1.0f;
@@ -50,6 +50,14 @@ struct GameObject {
   int32     tex_coord0_id;
   uint32    mesh_count;
   uint32    tbo;
+  uint32    vertex_data_offset;
+  uint32    vertex_data_count;
+  uint32    index_data_offset;
+  uint32    index_data_count;
+  uint32    colour_data_offset;
+  uint32    colour_data_count;
+  uint32    tex_coord0_data_offset;
+  uint32    tex_coord0_data_count;
   MeshData* mesh_data;
   MeshData* collider_mesh_data;
   uint32*   indices;
@@ -151,6 +159,12 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
     
     // copy data into object
     memcpy( mesh_dest, &this_mesh, sizeof( MeshData ) );
+    
+    // if( i == 0 ) {
+    //   game_object -> vertex_data_offset     = log_vertex_data( this_mesh.vertex_data, this_mesh.vertex_count );
+    //   game_object -> index_data_offset      = log_index_data( this_mesh.index_data_raw, this_mesh.index_count );
+    //   game_object -> tex_coord0_data_offset = log_tex_coord0_data( this_mesh.tex_coord0_data, this_mesh.tex_coord0_count );
+    // }
     
   }
   
