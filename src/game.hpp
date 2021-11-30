@@ -372,7 +372,7 @@ uint32 compileShader( uint32 type, const char* source ) {
   return id;
 }
 
-uint32 createShader( const char* shaderSource, uint32 filesizeMax ) {
+uint32 create_shader( const char* shaderSource, uint32 filesizeMax ) {
   
   enum ShaderType {
     SHADERTYPENONE = -1, VERTEX = 0, FRAGMENT = 1

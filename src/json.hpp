@@ -899,7 +899,7 @@ BufferViewData get_buffer_view_data( uint32 target_buffer_view_index, const char
   return result;
 }
 
-MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, ReadFileResult* gltf_file, real32 scale ) {
+MeshData populate_mesh_data_gltf( uint32 target_mesh_index, const char* json_string, ReadFileResult* gltf_file, real32 scale ) {
   
   MeshData result;
   

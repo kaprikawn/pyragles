@@ -4,6 +4,8 @@
 #include "json.hpp"
 #include "input.hpp"
 #include "vector_maths.hpp"
+#include "globals.hpp"
+
 /*
 void GLClearError() {
   while( glGetError() != GL_NO_ERROR );
@@ -17,7 +19,6 @@ bool GLLogCall( const char* function, const char* file, int line ) {
   return true;
 }
 */
-
 
 struct Mat4 {
   real32  m00 = 1.0f;
@@ -38,6 +39,15 @@ struct Mat4 {
   real32  m33 = 1.0f;
 };
 
+real32  vertex_data     [ 10000 ];
+real32  normal_data     [ 10000 ];
+real32  colour_data     [ 10000 ];
+real32  tex_coord0_data [ 10000 ];
+
+int32 log_vertex_data( real32* dest, real32* vertex_data, int32 vertex_data_size_in_bytes ) {
+  
+}
+
 struct GameObject {
   uint32    id;
   real32    mvp[ 16 ];
@@ -50,6 +60,20 @@ struct GameObject {
   int32     tex_coord0_id;
   uint32    mesh_count;
   uint32    tbo;
+  int32     vertex_data_position;
+  int32     vertex_data_size_in_bytes;
+  int32     vertex_data_count;
+  int32     normal_data_position;
+  int32     normal_data_size_in_bytes;
+  int32     normal_data_count;
+  int32     colour_data_position;
+  int32     colour_data_size_in_bytes;
+  int32     colour_data_count;
+  int32     tex_coord0_data_position;
+  int32     tex_coord0_data_size_in_bytes;
+  int32     tex_coord0_data_count;
+  bool32    has_texture;
+  bool32    has_vertex_colours;
   MeshData* mesh_data;
   MeshData* collider_mesh_data;
   uint32*   indices;
@@ -67,12 +91,11 @@ uint32 index_buffer_current_offset  = 0;
 // for delta time ( dt )
 uint32 current_time, previous_time, before_frame_flip_time;
 
-    
 void load_game_object( GameObject* game_object, const char* model_filename, const char* shader_filename, real32 scale = 1.0f ) {
   
   ReadFileResult shader_file = read_entire_file( shader_filename );
   
-  game_object -> shader_program_id = createShader( ( const char* )shader_file.contents, shader_file.contentsSize );
+  game_object -> shader_program_id = create_shader( ( const char* )shader_file.contents, shader_file.contentsSize );
   free_memory( shader_file.contents, shader_file.contentsSize );
   
   ReadFileResult gltf_file = read_entire_file( model_filename );
@@ -84,7 +107,7 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "json is %s\n", json_string );
   game_object -> mesh_count = count_meshes( json_string, json_string_length );
   
-  uint32 collider_count = 0; // TODO : replace by actually reading the json
+  uint32 collider_count = 0;
   
   for( uint32 i = 0; i < game_object -> mesh_count; i++ ) {
     const uint32 char_buffer_size = 100;
@@ -105,7 +128,7 @@ void load_game_object( GameObject* game_object, const char* model_filename, cons
   
   for( uint32 i = 0; i < game_object -> mesh_count; i++ ) {
     
-    MeshData this_mesh = populate_mesh_data( i, json_string, &gltf_file, scale );
+    MeshData this_mesh = populate_mesh_data_gltf( i, json_string, &gltf_file, scale );
     uint32 index_count = this_mesh.index_count;
     
     this_mesh.index_data = ( uint32* )malloc( sizeof( uint32 ) * index_count );
@@ -218,8 +241,6 @@ void calculate_ship_rotation( GameInput* game_input, GameObject* ship, real32 dt
     target_x = 0.0f;
   }
   
-  //target_x = 0.0f;
-  
   real32 new_rotation_x = lerp_dt( current_x, target_x, lerp_smoothing, dt );
   ship -> rotation_x    = new_rotation_x;
   
@@ -279,14 +300,7 @@ void dump_mat4( real32* mat ) {
 }
 
 inline void translate( real32* matrix, Position position ) {
-  
-  // real32 x = position.x;
-  // real32 y = position.y;
-  // real32 z = position.z;
-  
-  // real32* matrix_pos = matrix;
   matrix += 12;
-  
   *matrix = position.x;
   matrix++;
   *matrix = position.y;
@@ -305,14 +319,8 @@ uint32 init_game( game_memory* memory ) {
   
   SDL_Window* window = sdlObjects.window;
   
-  // Mat4 view_matrix;
-  // Mat4 projection_matrix;
-  
-  // real32 view_matrix[ 16 ]        = { 0.59f, -4.11f, 0.68f, 0.0f, 0.0f, 0.86f, 0.51f, 0.0f, -0.8f, -0.31f, 0.51f, 0.0f, 0.0f, 0.0f, -5.8f, 1.0f };
-  // real32 projection_matrix[ 16 ]  = { 0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.43f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, -0.2f, 0.0f };
-  
-  real32 light_position[ 3 ]  = { 0.0f, 5.0f, 0.0f };
-  real32 ambient_light        = 0.3f;
+  real32 light_position[ 3 ]  = LIGHT_POSITION;
+  real32 ambient_light        = AMBIENT_LIGHT;
   
   real32  aspect = ( real32 ) sdlObjects.windowWidth / ( real32 ) sdlObjects.windowHeight;
   
@@ -324,7 +332,7 @@ uint32 init_game( game_memory* memory ) {
   
   initialise_gamepads();
   
-  const uint32 object_count = 2;
+  const uint32 object_count = 3;
   GameObject game_objects[ object_count ];
   
   bool32  running = true;
@@ -341,24 +349,31 @@ uint32 init_game( game_memory* memory ) {
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
       glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
       
-      GameObject ship;
-      load_game_object( &game_objects[ 0 ], "modelShip.glb"     , "shaderLight.glsl" );
-      load_game_object( &game_objects[ 1 ], "modelEnemyPod.glb" , "shaderLight.glsl" );
+      // GameObject ship;
+      load_game_object( &game_objects[ 0 ], "modelShip.glb" , "shaderLight.glsl" );
+      load_game_object( &game_objects[ 1 ], "modelArch.glb" , "shaderLight.glsl" );
       
-      game_objects[ 0 ].position.x -= 2.0f;
-      game_objects[ 1 ].position.x += 2.0f;
-      game_objects[ 1 ].position.z -= 5.0f;
-      game_objects[ 1 ].position.y += 5.0f;
+      // initialise floor
+      game_objects[ 2 ].position.x = 0.0f;
+      game_objects[ 2 ].position.y = FLOOR_Y;
+      game_objects[ 2 ].position.z = 0.0f;
+      
+      MeshData* floor_mesh_data = new MeshData;
+      
+      game_objects[ 0 ].position.y = START_Y;
+      game_objects[ 0 ].position.z = START_Z;
+      game_objects[ 1 ].position.x = -2.0f;
+      game_objects[ 1 ].position.z = -50.0f;
       
       // projection matrix
-      real32 p[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-      real32 fov = 70.0f;
+      real32 p[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+      real32 fov        = 70.0f;
       real32 near_plane = 0.1f;
-      real32 far_plane = 100.0f;
+      real32 far_plane  = 100.0f;
       populate_perspective_matrix( &p[ 0 ], fov, aspect, near_plane, far_plane );
       
-      Position eye = { 7.0f, 7.0f, 7.0f };
-      Position centre = { 1.0f, 1.0f, 1.0f };
+      Position eye    = { 0.0f, START_Y, 10.0f };
+      Position centre = { 0.0f, START_Y, -10.0f };
       
       populate_view_matrix( &v[ 0 ], eye, centre );
       
@@ -367,7 +382,6 @@ uint32 init_game( game_memory* memory ) {
       memory -> isInitialized = true;
       
       current_time = 1; // so dt calc doesn't do weird things
-      
       
     }
     
@@ -406,9 +420,7 @@ uint32 init_game( game_memory* memory ) {
     
     calculate_ship_rotation( &game_input, &game_objects[ 0 ], dt );
     
-    game_objects[ 1 ].rotation_x += 0.02f;
-    game_objects[ 1 ].rotation_y += 2.0f;
-    // game_objects[ 1 ].rotation_z += 6.0f;
+    game_objects[ 1 ].position.z += SCROLL_SPEED * dt;
     
     for( uint32 i = 0; i < object_count; i++ ) {
       
@@ -436,12 +448,6 @@ uint32 init_game( game_memory* memory ) {
       
       mat4_multiply( &model_matrix[ 0 ], &rot_mat_xyz[ 0 ], &model_matrix[ 0 ] );
       
-      // real32 m[ 16 ] = game_objects[ i ].model_matrix;
-      // real32 v[ 16 ] = view_matrix;
-      // real32 p[ 16 ] = projection_matrix;
-      // real32 vp[ 16 ] = p * v;
-      // real32 mvp[ 16 ] = vp * m;
-    
       real32 mvp[ 16 ]  = {}; // model view projection matrix
       
       // multiply model matrix with the view-projection matrix to get the mvp matrix
