@@ -4,6 +4,7 @@
 #include "json.hpp"
 #include "input.hpp"
 #include "vector_maths.hpp"
+#include "object_data.hpp"
 /*
 void GLClearError() {
   while( glGetError() != GL_NO_ERROR );
@@ -17,7 +18,6 @@ bool GLLogCall( const char* function, const char* file, int line ) {
   return true;
 }
 */
-
 
 struct Mat4 {
   real32  m00 = 1.0f;
@@ -50,9 +50,16 @@ struct GameObject {
   int32     tex_coord0_id;
   uint32    mesh_count;
   uint32    tbo;
-  MeshData* mesh_data;
-  MeshData* collider_mesh_data;
-  uint32*   indices;
+  uint32    vertex_data_offset;
+  uint32    vertex_data_count;
+  uint32    normal_data_offset;
+  uint32    normal_data_count;
+  uint32    index_data_offset;
+  uint32    index_data_count;
+  uint32    tex_coord0_data_offset;
+  uint32    tex_coord0_bytes;
+  uint32    colour_data_offset;
+  uint32    colour_data_count;
   uint32    shader_program_id;
   int32     mvp_id;
   int32     model_id;
@@ -61,139 +68,345 @@ struct GameObject {
   int32     ambient_light_id;
 };
 
-uint32 vertex_buffer_current_offset = 0;
-uint32 index_buffer_current_offset  = 0;
 
 // for delta time ( dt )
 uint32 current_time, previous_time, before_frame_flip_time;
 
-    
-void load_game_object( GameObject* game_object, const char* model_filename, const char* shader_filename, real32 scale = 1.0f ) {
+enum GltfContentType { GLTF_VERTICES, GLTF_INDICES, GLTF_NORMALS, GLTF_TEX_COORD0 };
+
+uint32 get_bin_start_offset( const char* gltf_contents ) {
+  uint32 result;
+  GltfHeader* gltf_header   = ( GltfHeader* )gltf_contents; // pulls in fixed length json stuff too
+  uint32  gltf_header_size_in_bytes = 12; // magic + version + length
+  uint32  json_header_in_bytes      = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  uint32  json_string_in_bytes      = gltf_header -> json_chunk_length;
+  uint32  bin_header_in_bytes       = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  result = gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes + bin_header_in_bytes;
+  return result;
+}
+
+real32* get_gltf_data_pointer_real32( uint32 target_mesh_index, const char* gltf_contents, char* json_string, int32 content_type ) {
+  
+  real32* result = NULL;
+  
+  uint32  json_char_count   = string_length( json_string );
+  
+  GltfHeader* gltf_header   = ( GltfHeader* )gltf_contents; // pulls in fixed length json stuff too
+  
+  uint32  gltf_header_size_in_bytes = 12; // magic + version + length
+  uint32  json_header_in_bytes      = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  uint32  bin_header_in_bytes       = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  uint32  json_string_in_bytes      = gltf_header -> json_chunk_length;
+  uint32* bin_chunk_length          = ( uint32* )( ( uint8* )gltf_contents + gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes );
+  uint32  bin_size_in_bytes         = *bin_chunk_length;
+  uint32  bin_start_offset          = get_bin_start_offset( gltf_contents );
+  uint32  json_chunk_in_bytes       = bin_header_in_bytes + json_string_in_bytes;
+  
+  MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
+  AccessorData        accessor_data;
+  
+  if( content_type == GLTF_VERTICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.vertices, json_string, json_char_count );
+  } else if( content_type == GLTF_NORMALS ) {
+    accessor_data = get_accessor_data( mesh_position_indices.normals, json_string, json_char_count );
+  } else if( content_type == GLTF_TEX_COORD0 ) {
+    accessor_data = get_accessor_data( mesh_position_indices.texcoord_0, json_string, json_char_count );
+  } else {
+    return result;
+  }
+  
+  BufferViewData buffer_view_data = get_buffer_view_data( accessor_data.buffer_view, json_string, json_char_count );
+  
+  uint32  total_offset = bin_start_offset + buffer_view_data.byte_offset;
+  
+  result = ( real32* )( ( char* )gltf_contents + total_offset );
+  
+  return result;
+}
+
+uint16* get_gltf_data_pointer_uint16( uint32 target_mesh_index, const char* gltf_contents, char* json_string, int32 content_type ) {
+  
+  uint16* result = NULL;
+  
+  uint32  json_char_count   = string_length( json_string );
+  
+  GltfHeader* gltf_header   = ( GltfHeader* )gltf_contents; // pulls in fixed length json stuff too
+  
+  uint32  gltf_header_size_in_bytes = 12; // magic + version + length
+  uint32  json_header_in_bytes      = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  uint32  bin_header_in_bytes       = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  uint32  json_string_in_bytes      = gltf_header -> json_chunk_length;
+  uint32* bin_chunk_length          = ( uint32* )( ( uint8* )gltf_contents + gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes );
+  uint32  bin_size_in_bytes         = *bin_chunk_length;
+  uint32  bin_start_offset          = gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes + bin_header_in_bytes;
+  uint32  json_chunk_in_bytes       = bin_header_in_bytes + json_string_in_bytes;
+  
+  MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
+  AccessorData        accessor_data;
+  
+  if( content_type == GLTF_INDICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.indices, json_string, json_char_count );
+  } else {
+    return result;
+  }
+  
+  BufferViewData buffer_view_data = get_buffer_view_data( accessor_data.buffer_view, json_string, json_char_count );
+  
+  uint32  total_offset = bin_start_offset + buffer_view_data.byte_offset;
+  
+  result = ( uint16* )( ( char* )gltf_contents + total_offset );
+  
+  return result;
+}
+
+uint32 get_gltf_data_count( uint32 target_mesh_index, const char* gltf_contents, char* json_string, int32 content_type ) {
+  
+  uint32 result = 0;
+  
+  uint32  json_char_count   = string_length( json_string );
+  
+  MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
+  AccessorData        accessor_data;
+  
+  if( content_type == GLTF_VERTICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.vertices, json_string, json_char_count );
+  } else if( content_type == GLTF_INDICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.indices, json_string, json_char_count );
+  } else if( content_type == GLTF_NORMALS ) {
+    accessor_data = get_accessor_data( mesh_position_indices.normals, json_string, json_char_count );
+  } else if( content_type == GLTF_TEX_COORD0 ) {
+    accessor_data = get_accessor_data( mesh_position_indices.texcoord_0, json_string, json_char_count );
+  } else {
+    return result;
+  }
+  
+  uint32 count_per_value = 0;
+  if( strings_are_equal( accessor_data.type, "VEC3" ) ) {
+    count_per_value = 3;
+  } else if( strings_are_equal( accessor_data.type, "SCALAR" ) ) {
+    count_per_value = 1;
+  } else if( strings_are_equal( accessor_data.type, "VEC2" ) ) {
+    count_per_value = 2;
+  }
+  result = count_per_value * accessor_data.count;
+  
+  return result;
+}
+
+struct GltfbufferViewInfo {
+  uint32 buffer_view;
+  uint32 component_type;
+  uint32 gltf_count; // count as defined by the JSON
+  uint32 buffer;
+  uint32 byte_length;
+  uint32 byte_offset;
+  uint32 count; // count of values
+  uint32 offset;
+  int32  type;
+};
+
+struct GltfBufferViewData {
+  uint32 buffer;
+  uint32 byte_length;
+  uint32 byte_offset;
+};
+
+struct JsonString {
+  char*   json_string;
+  uint32  json_char_count;
+};
+
+GltfbufferViewInfo get_glft_buffer_view_info( uint32 target_mesh_index, const char* gltf_contents, char* json_string, int32 content_type ) {
+  GltfbufferViewInfo result = {};
+  
+  uint32  json_char_count   = string_length( json_string );
+  
+  MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
+  AccessorData        accessor_data;
+  
+  if( content_type == GLTF_VERTICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.vertices, json_string, json_char_count );
+  } else if( content_type == GLTF_INDICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.indices, json_string, json_char_count );
+  } else if( content_type == GLTF_NORMALS ) {
+    accessor_data = get_accessor_data( mesh_position_indices.normals, json_string, json_char_count );
+  } else if( content_type == GLTF_TEX_COORD0 ) {
+    accessor_data = get_accessor_data( mesh_position_indices.texcoord_0, json_string, json_char_count );
+  } else {
+    return result;
+  }
+  
+  BufferViewData buffer_view_data = get_buffer_view_data( accessor_data.buffer_view, json_string, json_char_count );
+  
+  result.buffer_view    = accessor_data.buffer_view;
+  result.component_type = accessor_data.component_type;
+  result.count          = accessor_data.count;
+  result.type           = accessor_data.accessor_type;
+  result.buffer         = buffer_view_data.buffer;
+  result.byte_length    = buffer_view_data.byte_length;
+  result.byte_offset    = buffer_view_data.byte_offset;
+  
+  return result;
+}
+
+inline uint32 get_count_from_type_string( uint32 gltf_count, char* gltf_type ) {
+  
+  uint32 result = 0;
+  uint32 count_per_gltf_count = 0;
+  
+  if( strings_are_equal( gltf_type, "VEC3" ) ) {
+    count_per_gltf_count = 3;
+  } else if( strings_are_equal( gltf_type, "SCALAR" ) ) {
+    count_per_gltf_count = 1;
+  } else if( strings_are_equal( gltf_type, "VEC2" ) ) {
+    count_per_gltf_count = 2;
+  }
+  
+  result = count_per_gltf_count * gltf_count;
+  
+  return result;
+}
+
+inline uint32 get_count_from_type( uint32 gltf_count, int32 type ) {
+  uint32 result = 0;
+  uint32 count_per_gltf_count = 0;
+  
+  if( type == ACCESSOR_VEC3 ) {
+    count_per_gltf_count = 3;
+  } else if( type == ACCESSOR_SCALAR ) {
+    count_per_gltf_count = 1;
+  } else if( type == ACCESSOR_VEC2 ) {
+    count_per_gltf_count = 2;
+  }
+  
+  result = count_per_gltf_count * gltf_count;
+  
+  return result;
+}
+
+void load_game_object_gltf( GameObject* game_object, const char* model_filename, const char* shader_filename, real32 scale = 1.0f ) {
   
   ReadFileResult shader_file = read_entire_file( shader_filename );
   
   game_object -> shader_program_id = createShader( ( const char* )shader_file.contents, shader_file.contentsSize );
   free_memory( shader_file.contents, shader_file.contentsSize );
   
-  ReadFileResult gltf_file = read_entire_file( model_filename );
+  ReadFileResult gltf_file  = read_entire_file( model_filename );
   uint32 json_string_length = json_size_in_bytes( &gltf_file ); // including padding
   
-  char* json_string = ( char* )malloc( json_string_length + 1 );
+  char* json_string         = ( char* )malloc( json_string_length + 1 );
   
   pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
+  
+  JsonString json;
+  json.json_string = json_string;
+  json.json_char_count = string_length( json_string );
+  
   // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "json is %s\n", json_string );
   game_object -> mesh_count = count_meshes( json_string, json_string_length );
   
-  uint32 collider_count = 0; // TODO : replace by actually reading the json
+  // log data vertices, indices, normals and tex_coord0
+  const char* gltf_contents = ( char* )gltf_file.contents;
+  void*       data_void;
+  real32*     data;
+  uint32      count;
+  uint32      offset;
+  uint32      byte_length;
+  uint32      vertex_offset, index_offset, normal_offset, tex_coord0_offset;
+  uint32      vertex_byte_length, index_byte_length, normal_byte_length, tex_coord0_byte_length;
+  uint32      target_mesh_index = 0; // @TODO: Hardcoding for the initial mesh for now
   
-  for( uint32 i = 0; i < game_object -> mesh_count; i++ ) {
-    const uint32 char_buffer_size = 100;
-    char mesh_name[ char_buffer_size ];
-    for( uint32 j = 0; j < char_buffer_size; j++ ) {
-      mesh_name[ j ] = '\0';
-    }
-    populate_mesh_name( i, json_string, json_string_length, mesh_name );
-    if( strings_are_equal( mesh_name, "Collider" ) ) {
-      collider_count++;
-    }
-  }
+  GltfbufferViewInfo buffer_view_info;
   
-  game_object -> mesh_data = ( MeshData* )malloc( sizeof( MeshData ) * ( game_object -> mesh_count - collider_count ) );
-  if( collider_count > 0 ) {
-    game_object -> collider_mesh_data = ( MeshData* )malloc( sizeof( MeshData ) * collider_count );
-  }
+  // vertices
+  buffer_view_info  = get_glft_buffer_view_info( target_mesh_index, gltf_contents, json_string, GLTF_VERTICES );
+  data              = get_gltf_data_pointer_real32( target_mesh_index, gltf_contents, json_string, GLTF_VERTICES );
+  count             = get_gltf_data_count( target_mesh_index, gltf_contents, json_string, GLTF_VERTICES );
+  byte_length       = buffer_view_info.byte_length;
+  game_object       -> vertex_data_offset = log_array_buffer_data( data, count );
+  game_object       -> vertex_data_count = get_count_from_type( count, buffer_view_info.type );
+  glBufferSubData( GL_ARRAY_BUFFER, game_object -> vertex_data_offset, byte_length, data );
   
-  for( uint32 i = 0; i < game_object -> mesh_count; i++ ) {
-    
-    MeshData this_mesh = populate_mesh_data( i, json_string, &gltf_file, scale );
-    uint32 index_count = this_mesh.index_count;
-    
-    this_mesh.index_data = ( uint32* )malloc( sizeof( uint32 ) * index_count );
-    
-    // TODO : this is broken
-    uint16* src   = this_mesh.index_data_raw;
-    uint32* dest  = this_mesh.index_data;
-    for( uint32 j = 0; j < index_count; j++ ) {
-      uint16 this_index = *src;
-      uint32 index_value = ( uint32 )this_index;
-      *dest = index_value;
-      src++;
-      dest++;
-    }
-    this_mesh.index_data_in_bytes = sizeof( this_mesh.index_data[ 0 ] ) * this_mesh.index_count;
-    
-    // determine where to copy data into - if we're on the second mesh, move the pointer along by one etc.
-    MeshData* mesh_dest = game_object -> mesh_data;
-    for( uint32 j = 0; j < i; j++ ) {
-      mesh_dest++;
-    }
-    
-    this_mesh.gl_vertex_offset      = vertex_buffer_current_offset;
-    vertex_buffer_current_offset   += this_mesh.vertex_data_in_bytes;
-    this_mesh.gl_normal_offset      = vertex_buffer_current_offset;
-    vertex_buffer_current_offset   += this_mesh.normal_data_in_bytes;
-    this_mesh.gl_tex_coord0_offset  = vertex_buffer_current_offset;
-    vertex_buffer_current_offset   += this_mesh.tex_coord0_data_in_bytes;
-    this_mesh.gl_tex_coord0_offset  = vertex_buffer_current_offset;
-    vertex_buffer_current_offset   += this_mesh.tex_coord0_data_in_bytes;
-    this_mesh.gl_index_offset       = index_buffer_current_offset;
-    index_buffer_current_offset    += this_mesh.index_data_in_bytes;
-    
-    if( this_mesh.is_collider ) {
-      mesh_dest = game_object -> collider_mesh_data;
-    } else {
-      // upload data to GL
-      glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_vertex_offset, this_mesh.vertex_data_in_bytes, this_mesh.vertex_data );
-      glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_normal_offset, this_mesh.normal_data_in_bytes, this_mesh.normal_data );
-      glBufferSubData( GL_ARRAY_BUFFER, this_mesh.gl_tex_coord0_offset, this_mesh.tex_coord0_data_in_bytes, this_mesh.tex_coord0_data );
-      glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, this_mesh.gl_index_offset, this_mesh.index_data_in_bytes, this_mesh.index_data );
-    }
-    
-    // copy data into object
-    memcpy( mesh_dest, &this_mesh, sizeof( MeshData ) );
-    
-  }
+  // indices
+  buffer_view_info  = get_glft_buffer_view_info( target_mesh_index, gltf_contents, json_string, GLTF_INDICES );
+  uint16* data16    = get_gltf_data_pointer_uint16( target_mesh_index, gltf_contents, json_string, GLTF_INDICES );
+  count             = get_gltf_data_count( target_mesh_index, gltf_contents, json_string, GLTF_INDICES );
+  byte_length       = buffer_view_info.byte_length;
+  game_object       -> index_data_offset = log_element_array_buffer_data( data16, count );
+  game_object       -> index_data_count = get_count_from_type( count, buffer_view_info.type );
+  glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, game_object -> index_data_offset, byte_length, data16 );
   
-  int32 texture_width, texture_height, texture_bpp;
+  // // normals
+  // buffer_view_info  = get_glft_buffer_view_info( target_mesh_index, gltf_contents, json_string, GLTF_NORMALS );
+  // data              = get_gltf_data_pointer_real32( target_mesh_index, gltf_contents, json_string, GLTF_NORMALS );
+  // count             = get_gltf_data_count( target_mesh_index, gltf_contents, json_string, GLTF_NORMALS );
+  // byte_length       = buffer_view_info.byte_length;
+  // game_object       -> normal_data_offset = log_array_buffer_data( data, count );
+  // game_object       -> normal_data_count = get_count_from_type( count, buffer_view_info.type );
+  // glBufferSubData( GL_ARRAY_BUFFER, game_object -> normal_data_offset, byte_length, data );
   
-  uchar* texture_data = stbi_load_from_memory( ( const uchar* )game_object -> mesh_data[ 0 ].image_data, game_object -> mesh_data[ 0 ].image_data_in_bytes, &texture_width, &texture_height, &texture_bpp, 4 );
+  // // tex_coord0
+  // buffer_view_info  = get_glft_buffer_view_info( target_mesh_index, gltf_contents, json_string, GLTF_TEX_COORD0 );
+  // data              = get_gltf_data_pointer_real32( target_mesh_index, gltf_contents, json_string, GLTF_TEX_COORD0 );
+  // count             = get_gltf_data_count( target_mesh_index, gltf_contents, json_string, GLTF_TEX_COORD0 );
+  // byte_length       = buffer_view_info.byte_length;
+  // game_object       -> normal_data_offset = log_array_buffer_data( data, count );
+  // game_object       -> normal_data_count = get_count_from_type( count, buffer_view_info.type );
+  // glBufferSubData( GL_ARRAY_BUFFER, game_object -> tex_coord0_data_offset, byte_length, data );
   
-  glGenTextures( 1, &game_object -> tbo );
-  glBindTexture( GL_TEXTURE_2D, game_object -> tbo );
+  // int32 texture_width, texture_height, texture_bpp;
   
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-  // https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
-  glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data );
-  glBindTexture( GL_TEXTURE_2D, game_object -> tbo );
+  // uint8*  texture_location = NULL;
+  // uint32  texture_byte_length;
+  
+  // int32 image_buffer_view_index = get_image_buffer_view_index( json_string, 0 );
+  // if( image_buffer_view_index >= 0  ) {
+  //   BufferViewData image_buffer_view_data = get_buffer_view_data( image_buffer_view_index, json.json_string, json.json_char_count );
+  //   uint32 bin_start_offset               = get_bin_start_offset( gltf_contents );
+  //   uint32 image_data_total_offset        = bin_start_offset + image_buffer_view_data.byte_offset;
+  //   texture_location                      = ( uint8* )( ( char* )gltf_contents + image_data_total_offset );
+  //   texture_byte_length                   = image_buffer_view_data.byte_length;
+  // }
+  
+  // const uchar* texture_buffer = ( uchar* )texture_location;
+  // uchar* texture_data = stbi_load_from_memory( texture_buffer, texture_byte_length, &texture_width, &texture_height, &texture_bpp, 4 );
+  
+  free( json_string );
+  
+  // glGenTextures( 1, &game_object -> tbo );
+  // glBindTexture( GL_TEXTURE_2D, game_object -> tbo );
+  
+  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+  // // https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
+  // glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+  // glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data );
+  // glBindTexture( GL_TEXTURE_2D, game_object -> tbo );
+  
+  int32 position_id = glGetAttribLocation( game_object -> shader_program_id,  "aPosition" );
   
   game_object -> position_id        = glGetAttribLocation( game_object -> shader_program_id,  "aPosition" );
-  game_object -> normal_id          = glGetAttribLocation( game_object -> shader_program_id,  "aNormal" );
-  game_object -> tex_coord0_id      = glGetAttribLocation( game_object -> shader_program_id,  "aTexCoord" );
+  // game_object -> normal_id          = glGetAttribLocation( game_object -> shader_program_id,  "aNormal" );
+  // game_object -> tex_coord0_id      = glGetAttribLocation( game_object -> shader_program_id,  "aTexCoord" );
   game_object -> mvp_id             = glGetUniformLocation( game_object -> shader_program_id, "uMVP" );
-  game_object -> model_view_id      = glGetUniformLocation( game_object -> shader_program_id, "uModelViewMatrix" );
-  game_object -> model_id           = glGetUniformLocation( game_object -> shader_program_id, "uModelMatrix" );
-  game_object -> light_position_id  = glGetUniformLocation( game_object -> shader_program_id, "uLightPosition" );
-  game_object -> ambient_light_id   = glGetUniformLocation( game_object -> shader_program_id, "uAmbientLight" );
+  // game_object -> model_view_id      = glGetUniformLocation( game_object -> shader_program_id, "uModelViewMatrix" );
+  // game_object -> model_id           = glGetUniformLocation( game_object -> shader_program_id, "uModelMatrix" );
+  // game_object -> light_position_id  = glGetUniformLocation( game_object -> shader_program_id, "uLightPosition" );
+  // game_object -> ambient_light_id   = glGetUniformLocation( game_object -> shader_program_id, "uAmbientLight" );
   
   glEnableVertexAttribArray( game_object -> position_id );
-  glEnableVertexAttribArray( game_object -> normal_id );
-  glEnableVertexAttribArray( game_object -> tex_coord0_id );
+  // glEnableVertexAttribArray( game_object -> normal_id );
+  // glEnableVertexAttribArray( game_object -> tex_coord0_id );
   
-  glVertexAttribPointer( game_object -> position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_vertex_offset );
-  glVertexAttribPointer( game_object -> normal_id     , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_normal_offset );
-  glVertexAttribPointer( game_object -> tex_coord0_id , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_object -> mesh_data[ 0 ].gl_tex_coord0_offset );
-}
-
-inline real32 lerp( real32 src, real32 dest, real32 alpha ) {
-  return ( ( src * ( 1 - alpha ) ) + ( dest * alpha ) );
-}
-
-inline real32 lerp_dt( real32 src, real32 dest, real32 smoothing, real32 dt ) {
-  return lerp( src, dest, 1 - pow( smoothing, dt ) );
+  real32* vertex_data_position      = &gl_array_buffer_data[ game_object -> vertex_data_offset ];
+  // real32* normal_data_position      = &gl_array_buffer_data[ game_object -> normal_data_offset ];
+  // real32* tex_coord0_data_position  = &gl_array_buffer_data[ game_object -> tex_coord0_data_offset ];
+  
+  glVertexAttribPointer( game_object -> position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )vertex_data_position );
+  // glVertexAttribPointer( game_object -> normal_id     , 3, GL_FLOAT, GL_FALSE, 0, ( void* )normal_data_position );
+  // glVertexAttribPointer( game_object -> tex_coord0_id , 2, GL_FLOAT, GL_FALSE, 0, ( void* )tex_coord0_data_position );
 }
 
 void calculate_ship_rotation( GameInput* game_input, GameObject* ship, real32 dt ) {
@@ -279,14 +492,7 @@ void dump_mat4( real32* mat ) {
 }
 
 inline void translate( real32* matrix, Position position ) {
-  
-  // real32 x = position.x;
-  // real32 y = position.y;
-  // real32 z = position.z;
-  
-  // real32* matrix_pos = matrix;
   matrix += 12;
-  
   *matrix = position.x;
   matrix++;
   *matrix = position.y;
@@ -305,12 +511,6 @@ uint32 init_game( game_memory* memory ) {
   
   SDL_Window* window = sdlObjects.window;
   
-  // Mat4 view_matrix;
-  // Mat4 projection_matrix;
-  
-  // real32 view_matrix[ 16 ]        = { 0.59f, -4.11f, 0.68f, 0.0f, 0.0f, 0.86f, 0.51f, 0.0f, -0.8f, -0.31f, 0.51f, 0.0f, 0.0f, 0.0f, -5.8f, 1.0f };
-  // real32 projection_matrix[ 16 ]  = { 0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.43f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, -0.2f, 0.0f };
-  
   real32 light_position[ 3 ]  = { 0.0f, 5.0f, 0.0f };
   real32 ambient_light        = 0.3f;
   
@@ -324,7 +524,7 @@ uint32 init_game( game_memory* memory ) {
   
   initialise_gamepads();
   
-  const uint32 object_count = 2;
+  const uint32 object_count = 1;
   GameObject game_objects[ object_count ];
   
   bool32  running = true;
@@ -341,14 +541,13 @@ uint32 init_game( game_memory* memory ) {
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
       glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
       
-      GameObject ship;
-      load_game_object( &game_objects[ 0 ], "modelShip.glb"     , "shaderLight.glsl" );
-      load_game_object( &game_objects[ 1 ], "modelEnemyPod.glb" , "shaderLight.glsl" );
+      load_game_object_gltf( &game_objects[ 0 ], "modelShip.glb"     , "shaderBasic.glsl" );
+      // load_game_object_gltf( &game_objects[ 1 ], "modelEnemyPod.glb" , "shaderLight.glsl" );
       
       game_objects[ 0 ].position.x -= 2.0f;
-      game_objects[ 1 ].position.x += 2.0f;
-      game_objects[ 1 ].position.z -= 5.0f;
-      game_objects[ 1 ].position.y += 5.0f;
+      // game_objects[ 1 ].position.x += 2.0f;
+      // game_objects[ 1 ].position.z -= 5.0f;
+      // game_objects[ 1 ].position.y += 5.0f;
       
       // projection matrix
       real32 p[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
@@ -367,8 +566,6 @@ uint32 init_game( game_memory* memory ) {
       memory -> isInitialized = true;
       
       current_time = 1; // so dt calc doesn't do weird things
-      
-      
     }
     
     previous_time = current_time;
@@ -394,7 +591,7 @@ uint32 init_game( game_memory* memory ) {
     
     // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "x is %f\n", game_input.joy_axis_x );
     // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "y is %f\n", game_input.joy_axis_y );
-        
+    
     if( game_input.quit )
       running = false;
     
@@ -406,28 +603,30 @@ uint32 init_game( game_memory* memory ) {
     
     calculate_ship_rotation( &game_input, &game_objects[ 0 ], dt );
     
-    game_objects[ 1 ].rotation_x += 0.02f;
-    game_objects[ 1 ].rotation_y += 2.0f;
+    // game_objects[ 1 ].rotation_x += 0.02f;
+    // game_objects[ 1 ].rotation_y += 2.0f;
     // game_objects[ 1 ].rotation_z += 6.0f;
     
     for( uint32 i = 0; i < object_count; i++ ) {
       
-      if( game_objects[ i ].rotation_x > 360.0f ) game_objects[ i ].rotation_x -= 360.0f;
-      if( game_objects[ i ].rotation_y > 360.0f ) game_objects[ i ].rotation_y -= 360.0f;
-      if( game_objects[ i ].rotation_z > 360.0f ) game_objects[ i ].rotation_z -= 360.0f;
-      if( game_objects[ i ].rotation_x < 0.0f )   game_objects[ i ].rotation_x += 360.0f;
-      if( game_objects[ i ].rotation_y < 0.0f )   game_objects[ i ].rotation_y += 360.0f;
-      if( game_objects[ i ].rotation_z < 0.0f )   game_objects[ i ].rotation_z += 360.0f;
+      GameObject* game_object = &game_objects[ i ];
+      
+      if( game_object -> rotation_x > 360.0f ) game_object -> rotation_x -= 360.0f;
+      if( game_object -> rotation_y > 360.0f ) game_object -> rotation_y -= 360.0f;
+      if( game_object -> rotation_z > 360.0f ) game_object -> rotation_z -= 360.0f;
+      if( game_object -> rotation_x < 0.0f )   game_object -> rotation_x += 360.0f;
+      if( game_object -> rotation_y < 0.0f )   game_object -> rotation_y += 360.0f;
+      if( game_object -> rotation_z < 0.0f )   game_object -> rotation_z += 360.0f;
       
       real32 model_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
       real32 rot_mat_x[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
       real32 rot_mat_y[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
       real32 rot_mat_z[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
       
-      translate( &model_matrix[ 0 ], game_objects[ i ].position );
-      rotate_x( &rot_mat_x[ 0 ], game_objects[ i ].rotation_x );
-      rotate_y( &rot_mat_y[ 0 ], game_objects[ i ].rotation_y );
-      rotate_z( &rot_mat_z[ 0 ], game_objects[ i ].rotation_z );
+      translate( &model_matrix[ 0 ], game_object -> position );
+      rotate_x( &rot_mat_x[ 0 ], game_object -> rotation_x );
+      rotate_y( &rot_mat_y[ 0 ], game_object -> rotation_y );
+      rotate_z( &rot_mat_z[ 0 ], game_object -> rotation_z );
       
       real32 rot_mat_xy[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
       real32 rot_mat_xyz[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
@@ -436,12 +635,6 @@ uint32 init_game( game_memory* memory ) {
       
       mat4_multiply( &model_matrix[ 0 ], &rot_mat_xyz[ 0 ], &model_matrix[ 0 ] );
       
-      // real32 m[ 16 ] = game_objects[ i ].model_matrix;
-      // real32 v[ 16 ] = view_matrix;
-      // real32 p[ 16 ] = projection_matrix;
-      // real32 vp[ 16 ] = p * v;
-      // real32 mvp[ 16 ] = vp * m;
-    
       real32 mvp[ 16 ]  = {}; // model view projection matrix
       
       // multiply model matrix with the view-projection matrix to get the mvp matrix
@@ -450,17 +643,23 @@ uint32 init_game( game_memory* memory ) {
       
       glUseProgram( game_objects[ i ].shader_program_id );
       glUniformMatrix4fv( game_objects[ i ].mvp_id  , 1, GL_FALSE, &mvp[ 0 ] );
-      glUniformMatrix4fv( game_objects[ i ].model_id, 1, GL_FALSE, &model_matrix[ 0 ] );
-      glUniform3f( game_objects[ i ].light_position_id, light_position[ 0 ] , light_position[ 1 ] , light_position[ 2 ] );
-      glUniform1f( game_objects[ i ].ambient_light_id , ambient_light );
+      // glUniformMatrix4fv( game_objects[ i ].model_id, 1, GL_FALSE, &model_matrix[ 0 ] );
+      // glUniform3f( game_objects[ i ].light_position_id, light_position[ 0 ] , light_position[ 1 ] , light_position[ 2 ] );
+      // glUniform1f( game_objects[ i ].ambient_light_id , ambient_light );
       
-      glVertexAttribPointer( game_objects[ i ].position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_vertex_offset );
-      glVertexAttribPointer( game_objects[ i ].normal_id     , 3, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_normal_offset );
-      glVertexAttribPointer( game_objects[ i ].tex_coord0_id , 2, GL_FLOAT, GL_FALSE, 0, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_tex_coord0_offset );
+      real32* vertex_data_position      = &gl_array_buffer_data[ game_object -> vertex_data_offset ];
+      // real32* normal_data_position      = &gl_array_buffer_data[ game_object -> normal_data_offset ];
+      // real32* tex_coord0_data_position  = &gl_array_buffer_data[ game_object -> tex_coord0_data_offset ];
       
-      glBindTexture( GL_TEXTURE_2D, game_objects[ i ].tbo );
+      glVertexAttribPointer( game_object -> position_id   , 3, GL_FLOAT, GL_FALSE, 0, ( void* )vertex_data_position );
+      // glVertexAttribPointer( game_object -> normal_id     , 3, GL_FLOAT, GL_FALSE, 0, ( void* )normal_data_position );
+      // glVertexAttribPointer( game_object -> tex_coord0_id , 2, GL_FLOAT, GL_FALSE, 0, ( void* )tex_coord0_data_position );
       
-      glDrawElements( GL_TRIANGLES, game_objects[ i ].mesh_data[ 0 ].index_count, GL_UNSIGNED_INT, ( void* )game_objects[ i ].mesh_data[ 0 ].gl_index_offset );
+      // glBindTexture( GL_TEXTURE_2D, game_object -> tbo );
+      
+      uint32* index_data_location = &gl_element_array_buffer_data[ game_object -> index_data_offset ];
+      
+      glDrawElements( GL_TRIANGLES, game_object -> index_data_count, GL_UNSIGNED_INT, ( void* )index_data_location );
       
     }
     

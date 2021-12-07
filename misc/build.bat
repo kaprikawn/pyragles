@@ -17,7 +17,7 @@ if not exist %BUILD_DIR% mkdir %BUILD_DIR%
 
 pushd %BUILD_DIR%
 
-call %VCVARS_DIR%\vcvarsall.bat x64
+@REM call %VCVARS_DIR%\vcvarsall.bat x64
 
 cl -Zi /EHsc -wd4312 -DDEBUG=1 ..\src\main_windows.cpp user32.lib gdi32.lib Shlwapi.lib opengl32.lib /I%SDL_ROOT_DIR%\include /I%GLEW_ROOT_DIR%/include /link /LIBPATH:%SDL_ROOT_DIR%\lib\x64 /LIBPATH:%GLEW_ROOT_DIR%\lib\Release\x64 SDL2.lib SDL2main.lib glew32.lib /OUT:AlphaFlight.exe
 

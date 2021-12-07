@@ -74,11 +74,14 @@ struct MeshPositionIndices {
   uint32 material;
 };
 
+enum AccessorType { ACCESSOR_VEC3, ACCESSOR_VEC2, ACCESSOR_SCALAR };
+
 struct AccessorData {
   uint32  buffer_view;
   uint32  component_type;
   uint32  count;
-  char    type[ 6 ];
+  int32   accessor_type;
+  char    type[ 7 ];
 };
 
 struct BufferViewData {
@@ -295,6 +298,10 @@ void populate_mesh_name( uint32 target_mesh_index, const char* json_string, uint
 int32 get_image_buffer_view_index( const char* json_string, uint32 json_char_count ) {
   
   int32 result = -1;
+  
+  if( json_char_count == 0 ) {
+    json_char_count = string_length( json_string );
+  }
   
   bool32  in_images_section   = false;
   uint32  object_depth        = 0;
@@ -742,7 +749,13 @@ AccessorData get_accessor_data( uint32 target_accessor_index, const char* json_s
             }
             
             done_type = true;
-            
+            if( strings_are_equal( result.type, "VEC3" ) ) {
+              result.accessor_type = ACCESSOR_VEC3;
+            } else if( strings_are_equal( result.type, "VEC2" ) ) {
+              result.accessor_type = ACCESSOR_VEC2;
+            } else if( strings_are_equal( result.type, "SCALAR" ) ) {
+              result.accessor_type = ACCESSOR_SCALAR;
+            }
           }
           
           if( done_buffer_view && done_component_type && done_count && done_type )

@@ -13,6 +13,14 @@ struct Position {
   real32 z;
 };
 
+inline real32 lerp( real32 src, real32 dest, real32 alpha ) {
+  return ( ( src * ( 1 - alpha ) ) + ( dest * alpha ) );
+}
+
+inline real32 lerp_dt( real32 src, real32 dest, real32 smoothing, real32 dt ) {
+  return lerp( src, dest, 1 - pow( smoothing, dt ) );
+}
+
 inline void mat4_multiply( real32* dest, real32* mat1, real32* mat2 ) {
   
   real32 result[ 16 ] = {
