@@ -346,7 +346,6 @@ bool32 strings_are_equal( const char* str1, const char* str2 ) {
   return true;
 }
 
-
 uint32 compileShader( uint32 type, const char* source ) {
   
   // std::cout << "##source is " << "\n\n" << source << std::endl;
@@ -446,7 +445,6 @@ uint32 createShader( const char* shaderSource, uint32 filesizeMax ) {
   glDeleteShader( vs );
   glDeleteShader( fs );
   
-
   free( vertexShaderSource );
   free( fragmentShaderSource );
   
