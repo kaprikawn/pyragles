@@ -157,15 +157,10 @@ uint32 init_game( game_memory* memory ) {
   const uint32 object_count = 1;
   GameObject game_objects[ object_count ];
   
-  GameObject game_object = {};
-  game_object.position.z = -5.0f;
-  
   bool32  running = true;
   
   int32   program_id;
   int32   active_shader_program_id = -9;
-  int32   pos_id = -9;
-  int32   mvp_id = -9;
   
   do { // start main loop
     
@@ -185,69 +180,72 @@ uint32 init_game( game_memory* memory ) {
       
       mat4_multiply( &vp[ 0 ], &v[ 0 ], &p[ 0 ] );
       
-      real32 vertices[ 24 ] = {
-          -1.0f,  1.0f,  1.0f // front top left
-        , -1.0f, -1.0f,  1.0f // front bottom left
-        ,  1.0f,  1.0f,  1.0f // front top right
-        ,  1.0f, -1.0f,  1.0f // front bottom right
-        ,  1.0f,  1.0f, -1.0f // back top right
-        ,  1.0f, -1.0f, -1.0f // back bottom right
-        , -1.0f,  1.0f, -1.0f // back top left
-        , -1.0f, -1.0f, -1.0f // back bottom left
-      };
-      
-      game_object.offset_vertex_data = 0;
-      game_object.count_vertex_data = 24;
-      
-      log_array_buffer_data( &vertices[ 0 ], game_object.count_vertex_data );
-      
-      
+      // set up gl buffers
       glGenBuffers( 1, &vbo );
       glBindBuffer( GL_ARRAY_BUFFER, vbo );
       glBufferData( GL_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
-      glBufferSubData( GL_ARRAY_BUFFER, game_object.offset_vertex_data, game_object.count_vertex_data * sizeof( &gl_array_buffer_data[ 0 ] ), ( void* )&gl_array_buffer_data[ game_object.offset_vertex_data ] );
-      // glBufferData( GL_ARRAY_BUFFER, game_object.count_vertex_data * sizeof( &gl_array_buffer_data[ 0 ] ), &gl_array_buffer_data[ game_object.offset_vertex_data ], GL_STATIC_DRAW );
-      
-      uint32 indices[ 36 ] = {
-          0, 1, 2 // front A
-        , 2, 1, 3 // front B
-        , 4, 2, 3 // right A
-        , 4, 3, 5 // right B
-        , 4, 5, 6 // back A
-        , 6, 5, 7 // back B
-        , 7, 0, 6 // left A
-        , 0, 7, 1 // left B
-        , 5, 3, 7 // bottom A
-        , 7, 3, 0 // bottom B
-        , 2, 4, 0 // top A
-        , 0, 4, 6 // top B
-      };
-      
-      game_object.offset_index_data = 0;
-      game_object.count_index_data = 36;
-      
-      log_element_array_buffer_data( NULL, &indices[ 0 ], game_object.count_index_data );
-      
       
       glGenBuffers( 1, &ibo );
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
       glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
-      glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, game_object.offset_index_data, game_object.count_index_data * sizeof( &gl_element_array_buffer_data[ 0 ] ), ( void* )&gl_element_array_buffer_data[ game_object.offset_index_data ] );
+      
+      for( uint32 i = 0; i < object_count; i++ ) {
+        real32 vertices[ 24 ] = {
+            -1.0f,  1.0f,  1.0f // front top left
+          , -1.0f, -1.0f,  1.0f // front bottom left
+          ,  1.0f,  1.0f,  1.0f // front top right
+          ,  1.0f, -1.0f,  1.0f // front bottom right
+          ,  1.0f,  1.0f, -1.0f // back top right
+          ,  1.0f, -1.0f, -1.0f // back bottom right
+          , -1.0f,  1.0f, -1.0f // back top left
+          , -1.0f, -1.0f, -1.0f // back bottom left
+        };
+        
+        game_objects[ i ].count_vertex_data = 24;
+        
+        game_objects[ i ].offset_vertex_data = log_array_buffer_data( &vertices[ 0 ], game_objects[ i ].count_vertex_data );
+        
+        glBufferSubData( GL_ARRAY_BUFFER, game_objects[ i ].offset_vertex_data, game_objects[ i ].count_vertex_data * sizeof( &gl_array_buffer_data[ 0 ] ), ( void* )&gl_array_buffer_data[ game_objects[ i ].offset_vertex_data ] );
+        // glBufferData( GL_ARRAY_BUFFER, game_object.count_vertex_data * sizeof( &gl_array_buffer_data[ 0 ] ), &gl_array_buffer_data[ game_object.offset_vertex_data ], GL_STATIC_DRAW );
+        
+        uint32 indices[ 36 ] = {
+            0, 1, 2 // front A
+          , 2, 1, 3 // front B
+          , 4, 2, 3 // right A
+          , 4, 3, 5 // right B
+          , 4, 5, 6 // back A
+          , 6, 5, 7 // back B
+          , 7, 0, 6 // left A
+          , 0, 7, 1 // left B
+          , 5, 3, 7 // bottom A
+          , 7, 3, 0 // bottom B
+          , 2, 4, 0 // top A
+          , 0, 4, 6 // top B
+        };
+        
+        game_objects[ i ].count_index_data = 36;
+        
+        game_objects[ i ].offset_index_data = log_element_array_buffer_data( NULL, &indices[ 0 ], game_objects[ i ].count_index_data );
+        
+        glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, game_objects[ i ].offset_index_data, game_objects[ i ].count_index_data * sizeof( &gl_element_array_buffer_data[ 0 ] ), ( void* )&gl_element_array_buffer_data[ game_objects[ i ].offset_index_data ] );
 
-      // glBufferData( GL_ELEMENT_ARRAY_BUFFER, game_object.count_index_data * sizeof( &gl_element_array_buffer_data[ 0 ] ), &gl_element_array_buffer_data[ game_object.offset_index_data ], GL_STATIC_DRAW );
-      
-      ReadFileResult shader_file = read_entire_file( "shaderDebug.glsl" );
-      program_id = createShader( ( const char* )shader_file.contents, shader_file.contentsSize );
-      gl_use_program( program_id, &active_shader_program_id );
-      free_memory( shader_file.contents, shader_file.contentsSize );
-      
-      pos_id  = glGetAttribLocation( program_id, "aPosition" );
-      mvp_id  = glGetUniformLocation( program_id, "uMVP" );
-      
-      if( pos_id >= 0 ) {
-        glEnableVertexAttribArray( pos_id );
-      } else {
-        SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Error - Failed to get pos_id\n" );
+        // glBufferData( GL_ELEMENT_ARRAY_BUFFER, game_object.count_index_data * sizeof( &gl_element_array_buffer_data[ 0 ] ), &gl_element_array_buffer_data[ game_object.offset_index_data ], GL_STATIC_DRAW );
+        
+        ReadFileResult shader_file = read_entire_file( "shaderDebug.glsl" );
+        game_objects[ i ].shader_program_id = createShader( ( const char* )shader_file.contents, shader_file.contentsSize );
+        gl_use_program( game_objects[ i ].shader_program_id, &active_shader_program_id );
+        free_memory( shader_file.contents, shader_file.contentsSize );
+        
+        game_objects[ 0 ].position.z = -5.0f;
+        
+        game_objects[ i ].gl_id_position  = glGetAttribLocation( game_objects[ i ].shader_program_id, "aPosition" );
+        game_objects[ i ].gl_id_mvp_mat  = glGetUniformLocation( game_objects[ i ].shader_program_id, "uMVP" );
+        
+        if( game_objects[ i ].gl_id_position >= 0 ) {
+          glEnableVertexAttribArray( game_objects[ i ].gl_id_position );
+        } else {
+          SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Error - Failed to get pos_id\n" );
+        }
       }
       
       memory -> isInitialized = true;
@@ -283,18 +281,21 @@ uint32 init_game( game_memory* memory ) {
       running = false;
     
     // update and render
-    real32 model_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-    // translate( &model_matrix[ 0 ], game_object.position );
-    real32 mvp[ 16 ]  = {}; // model view projection matrix
-    mat4_multiply( &mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
     
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    glUseProgram( program_id );
-    glUniformMatrix4fv( mvp_id, 1, GL_FALSE, &mvp[ 0 ] );
-    
-    glVertexAttribPointer( pos_id, 3, GL_FLOAT, GL_FALSE, 0, ( void* )0 );
-    
-    glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, ( void* )0 );
+    for( uint32 i = 0; i < object_count; i++ ) {
+      real32 model_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      translate( &model_matrix[ 0 ], game_objects[ i ].position );
+      real32 mvp[ 16 ]  = {}; // model view projection matrix
+      mat4_multiply( &mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
+      
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+      gl_use_program( game_objects[ i ].shader_program_id, &active_shader_program_id );
+      glUniformMatrix4fv( game_objects[ i ].gl_id_mvp_mat, 1, GL_FALSE, &mvp[ 0 ] );
+      
+      glVertexAttribPointer( game_objects[ i ].gl_id_position, 3, GL_FLOAT, GL_FALSE, 0, ( void* )0 );
+      
+      glDrawElements( GL_TRIANGLES, game_objects[ i ].count_index_data, GL_UNSIGNED_INT, ( void* )0 );
+    }
     
     uint64 before_frame_flip_ticks = SDL_GetTicks();
     
