@@ -18,25 +18,6 @@ bool GLLogCall( const char* function, const char* file, int line ) {
 }
 */
 
-struct Mat4 {
-  real32  m00 = 1.0f;
-  real32  m01 = 0.0f;
-  real32  m02 = 0.0f;
-  real32  m03 = 0.0f;
-  real32  m10 = 0.0f;
-  real32  m11 = 1.0f;
-  real32  m12 = 0.0f;
-  real32  m13 = 0.0f;
-  real32  m20 = 0.0f;
-  real32  m21 = 0.0f;
-  real32  m22 = 1.0f;
-  real32  m23 = 0.0f;
-  real32  m30 = 0.0f;
-  real32  m31 = 0.0f;
-  real32  m32 = 0.0f;
-  real32  m33 = 1.0f;
-};
-
 struct GameObject {
   real32    mvp[ 16 ];
   Position  position;
@@ -77,14 +58,24 @@ uint32 log_array_buffer_data( real32* data, uint32 count ) {
   return result;
 }
 
-uint32 log_element_array_buffer_data( uint16* data, uint32 count ) {
+uint32 log_element_array_buffer_data( uint16* data, uint32* data32, uint32 count ) {
   uint32 result = gl_element_array_buffer_data_last_position;
-  for( uint32 i = 0; i < count; i++ ) {
-    uint16 this_index = *data;
-    uint32 index_value = ( uint32 )this_index;
-    gl_element_array_buffer_data[ gl_element_array_buffer_data_last_position++ ] = index_value;
-    data++;
+  
+  if( data != NULL ) {
+    for( uint32 i = 0; i < count; i++ ) {
+      uint16 this_index = *data;
+      uint32 index_value = ( uint32 )this_index;
+      gl_element_array_buffer_data[ gl_element_array_buffer_data_last_position++ ] = index_value;
+      data++;
+    }
+  } else if( data32 != NULL ) {
+    for( uint32 i = 0; i < count; i++ ) {
+      real32 this_value = *data32;
+      gl_element_array_buffer_data[ gl_element_array_buffer_data_last_position++ ] = this_value;
+      data32++;
+    }
   }
+  
   return result;
 }
 
@@ -128,7 +119,7 @@ void load_game_object_gltf( GameObject* game_object, const char* model_filename,
   data              = get_gltf_data_pointer( target_mesh_index, gltf_contents, json, GLTF_INDICES );
   count             = get_gltf_data_count( target_mesh_index, gltf_contents, json, GLTF_INDICES );
   byte_length       = buffer_view_info.byte_length;
-  game_object -> offset_index_data  = log_element_array_buffer_data( ( uint16* )data, count );
+  game_object -> offset_index_data  = log_element_array_buffer_data( ( uint16* )data, NULL, count );
   game_object -> count_index_data   = get_count_from_type( count, buffer_view_info.type );
   glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, game_object -> offset_index_data, byte_length, data );
   
@@ -200,6 +191,8 @@ uint32 init_game( game_memory* memory ) {
       
       vertex_data_postion = &vertices[ 0 ];
       
+      log_array_buffer_data( &vertices[ 0 ], 24 );
+      
       glGenBuffers( 1, &vbo );
       glBindBuffer( GL_ARRAY_BUFFER, vbo );
       glBufferData( GL_ARRAY_BUFFER, 24 * sizeof( &vertices[ 0 ] ), &vertices[ 0 ], GL_STATIC_DRAW );
@@ -220,6 +213,8 @@ uint32 init_game( game_memory* memory ) {
       };
       
       index_data_position = &indices[ 0 ];
+      
+      log_element_array_buffer_data( NULL, &indices[ 0 ], 36 );
       
       glGenBuffers( 1, &ibo );
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );

@@ -7,6 +7,25 @@
 
 const real32 DEGREES_TO_RADIANS_FACTOR = 0.01745329251994329576923690768489f;
 
+struct Mat4 {
+  real32  m00 = 1.0f;
+  real32  m01 = 0.0f;
+  real32  m02 = 0.0f;
+  real32  m03 = 0.0f;
+  real32  m10 = 0.0f;
+  real32  m11 = 1.0f;
+  real32  m12 = 0.0f;
+  real32  m13 = 0.0f;
+  real32  m20 = 0.0f;
+  real32  m21 = 0.0f;
+  real32  m22 = 1.0f;
+  real32  m23 = 0.0f;
+  real32  m30 = 0.0f;
+  real32  m31 = 0.0f;
+  real32  m32 = 0.0f;
+  real32  m33 = 1.0f;
+};
+
 struct Position {
   real32 x;
   real32 y;
