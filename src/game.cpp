@@ -154,7 +154,7 @@ uint32 init_game( game_memory* memory ) {
   
   initialise_gamepads();
   
-  const uint32 object_count = 1;
+  const uint32 object_count = 2;
   GameObject game_objects[ object_count ];
   
   bool32  running = true;
@@ -190,6 +190,7 @@ uint32 init_game( game_memory* memory ) {
       glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
       
       for( uint32 i = 0; i < object_count; i++ ) {
+        
         real32 vertices[ 24 ] = {
             -1.0f,  1.0f,  1.0f // front top left
           , -1.0f, -1.0f,  1.0f // front bottom left
@@ -228,15 +229,15 @@ uint32 init_game( game_memory* memory ) {
         game_objects[ i ].offset_index_data = log_element_array_buffer_data( NULL, &indices[ 0 ], game_objects[ i ].count_index_data );
         
         glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, game_objects[ i ].offset_index_data, game_objects[ i ].count_index_data * sizeof( &gl_element_array_buffer_data[ 0 ] ), ( void* )&gl_element_array_buffer_data[ game_objects[ i ].offset_index_data ] );
-
+        
         // glBufferData( GL_ELEMENT_ARRAY_BUFFER, game_object.count_index_data * sizeof( &gl_element_array_buffer_data[ 0 ] ), &gl_element_array_buffer_data[ game_object.offset_index_data ], GL_STATIC_DRAW );
         
         ReadFileResult shader_file = read_entire_file( "shaderDebug.glsl" );
         game_objects[ i ].shader_program_id = createShader( ( const char* )shader_file.contents, shader_file.contentsSize );
-        gl_use_program( game_objects[ i ].shader_program_id, &active_shader_program_id );
+        glUseProgram( game_objects[ i ].shader_program_id );
         free_memory( shader_file.contents, shader_file.contentsSize );
         
-        game_objects[ 0 ].position.z = -5.0f;
+        game_objects[ 0 ].position.z = -10.0f;
         
         game_objects[ i ].gl_id_position  = glGetAttribLocation( game_objects[ i ].shader_program_id, "aPosition" );
         game_objects[ i ].gl_id_mvp_mat  = glGetUniformLocation( game_objects[ i ].shader_program_id, "uMVP" );
@@ -281,15 +282,14 @@ uint32 init_game( game_memory* memory ) {
       running = false;
     
     // update and render
-    
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     for( uint32 i = 0; i < object_count; i++ ) {
       real32 model_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
       translate( &model_matrix[ 0 ], game_objects[ i ].position );
       real32 mvp[ 16 ]  = {}; // model view projection matrix
       mat4_multiply( &mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
       
-      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-      gl_use_program( game_objects[ i ].shader_program_id, &active_shader_program_id );
+      glUseProgram( game_objects[ i ].shader_program_id );
       glUniformMatrix4fv( game_objects[ i ].gl_id_mvp_mat, 1, GL_FALSE, &mvp[ 0 ] );
       
       glVertexAttribPointer( game_objects[ i ].gl_id_position, 3, GL_FLOAT, GL_FALSE, 0, ( void* )0 );
