@@ -125,6 +125,14 @@ void load_game_object_gltf( GameObject* game_object, const char* model_filename,
   
 }
 
+inline void gl_use_program( int32 required_shader_program_id, int32* active_shader_program_id ) {
+  int32 current_shader_program_id = *active_shader_program_id;
+  if( current_shader_program_id != required_shader_program_id ) {
+    glUseProgram( required_shader_program_id );
+    *active_shader_program_id = required_shader_program_id;
+  }
+}
+
 uint32 init_game( game_memory* memory ) {
   
   SDLObjects sdlObjects;
@@ -154,11 +162,10 @@ uint32 init_game( game_memory* memory ) {
   
   bool32  running = true;
   
-  real32* vertex_data_postion;
-  uint32* index_data_position;
   int32   program_id;
-  int32 pos_id = -9;
-  int32 mvp_id = -9;
+  int32   active_shader_program_id = -9;
+  int32   pos_id = -9;
+  int32   mvp_id = -9;
   
   do { // start main loop
     
@@ -189,13 +196,17 @@ uint32 init_game( game_memory* memory ) {
         , -1.0f, -1.0f, -1.0f // back bottom left
       };
       
-      vertex_data_postion = &vertices[ 0 ];
+      game_object.offset_vertex_data = 0;
+      game_object.count_vertex_data = 24;
       
-      log_array_buffer_data( &vertices[ 0 ], 24 );
+      log_array_buffer_data( &vertices[ 0 ], game_object.count_vertex_data );
+      
       
       glGenBuffers( 1, &vbo );
       glBindBuffer( GL_ARRAY_BUFFER, vbo );
-      glBufferData( GL_ARRAY_BUFFER, 24 * sizeof( &vertices[ 0 ] ), &vertices[ 0 ], GL_STATIC_DRAW );
+      glBufferData( GL_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
+      glBufferSubData( GL_ARRAY_BUFFER, game_object.offset_vertex_data, game_object.count_vertex_data * sizeof( &gl_array_buffer_data[ 0 ] ), ( void* )&gl_array_buffer_data[ game_object.offset_vertex_data ] );
+      // glBufferData( GL_ARRAY_BUFFER, game_object.count_vertex_data * sizeof( &gl_array_buffer_data[ 0 ] ), &gl_array_buffer_data[ game_object.offset_vertex_data ], GL_STATIC_DRAW );
       
       uint32 indices[ 36 ] = {
           0, 1, 2 // front A
@@ -212,17 +223,22 @@ uint32 init_game( game_memory* memory ) {
         , 0, 4, 6 // top B
       };
       
-      index_data_position = &indices[ 0 ];
+      game_object.offset_index_data = 0;
+      game_object.count_index_data = 36;
       
-      log_element_array_buffer_data( NULL, &indices[ 0 ], 36 );
+      log_element_array_buffer_data( NULL, &indices[ 0 ], game_object.count_index_data );
+      
       
       glGenBuffers( 1, &ibo );
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-      glBufferData( GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof( &indices[ 0 ] ), &indices[ 0 ], GL_STATIC_DRAW );
+      glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
+      glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, game_object.offset_index_data, game_object.count_index_data * sizeof( &gl_element_array_buffer_data[ 0 ] ), ( void* )&gl_element_array_buffer_data[ game_object.offset_index_data ] );
+
+      // glBufferData( GL_ELEMENT_ARRAY_BUFFER, game_object.count_index_data * sizeof( &gl_element_array_buffer_data[ 0 ] ), &gl_element_array_buffer_data[ game_object.offset_index_data ], GL_STATIC_DRAW );
       
       ReadFileResult shader_file = read_entire_file( "shaderDebug.glsl" );
       program_id = createShader( ( const char* )shader_file.contents, shader_file.contentsSize );
-      glUseProgram( program_id );
+      gl_use_program( program_id, &active_shader_program_id );
       free_memory( shader_file.contents, shader_file.contentsSize );
       
       pos_id  = glGetAttribLocation( program_id, "aPosition" );
