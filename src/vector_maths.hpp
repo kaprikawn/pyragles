@@ -170,4 +170,21 @@ void populate_view_matrix( real32* dest, Position eye, Position centre ) {
   int y = 7;
 }
 
+inline real32 lerp( real32 src, real32 dest, real32 alpha ) {
+  return ( ( src * ( 1 - alpha ) ) + ( dest * alpha ) );
+}
+
+inline real32 lerp_dt( real32 src, real32 dest, real32 smoothing, real32 dt ) {
+  return lerp( src, dest, 1 - pow( smoothing, dt ) );
+}
+
+inline void translate( real32* matrix, Position position ) {
+  matrix += 12;
+  *matrix = position.x;
+  matrix++;
+  *matrix = position.y;
+  matrix++;
+  *matrix = position.z;
+}
+
 #endif //VECTOR_MATHS_HPP

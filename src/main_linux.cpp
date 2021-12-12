@@ -24,7 +24,7 @@ int main( int argc, char* argv[] ) {
   Assert( memory.permanentStorage );
   Assert( memory.tempStorage );
   
-  init_game( &memory );
+  run_game( &memory );
   
   return 0;
 }
