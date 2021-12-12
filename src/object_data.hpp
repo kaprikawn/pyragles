@@ -41,8 +41,4 @@ uint32    counts_normal_data        [ object_count ];
 uint32    counts_tex_coord0_data    [ object_count ];
 uint32    counts_index_data         [ object_count ];
 
-uint32    target_gl_offsets_vertex_data = 0;
-uint32    target_gl_offsets_index_data  = 0;
-
-
 #endif //OBJECT_DATA_HPP

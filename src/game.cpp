@@ -9,11 +9,13 @@
 
 struct GameState {
   real32  vp_mat[ 16 ]; // view perspective matrix
-  GLuint  vbo;
-  GLuint  ibo;
-  uint32  array_buffer_target         = 0;
-  uint32  element_array_buffer_target = 0;
-  bool32  invert_y = false;
+  int32   vbo;
+  int32   ibo;
+  uint32  array_buffer_target           = 0;
+  uint32  element_array_buffer_target   = 0;
+  uint32  target_gl_offsets_array_data  = 0;
+  uint32  target_gl_offsets_index_data  = 0;
+  bool32  invert_y                      = false;
 };
 
 // for delta time ( dt )
@@ -115,11 +117,12 @@ void load_level_objects( GameState* game_state ) {
     data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_VERTICES );
     count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_VERTICES );
     count *= 3; // three values per vertex
+    byte_length = ( count * sizeof( real32 ) );
     
     counts_vertex_data[ i ]   = count;
     offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
     {
-      void*   dest  = ( void* )&offsets_vertex_data[ i ];
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
       void*   src   = ( void* )data;
       uint32  bytes = byte_length;
       memcpy( dest, src, bytes );
@@ -131,11 +134,12 @@ void load_level_objects( GameState* game_state ) {
     data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_NORMALS );
     count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_NORMALS );
     count *= 3; // three values per vertex
+    byte_length = ( count * sizeof( real32 ) );
     
     counts_normal_data[ i ]   = count;
     offsets_normal_data[ i ]  = game_state -> array_buffer_target;
     {
-      void*   dest  = ( void* )&offsets_normal_data[ i ];
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
       void*   src   = ( void* )data;
       uint32  bytes = byte_length;
       memcpy( dest, src, bytes );
@@ -147,11 +151,12 @@ void load_level_objects( GameState* game_state ) {
     data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
     count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
     count *= 2; // two values per uv coordinate
+    byte_length = ( count * sizeof( real32 ) );
     
     counts_tex_coord0_data[ i ]   = count;
     offsets_tex_coord0_data[ i ]  = game_state -> array_buffer_target;
     {
-      void*   dest  = ( void* )&offsets_tex_coord0_data[ i ];
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_tex_coord0_data[ i ] ];
       void*   src   = ( void* )data;
       uint32  bytes = byte_length;
       memcpy( dest, src, bytes );
@@ -162,11 +167,12 @@ void load_level_objects( GameState* game_state ) {
     buffer_view_info  = get_glft_buffer_view_info(  target_mesh_index, gltf_contents, json, GLTF_INDICES );
     data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_INDICES );
     count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_INDICES );
+    byte_length = ( count * sizeof( uint16 ) );
     
     counts_index_data[ i ]   = count;
     offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
     {
-      void*   dest  = ( void* )&offsets_index_data[ i ];
+      void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
       void*   src   = ( void* )data;
       uint32  bytes = byte_length;
       memcpy( dest, src, bytes );
@@ -174,6 +180,60 @@ void load_level_objects( GameState* game_state ) {
     game_state -> element_array_buffer_target += count;
     
     free( json_string );
+  }
+}
+
+void upload_objects_data_to_gl( GameState* game_state ) {
+  
+  for( uint32 i = 0; i < object_count; i++ ) {
+    
+    // vertex data
+    {
+      gl_offsets_vertex_data[ i ] = game_state -> target_gl_offsets_array_data;
+      uint32      target          = GL_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_vertex_data[ i ];
+      uint32      size            = ( sizeof( real32 ) * counts_vertex_data[ i ] );
+      uint32      array_position  = offsets_vertex_data[ i ];
+      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      
+      glBufferSubData( target, offset, size, data );
+    }
+    
+    // normal data
+    {
+      gl_offsets_normal_data[ i ] = game_state -> target_gl_offsets_array_data;
+      uint32      target          = GL_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_normal_data[ i ];
+      uint32      size            = ( sizeof( real32 ) * counts_normal_data[ i ] );
+      uint32      array_position  = offsets_normal_data[ i ];
+      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      
+      glBufferSubData( target, offset, size, data );
+    }
+    
+    // tex_coord0 data
+    {
+      gl_offsets_tex_coord0_data[ i ] = game_state -> target_gl_offsets_array_data;
+      uint32      target          = GL_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_tex_coord0_data[ i ];
+      uint32      size            = ( sizeof( real32 ) * counts_tex_coord0_data[ i ] );
+      uint32      array_position  = offsets_tex_coord0_data[ i ];
+      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      
+      glBufferSubData( target, offset, size, data );
+    }
+    
+    // index data
+    {
+      gl_offsets_index_data[ i ] = game_state -> target_gl_offsets_index_data;
+      uint32      target          = GL_ELEMENT_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_index_data[ i ];
+      uint32      size            = ( sizeof( uint16 ) * counts_index_data[ i ] );
+      uint32      array_position  = offsets_index_data[ i ];
+      const void* data            = ( const void* )&gl_element_array_buffer_data[ array_position ];
+      
+      glBufferSubData( target, offset, size, data );
+    }
   }
 }
 
@@ -196,6 +256,8 @@ int32 run_game() {
   SDL_Window* window = sdl_params.window;
   
   load_level_objects( &game_state );
+  
+  upload_objects_data_to_gl( &game_state );
   
   bool32 running = true;
   
