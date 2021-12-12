@@ -50,7 +50,7 @@ bool32      launch_fullscreen = false;
 
 struct ReadFileResult
 {
-    uint32  contentsSize;
+    uint32  contents_size;
     void*   contents;
 };
 
@@ -119,7 +119,7 @@ inline ReadFileResult read_entire_file( const char* filename ) {
     result.contents = VirtualAlloc( 0, filesize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE );
     DWORD BytesRead;
     if( ReadFile( fh, result.contents, filesize, &BytesRead, 0 ) && filesize == BytesRead ) {
-      result.contentsSize = filesize;
+      result.contents_size = filesize;
     }
   }
   CloseHandle( fh );
@@ -138,17 +138,17 @@ void read_entire_file_into_memory( const char* filename, ReadFileResult* result 
     return;
   }
   
-  result -> contentsSize = get_filesize( filepath );
+  result -> contents_size = get_filesize( filepath );
   
-  result -> contents = VirtualAlloc( 0, result -> contentsSize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE );
+  result -> contents = VirtualAlloc( 0, result -> contents_size, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE );
   
   DWORD bytesRead;
-  if( ReadFile( fh, result -> contents, result -> contentsSize, &bytesRead, 0 ) && result -> contentsSize == bytesRead ) {
+  if( ReadFile( fh, result -> contents, result -> contents_size, &bytesRead, 0 ) && result -> contents_size == bytesRead ) {
     // file read successfully
   } else {
-    VirtualFree( result -> contents, result -> contentsSize, MEM_RELEASE );
+    VirtualFree( result -> contents, result -> contents_size, MEM_RELEASE );
     result -> contents = 0;
-    result -> contentsSize = 0;
+    result -> contents_size = 0;
   }
   
   CloseHandle( fh );
@@ -208,24 +208,24 @@ ReadFileResult read_entire_file( const char* filename ) {
     return result;
   }
   
-  result.contentsSize = fileStatus.st_size;
+  result.contents_size = fileStatus.st_size;
   
-  result.contents = malloc( result.contentsSize );
+  result.contents = malloc( result.contents_size );
   
   if( !result.contents ) {
     close( fh );
-    result.contentsSize = 0;
+    result.contents_size = 0;
     return result;
   }
   
-  uint32 bytesToRead = result.contentsSize;
+  uint32 bytesToRead = result.contents_size;
   uint8*  nextByteLocation = ( uint8* )result.contents;
   while( bytesToRead ) {
     ssize_t bytesRead = read( fh, nextByteLocation, bytesToRead );
     if( bytesRead  == -1 ) {
       free( result.contents );
       result.contents = 0;
-      result.contentsSize = 0;
+      result.contents_size = 0;
       close( fh );
       return result;
     }
@@ -375,9 +375,12 @@ enum ShaderType {
   SHADERTYPENONE = -1, VERTEXSHADER = 0, FRAGMENTSHADER = 1
 };
 
-uint32 createShader( const char* shader_source, uint32 filesize_max ) {
+uint32 createShader( ReadFileResult shader_file ) {
   
   uint32 result;
+  
+  const char* shader_source = ( const char* )shader_file.contents;
+  uint32 filesize_max       = shader_file.contents_size;
   
   ShaderType type = SHADERTYPENONE;
   

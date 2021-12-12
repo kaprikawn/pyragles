@@ -10,7 +10,6 @@ uniform   mat4  uMVP;
 uniform   mat4  uModelMatrix;
 uniform   vec3  uLightPosition;
 uniform   float uAmbientLight;
-varying   vec3  theColour;
 varying   float brightness;
 
 void main() {
@@ -40,7 +39,6 @@ precision mediump float;
 
 uniform sampler2D uTexture;
 varying vec2      vTexCoord;
-varying vec3      theColour;
 varying float     brightness;
 
 
