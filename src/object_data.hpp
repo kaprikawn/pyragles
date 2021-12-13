@@ -21,6 +21,7 @@ uint16 gl_element_array_buffer_data [ 10000 ];
 
 // object data
 Position  positions                 [ object_count ];
+Position  rotations                 [ object_count ];
 uint32    shader_program_ids        [ object_count ];
 int32     gl_id_positions           [ object_count ];
 int32     gl_id_normals             [ object_count ];
