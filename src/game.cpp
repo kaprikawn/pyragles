@@ -106,7 +106,7 @@ void load_level_objects( GameState* game_state ) {
     char* json_string         = ( char* )malloc( json_string_length + 1 );
     pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
     
-    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
     
     JsonString json;
     json.json_string      = json_string;
@@ -361,6 +361,7 @@ int32 run_game() {
   game_state.element_array_buffer_target  = 0;
   
   initial_setup( &game_state, sdl_params );
+  initialise_gamepads();
   
   SDL_Window* window          = sdl_params.window;
   
