@@ -275,7 +275,6 @@ void upload_objects_data_to_gl( GameState* game_state ) {
   }
 }
 
-
 int32 run_game() {
   
   SDLParams sdl_params;
@@ -301,6 +300,11 @@ int32 run_game() {
   
   upload_objects_data_to_gl( &game_state );
   
+  positions[ 0 ].x -= 2.0f;
+  positions[ 1 ].x += 2.0f;
+  positions[ 1 ].z -= 5.0f;
+  positions[ 1 ].y += 5.0f;
+  
   bool32 running = true;
   
   do {
@@ -320,13 +324,33 @@ int32 run_game() {
     real32 vp[ 16 ]; // view projection matrix
     memcpy( &vp[ 0 ], &game_state.vp_mat[ 0 ], ( sizeof( game_state.vp_mat[ 0 ] ) * 16 ) ); // dirty, I know, sue me
     
-    positions[ 1 ].z -= 0.1f;
+    rotations[ 1 ].x += 0.02f;
+    rotations[ 1 ].y += 2.0f;
     
     for( uint32 i = 0; i < object_count; i++ ) {
       
       real32 model_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      
+      // move object in world space
       translate( &model_matrix[ 0 ], positions[ i ] );
-      real32 mvp[ 16 ]; // model view projection matrix
+      // do rotations
+      real32 rot_mat_x[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      real32 rot_mat_y[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      real32 rot_mat_z[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      
+      rotate_x( &rot_mat_x[ 0 ], rotations[ i ].x );
+      rotate_y( &rot_mat_y[ 0 ], rotations[ i ].y );
+      rotate_z( &rot_mat_z[ 0 ], rotations[ i ].z );
+      
+      real32 rot_mat_xy[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      real32 rot_mat_xyz[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+      mat4_multiply( &rot_mat_xy[ 0 ], &rot_mat_y[ 0 ], &rot_mat_x[ 0 ] );
+      mat4_multiply( &rot_mat_xyz[ 0 ], &rot_mat_z[ 0 ], &rot_mat_xy[ 0 ] );
+      
+      mat4_multiply( &model_matrix[ 0 ], &rot_mat_xyz[ 0 ], &model_matrix[ 0 ] );
+      
+      // model view projection matrix
+      real32 mvp[ 16 ];
       mat4_multiply( &mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
       
       glUseProgram( shader_program_ids[ i ] );
@@ -385,8 +409,6 @@ int32 run_game() {
       }
       
       { // tex_coord0 s
-        
-        
         int32   index       = gl_id_tex_coords0[ i ];
         int32   size        = 2;
         uint32  type        = GL_FLOAT;
@@ -406,8 +428,6 @@ int32 run_game() {
         
         glDrawElements( mode, count, type, ( const GLvoid* )indices );
       }
-      
-      int32 y = 12; // breakpoint target
     }
     
     SDL_GL_SwapWindow( window );
