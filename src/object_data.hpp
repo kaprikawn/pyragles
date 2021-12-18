@@ -28,6 +28,7 @@ int32     gl_id_positions           [ object_count ];
 int32     gl_id_normals             [ object_count ];
 int32     gl_id_tex_coords0         [ object_count ];
 int32     gl_id_mvp_mats            [ object_count ];
+int32     gl_id_model_mats          [ object_count ];
 int32     gl_id_light_positions     [ object_count ];
 int32     gl_id_ambient_lights      [ object_count ];
 uint32    tbos                      [ object_count ];

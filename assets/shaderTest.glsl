@@ -30,7 +30,6 @@ void main() {
   
   float diffuse = clamp( dot( lightVector, normal ), 0.0, 1.0 );
   brightness    = diffuse + uAmbientLight; // send brighness to fs
-  
 }
 
 #shader fragment
@@ -44,8 +43,9 @@ varying float     brightness;
 
 void main() {
   
-  // vec4 pixelColour = vec4( 1.0, 0.0, 0.0, 1.0 ); //texture2D( uTexture, vTexCoord );
   vec4 pixelColour = texture2D( uTexture, vTexCoord );
+  
+  pixelColour.rgb *= brightness;
   
   gl_FragColor = pixelColour;
   

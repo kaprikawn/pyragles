@@ -74,16 +74,17 @@ void load_level_objects( GameState* game_state ) {
     int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
     int32 tex_coord0_attribute_location   = glGetAttribLocation ( shader_program_id, "aTexCoord" );
     int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
-    // int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
-    // int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
-    // int32 ambient_light_uniform_location  = glGetUniformLocation( shader_program_id, "uAmbientLight" );
+    int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
+    int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
+    int32 ambient_light_uniform_location  = glGetUniformLocation( shader_program_id, "uAmbientLight" );
     
     gl_id_positions[ i ]        = position_attribute_location;
     gl_id_normals[ i ]          = normal_attribute_location;
     gl_id_tex_coords0[ i ]      = tex_coord0_attribute_location;
     gl_id_mvp_mats[ i ]         = mvp_uniform_location;
-    // gl_id_light_positions[ i ]  = model_uniform_location;
-    // gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
+    gl_id_model_mats[ i ]       = model_uniform_location;
+    gl_id_light_positions[ i ]  = light_position_uniform_location;
+    gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
     
     glEnableVertexAttribArray( position_attribute_location );
     glEnableVertexAttribArray( normal_attribute_location );
@@ -105,7 +106,7 @@ void load_level_objects( GameState* game_state ) {
     char* json_string         = ( char* )malloc( json_string_length + 1 );
     pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
     
-    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
     
     JsonString json;
     json.json_string      = json_string;
@@ -288,9 +289,13 @@ int32 run_game() {
   game_state.array_buffer_target          = 0;
   game_state.element_array_buffer_target  = 0;
   
+  
   initial_setup( &game_state, sdl_params );
   
-  SDL_Window* window = sdl_params.window;
+  SDL_Window* window          = sdl_params.window;
+  
+  real32 light_position[ 3 ]  = { 0.0f, 5.0f, 0.0f };
+  real32 ambient_light        = 0.3f;  
   
   load_level_objects( &game_state );
   
@@ -327,11 +332,34 @@ int32 run_game() {
       glUseProgram( shader_program_ids[ i ] );
       
       { // mvp
-        int32   location    = gl_id_positions[ i ];
+        int32   location    = gl_id_mvp_mats[ i ];
         int32   count       = 1;
         bool32  transpose   = GL_FALSE;
         real32* mvp_position  = &mvp[ 0 ];
         glUniformMatrix4fv( location, count, transpose, mvp_position );
+      }
+      
+      { // model matrix
+        int32   location    = gl_id_model_mats[ i ];
+        int32   count       = 1;
+        bool32  transpose   = GL_FALSE;
+        real32* mvp_position  = &model_matrix[ 0 ];
+        glUniformMatrix4fv( location, count, transpose, mvp_position );
+      }
+      
+      { // light position
+        int32   location    = gl_id_light_positions[ i ];
+        real32  v0          = light_position[ 0 ];
+        real32  v1          = light_position[ 1 ];
+        real32  v2          = light_position[ 2 ];
+        
+        glUniform3f( location, v0, v1, v2 );
+      }
+      
+      { // ambient light
+        int32   location    = gl_id_ambient_lights[ i ];
+        real32  v0          = ambient_light;
+        glUniform1f( location, v0 );
       }
       
       { // vertices
