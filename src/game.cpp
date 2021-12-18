@@ -275,6 +275,78 @@ void upload_objects_data_to_gl( GameState* game_state ) {
   }
 }
 
+void calculate_ship_rotation( GameInput* game_input, real32 dt, uint32 ship_index = 0 ) {
+  
+  uint32 i = ship_index;
+  
+  // ###### X - up/down pitch
+  real32 max_rotation_x = 30.0f;
+  real32 current_x      = rotations[ i ].x;
+  real32 joy_y          = game_input -> joy_axis_y;
+  real32 lerp_smoothing = 0.05f;
+  real32 target_x;
+  
+  if( current_x > max_rotation_x )
+    current_x -= 360.0f;
+  if( current_x < -max_rotation_x )
+    current_x += 360.0f;
+  
+  if( joy_y < 0.0f ) { // up on the stick
+    target_x = -( max_rotation_x * joy_y );
+  } else if( joy_y > 0.0f ) { // down on the stick
+    target_x = ( -max_rotation_x * joy_y );
+  } else {
+    target_x = 0.0f;
+  }
+  
+  real32 new_rotation_x = lerp_dt( current_x, target_x, lerp_smoothing, dt );
+  rotations[ i ].x      = new_rotation_x;
+  
+  // ###### Y - turn
+  real32 max_rotation_y = 30.0f;
+  real32 current_y      = rotations[ i ].y;
+  real32 joy_x          = game_input -> joy_axis_x;
+  real32 target_y;
+  
+  if( current_y > max_rotation_y )
+    current_y -= 360.0f;
+  if( current_y < -max_rotation_y )
+    current_y += 360.0f;
+  
+  if( joy_x < 0.0f ) { // left on the stick
+    target_y = -( max_rotation_y * joy_x );
+  } else if( joy_x > 0.0f ) { // right on the stick
+    target_y = ( -max_rotation_y * joy_x );
+  } else {
+    target_y = 0.0f;
+  }
+  
+  real32 new_rotation_y = lerp_dt( current_y, target_y, lerp_smoothing, dt );
+  rotations[ i ].y      = new_rotation_y;
+  
+  // ###### Z - tilt
+  real32 max_rotation_z = 20.0f;
+  real32 current_z      = rotations[ i ].z;
+  real32 target_z;
+  
+  if( current_z > max_rotation_z )
+    current_z -= 360.0f;
+  if( current_z < -max_rotation_z )
+    current_z += 360.0f;
+  
+  if( joy_x < 0.0f ) { // left on the stick
+    target_z = -( max_rotation_z * joy_x );
+  } else if( joy_x > 0.0f ) { // right on the stick
+    target_z = ( -max_rotation_z * joy_x );
+  } else {
+    target_z = 0.0f;
+  }
+  
+  real32 new_rotation_z = lerp_dt( current_z, target_z, lerp_smoothing, dt );
+  rotations[ i ].z      = new_rotation_z;
+  
+}
+
 int32 run_game() {
   
   SDLParams sdl_params;
@@ -287,7 +359,6 @@ int32 run_game() {
   GameState game_state;
   game_state.array_buffer_target          = 0;
   game_state.element_array_buffer_target  = 0;
-  
   
   initial_setup( &game_state, sdl_params );
   
@@ -309,7 +380,13 @@ int32 run_game() {
   
   do {
     
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    previous_time = current_time;
+    current_time = SDL_GetTicks();
+    uint32 ms_since_last_frame  = current_time - previous_time;
+    real32 dt = ( real32 )ms_since_last_frame / 1000.0f;
+    if( dt > 0.15f ) dt = 0.15f; // prevent weird outliers e.g. first frame
+    
+    reset_game_inputs_pressed( &old_buttons, &new_buttons );
     
     SDL_Event event;
     while( SDL_PollEvent( &event ) ) {
@@ -324,8 +401,11 @@ int32 run_game() {
     real32 vp[ 16 ]; // view projection matrix
     memcpy( &vp[ 0 ], &game_state.vp_mat[ 0 ], ( sizeof( game_state.vp_mat[ 0 ] ) * 16 ) ); // dirty, I know, sue me
     
+    calculate_ship_rotation( &game_input, dt );
     rotations[ 1 ].x += 0.02f;
     rotations[ 1 ].y += 2.0f;
+    
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     for( uint32 i = 0; i < object_count; i++ ) {
       
