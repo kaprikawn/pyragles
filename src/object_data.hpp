@@ -18,6 +18,7 @@ GameObject game_objects[ object_count ];
 // gl data
 real32 gl_array_buffer_data         [ 100000 ];
 uint16 gl_element_array_buffer_data [ 10000 ];
+uint8* texture_data_array = ( uint8* )malloc( 100000 );
 
 // object data
 Position  positions                 [ object_count ];
@@ -29,6 +30,9 @@ int32     gl_id_tex_coords0         [ object_count ];
 int32     gl_id_mvp_mats            [ object_count ];
 int32     gl_id_light_positions     [ object_count ];
 int32     gl_id_ambient_lights      [ object_count ];
+uint32    tbos                      [ object_count ];
+uint32    texture_buffer_offsets    [ object_count ];
+uint32    texture_buffer_lengths    [ object_count ];
 uint32    offsets_vertex_data       [ object_count ];
 uint32    offsets_normal_data       [ object_count ];
 uint32    offsets_tex_coord0_data   [ object_count ];
@@ -41,5 +45,6 @@ uint32    counts_vertex_data        [ object_count ];
 uint32    counts_normal_data        [ object_count ];
 uint32    counts_tex_coord0_data    [ object_count ];
 uint32    counts_index_data         [ object_count ];
+uint8*    image_data_locations      [ object_count ];
 
 #endif //OBJECT_DATA_HPP

@@ -33,7 +33,7 @@ enum ascii_chars {ASCII_NUL,ASCII_SOH,ASCII_STX,ASCII_ETX,ASCII_EOT,ASCII_ENQ,AS
 enum current_positions { JSON_UNK, JSON_ASSET, JSON_SCENES, JSON_NODES, JSON_MATERIALS, JSON_MESHES, JSON_TEXTURES, JSON_IMAGES, JSON_ACCESSORS, JSON_BUFFER_VIEWS, JSON_BUFFERS };
 enum json_element_types { JSON_ELEMENT_NONE, JSON_ELEMENT_BRACKET, JSON_ELEMENT_CHAR, JSON_ELEMENT_NUMBER, JSON_ELEMENT_COMMA, JSON_ELEMENT_DOUBLE_QUOTE, JSON_ELEMENT_COLON };
 enum json_states { JSON_STATE_NONE, JSON_STATE_READING_KEY, JSON_STATE_READING_VALUE, JSON_STATE_READING_JSON };
-enum GltfContentType { GLTF_VERTICES, GLTF_INDICES, GLTF_NORMALS, GLTF_TEX_COORD0 };
+enum GltfContentType { GLTF_VERTICES, GLTF_INDICES, GLTF_NORMALS, GLTF_TEX_COORD0, GLTF_IMAGE };
 enum AccessorType { ACCESSOR_VEC3, ACCESSOR_VEC2, ACCESSOR_SCALAR };
 
 struct MeshData {
@@ -1049,6 +1049,7 @@ void* get_gltf_data_pointer( uint32 target_mesh_index, const char* gltf_contents
   
   MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
   AccessorData        accessor_data;
+  uint32              buffer_view;
   
   if( content_type == GLTF_VERTICES ) {
     accessor_data = get_accessor_data( mesh_position_indices.vertices, json_string, json_char_count );
@@ -1058,27 +1059,21 @@ void* get_gltf_data_pointer( uint32 target_mesh_index, const char* gltf_contents
     accessor_data = get_accessor_data( mesh_position_indices.normals, json_string, json_char_count );
   } else if( content_type == GLTF_TEX_COORD0 ) {
     accessor_data = get_accessor_data( mesh_position_indices.texcoord_0, json_string, json_char_count );
-  } else {
-    return result;
+  } else if( content_type == GLTF_IMAGE ) {
+    buffer_view = get_image_buffer_view_index( json.json_string, json.json_char_count );
   }
   
-  BufferViewData  buffer_view_data  = get_buffer_view_data( accessor_data.buffer_view, json_string, json_char_count );
+  if( content_type == GLTF_IMAGE ) {
+    buffer_view = get_image_buffer_view_index( json.json_string, json.json_char_count );
+  } else {
+    buffer_view = accessor_data.buffer_view;
+  }
+  
+  BufferViewData  buffer_view_data  = get_buffer_view_data( buffer_view, json_string, json_char_count );
   uint32          bin_start_offset  = get_bin_start_offset( gltf_header );
   uint32          total_offset      = bin_start_offset + buffer_view_data.byte_offset;
   
-  if( content_type == GLTF_VERTICES || content_type == GLTF_NORMALS || content_type == GLTF_TEX_COORD0 ) {
-    
-    real32* real32_data = ( real32* )( ( char* )gltf_contents + total_offset );
-    result = ( void* )real32_data;
-    
-  } else if( content_type == GLTF_INDICES ) {
-    
-    uint16* uint16_data = ( uint16* )( ( char* )gltf_contents + total_offset );
-    result = ( void* )uint16_data;
-    
-  } else {
-    return result;
-  }
+  result = ( void* )( ( char* )gltf_contents + total_offset );
   
   return result;
 }

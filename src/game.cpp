@@ -15,6 +15,7 @@ struct GameState {
   uint32  element_array_buffer_target   = 0;
   uint32  target_gl_offsets_array_data  = 0;
   uint32  target_gl_offsets_index_data  = 0;
+  uint32  target_texture_data_array_pos = 0;
   bool32  invert_y                      = false;
 };
 
@@ -104,6 +105,8 @@ void load_level_objects( GameState* game_state ) {
     char* json_string         = ( char* )malloc( json_string_length + 1 );
     pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
     
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
+    
     JsonString json;
     json.json_string      = json_string;
     json.json_char_count  = string_length( json_string );
@@ -126,7 +129,7 @@ void load_level_objects( GameState* game_state ) {
     offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
     {
       void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
-      void*   src   = ( void* )data;
+      void*   src   = data;
       uint32  bytes = byte_length;
       memcpy( dest, src, bytes );
     }
@@ -143,7 +146,7 @@ void load_level_objects( GameState* game_state ) {
     offsets_normal_data[ i ]  = game_state -> array_buffer_target;
     {
       void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
-      void*   src   = ( void* )data;
+      void*   src   = data;
       uint32  bytes = byte_length;
       memcpy( dest, src, bytes );
     }
@@ -160,7 +163,7 @@ void load_level_objects( GameState* game_state ) {
     offsets_tex_coord0_data[ i ]  = game_state -> array_buffer_target;
     {
       void*   dest  = ( void* )&gl_array_buffer_data[ offsets_tex_coord0_data[ i ] ];
-      void*   src   = ( void* )data;
+      void*   src   = data;
       uint32  bytes = byte_length;
       memcpy( dest, src, bytes );
     }
@@ -176,11 +179,38 @@ void load_level_objects( GameState* game_state ) {
     offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
     {
       void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
-      void*   src   = ( void* )data;
+      void*   src   = data;
       uint32  bytes = byte_length;
       memcpy( dest, src, bytes );
     }
     game_state -> element_array_buffer_target += count;
+    
+    
+    int32 image_buffer_view_index = get_image_buffer_view_index( json.json_string, json.json_char_count );
+    if( image_buffer_view_index >= 0  ) {
+      
+      // don't need to store image data so just upload straight to gl
+      data                                = get_gltf_data_pointer( target_mesh_index, gltf_contents, json, GLTF_IMAGE );
+      BufferViewData  image_buffer_view   = get_buffer_view_data( image_buffer_view_index, json.json_string, json.json_char_count );
+      uint32 image_data_bytes = image_buffer_view.byte_length;
+      
+      int32 texture_width, texture_height, texture_bpp;
+      
+      uchar* texture_data = stbi_load_from_memory( ( const uchar* )data, image_data_bytes, &texture_width, &texture_height, &texture_bpp, 4 );
+      
+      glGenTextures( 1, &tbos[ i ] );
+      glBindTexture( GL_TEXTURE_2D, tbos[ i ] );
+      
+      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+      // https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
+      glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+      glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data );
+      glBindTexture( GL_TEXTURE_2D, tbos[ i ] );
+    
+    }
     
     free( json_string );
   }
@@ -327,6 +357,9 @@ int32 run_game() {
       }
       
       { // tex_coord0 s
+        
+        glBindTexture( GL_TEXTURE_2D, tbos[ i ] );
+        
         int32   index       = gl_id_tex_coords0[ i ];
         int32   size        = 2;
         uint32  type        = GL_FLOAT;
