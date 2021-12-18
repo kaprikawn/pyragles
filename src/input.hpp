@@ -13,7 +13,7 @@
 
 #endif
 
-struct Buttons_pressed {
+struct ButtonsPressed {
   bool32 quit       = false;
   bool32 w          = false;
   bool32 a          = false;
@@ -43,14 +43,14 @@ struct GameInput {
   // bool d_released   = false;
 };
 
-void reset_game_inputs_pressed( Buttons_pressed* old_buttons, Buttons_pressed* new_buttons ) {
+void reset_game_inputs_pressed( ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
   old_buttons -> w = new_buttons -> w;
   old_buttons -> a = new_buttons -> a;
   old_buttons -> s = new_buttons -> s;
   old_buttons -> d = new_buttons -> d;
 }
 
-GameInput get_game_input_state( Buttons_pressed old_buttons, Buttons_pressed new_buttons, bool32 invert_y ) {
+GameInput get_game_input_state( ButtonsPressed old_buttons, ButtonsPressed new_buttons, bool32 invert_y ) {
   
   GameInput result;
   
@@ -121,7 +121,7 @@ GameInput get_game_input_state( Buttons_pressed old_buttons, Buttons_pressed new
   return result;
 }
 
-void input_on_key_down( SDL_Event* event, Buttons_pressed* old_buttons, Buttons_pressed* new_buttons ) {
+void input_on_key_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
   
   if( event -> key.repeat > 0 )
     return;
@@ -159,7 +159,7 @@ void input_on_key_down( SDL_Event* event, Buttons_pressed* old_buttons, Buttons_
   }
 }
 
-void input_on_key_up( SDL_Event* event, Buttons_pressed* old_buttons, Buttons_pressed* new_buttons ) {
+void input_on_key_up( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
   
   uint32 scancode = event -> key.keysym.scancode;
   
@@ -220,7 +220,7 @@ void initialise_gamepads() {
 
 int16 deadzone = 100;
 
-void on_joy_axis_move( SDL_Event* event, Buttons_pressed* new_buttons ) {
+void on_joy_axis_move( SDL_Event* event, ButtonsPressed* new_buttons ) {
   
   int16   axis_value  = event -> jaxis.value;
   real32  normalised_value;
@@ -252,7 +252,7 @@ void on_joy_axis_move( SDL_Event* event, Buttons_pressed* new_buttons ) {
   
 }
 
-void handle_sdl_input_event( SDL_Event* event, Buttons_pressed* old_buttons, Buttons_pressed* new_buttons ) {
+void handle_sdl_input_event( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
   
   switch( event -> type ) {
     

@@ -30,17 +30,11 @@ struct __attribute__ ((__packed__)) GltfHeader {
 // see https://en.cppreference.com/w/cpp/language/ascii
 enum ascii_chars {ASCII_NUL,ASCII_SOH,ASCII_STX,ASCII_ETX,ASCII_EOT,ASCII_ENQ,ASCII_ACK,ASCII_BEL,ASCII_BS,ASCII_HT,ASCII_LF,ASCII_VT,ASCII_FF,ASCII_CR,ASCII_SO,ASCII_SI,ASCII_DLE,ASCII_DC1,ASCII_DC2,ASCII_DC3,ASCII_DC4,ASCII_NAK,ASCII_SYN,ASCII_ETB,ASCII_CAN,ASCII_EM,ASCII_SUB,ASCII_ESC,ASCII_FS,ASCII_GS,ASCII_RS,ASCII_US,ASCII_SPACE,ASCII_EXCLAMATION,ASCII_DOUBLE_QUOTE,ASCII_HASH,ASCII_DOLLAR,ASCII_PERCENTAGE,ASCII_AMPERSANDS,ASCII_APOSTROPHE,ASCII_OPEN_BRACKET,ASCII_CLOSE_BRACKET,ASCII_STAR,ASCII_UNK1,ASCII_COMMA,ASCII_HYPHEN,ASCII_DECIMAL_POINT,ASCII_FORWARD_SLASH,ASCII_0,ASCII_1,ASCII_2,ASCII_3,ASCII_4,ASCII_5,ASCII_6,ASCII_7,ASCII_8,ASCII_9,ASCII_COLON,ASCII_SEMI_COLON,ASCII_LESS_THAN,ASCII_EQUALS,ASCII_GREATER_THAN,ASCII_QUESTION_MARK,ASCII_AT_SYMBOL,ASCII_A,ASCII_B,ASCII_C,ASCII_D,ASCII_E,ASCII_F,ASCII_G,ASCII_H,ASCII_I,ASCII_J,ASCII_K,ASCII_L,ASCII_M,ASCII_N,ASCII_O,ASCII_P,ASCII_Q,ASCII_R,ASCII_S,ASCII_T,ASCII_U,ASCII_V,ASCII_W,ASCII_X,ASCII_Y,ASCII_Z,ASCII_OPEN_SQUARE_BRACKETS,ASCII_BACK_SLASH,ASCII_CLOSE_SQUARE_BRACKETS,ASCII_CARROT,ASCII_UNDERSCORE,ASCII_BACKTICK,ASCII_a,ASCII_b,ASCII_c,ASCII_d,ASCII_e,ASCII_f,ASCII_g,ASCII_h,ASCII_i,ASCII_j,ASCII_k,ASCII_l,ASCII_m,ASCII_n,ASCII_o,ASCII_p,ASCII_q,ASCII_r,ASCII_s,ASCII_t,ASCII_u,ASCII_v,ASCII_w,ASCII_x,ASCII_y,ASCII_z,ASCII_OPEN_CURLY_BRACKET,ASCII_PIPE,ASCII_CLOSE_CURLY_BRACKET,ASCII_TILDE,ASCII_DEL};
 
-enum current_positions {
-  JSON_UNK, JSON_ASSET, JSON_SCENES, JSON_NODES, JSON_MATERIALS, JSON_MESHES, JSON_TEXTURES, JSON_IMAGES, JSON_ACCESSORS, JSON_BUFFER_VIEWS, JSON_BUFFERS
-};
-
-enum json_element_types {
-  JSON_ELEMENT_NONE, JSON_ELEMENT_BRACKET, JSON_ELEMENT_CHAR, JSON_ELEMENT_NUMBER, JSON_ELEMENT_COMMA, JSON_ELEMENT_DOUBLE_QUOTE, JSON_ELEMENT_COLON
-};
-
-enum json_states {
-  JSON_STATE_NONE, JSON_STATE_READING_KEY, JSON_STATE_READING_VALUE, JSON_STATE_READING_JSON
-};
+enum current_positions { JSON_UNK, JSON_ASSET, JSON_SCENES, JSON_NODES, JSON_MATERIALS, JSON_MESHES, JSON_TEXTURES, JSON_IMAGES, JSON_ACCESSORS, JSON_BUFFER_VIEWS, JSON_BUFFERS };
+enum json_element_types { JSON_ELEMENT_NONE, JSON_ELEMENT_BRACKET, JSON_ELEMENT_CHAR, JSON_ELEMENT_NUMBER, JSON_ELEMENT_COMMA, JSON_ELEMENT_DOUBLE_QUOTE, JSON_ELEMENT_COLON };
+enum json_states { JSON_STATE_NONE, JSON_STATE_READING_KEY, JSON_STATE_READING_VALUE, JSON_STATE_READING_JSON };
+enum GltfContentType { GLTF_VERTICES, GLTF_INDICES, GLTF_NORMALS, GLTF_TEX_COORD0, GLTF_IMAGE };
+enum AccessorType { ACCESSOR_VEC3, ACCESSOR_VEC2, ACCESSOR_SCALAR };
 
 struct MeshData {
   bool32  is_collider = false;
@@ -66,6 +60,23 @@ struct MeshData {
   uint32  gl_index_offset;
 };
 
+struct JsonString {
+  uint32  json_char_count;
+  char*   json_string;
+};
+
+struct GltfbufferViewInfo {
+  uint32 buffer_view;
+  uint32 component_type;
+  uint32 gltf_count; // count as defined by the JSON
+  uint32 buffer;
+  uint32 byte_length;
+  uint32 byte_offset;
+  uint32 count; // count of values
+  uint32 offset;
+  int32  type;
+};
+
 struct MeshPositionIndices {
   uint32 vertices;
   uint32 normals;
@@ -78,7 +89,8 @@ struct AccessorData {
   uint32  buffer_view;
   uint32  component_type;
   uint32  count;
-  char    type[ 6 ];
+  int32   accessor_type;
+  char    type[ 7 ];
 };
 
 struct BufferViewData {
@@ -90,6 +102,16 @@ struct BufferViewData {
 inline uint32 json_size_in_bytes( ReadFileResult* gltf_file ) {
   GltfHeader* gltf_header = ( GltfHeader* )gltf_file -> contents;
   return gltf_header -> json_chunk_length;
+}
+
+inline uint32 get_bin_start_offset(  GltfHeader* gltf_header ) {
+  uint32 result;
+  uint32  gltf_header_size_in_bytes = 12; // magic + version + length
+  uint32  json_header_in_bytes      = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  uint32  json_string_in_bytes      = gltf_header -> json_chunk_length;
+  uint32  bin_header_in_bytes       = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  result = gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes + bin_header_in_bytes;
+  return result;
 }
 
 inline void pull_out_json_string( ReadFileResult* gltf_file, char* json_string, uint32 json_string_length ) {
@@ -904,7 +926,7 @@ MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, 
   MeshData result;
   
   const char* gltf_contents = ( char* )gltf_file -> contents;
-  uint32 filesize           = gltf_file -> contentsSize;
+  uint32 filesize           = gltf_file -> contents_size;
   GltfHeader* gltf_header   = ( GltfHeader* )gltf_contents; // pulls in fixed length json stuff too
   
   uint32  gltf_header_size_in_bytes = 12; // magic + version + length
@@ -982,5 +1004,110 @@ MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, 
   return result;
 }
 
+GltfbufferViewInfo get_glft_buffer_view_info( uint32 target_mesh_index, const char* gltf_contents, JsonString json, int32 content_type ) {
+  
+  GltfbufferViewInfo result = {};
+  
+  char*   json_string     = json.json_string;
+  uint32  json_char_count = json.json_char_count;
+  
+  MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
+  AccessorData        accessor_data;
+  
+  if( content_type == GLTF_VERTICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.vertices, json_string, json_char_count );
+  } else if( content_type == GLTF_INDICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.indices, json_string, json_char_count );
+  } else if( content_type == GLTF_NORMALS ) {
+    accessor_data = get_accessor_data( mesh_position_indices.normals, json_string, json_char_count );
+  } else if( content_type == GLTF_TEX_COORD0 ) {
+    accessor_data = get_accessor_data( mesh_position_indices.texcoord_0, json_string, json_char_count );
+  } else {
+    return result;
+  }
+  
+  BufferViewData buffer_view_data = get_buffer_view_data( accessor_data.buffer_view, json_string, json_char_count );
+  
+  result.buffer_view    = accessor_data.buffer_view;
+  result.component_type = accessor_data.component_type;
+  result.count          = accessor_data.count;
+  result.type           = accessor_data.accessor_type;
+  result.buffer         = buffer_view_data.buffer;
+  result.byte_length    = buffer_view_data.byte_length;
+  result.byte_offset    = buffer_view_data.byte_offset;
+  
+  return result;
+}
+
+void* get_gltf_data_pointer( uint32 target_mesh_index, const char* gltf_contents, JsonString json, int32 content_type ) {
+  
+  void* result = NULL;
+  
+  char* json_string       = json.json_string;
+  uint32 json_char_count  = json.json_char_count;
+  GltfHeader* gltf_header = ( GltfHeader* )gltf_contents; // pulls in fixed length json stuff too
+  
+  MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
+  AccessorData        accessor_data;
+  uint32              buffer_view;
+  
+  if( content_type == GLTF_VERTICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.vertices, json_string, json_char_count );
+  } else if( content_type == GLTF_INDICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.indices, json_string, json_char_count );
+  } else if( content_type == GLTF_NORMALS ) {
+    accessor_data = get_accessor_data( mesh_position_indices.normals, json_string, json_char_count );
+  } else if( content_type == GLTF_TEX_COORD0 ) {
+    accessor_data = get_accessor_data( mesh_position_indices.texcoord_0, json_string, json_char_count );
+  } else if( content_type == GLTF_IMAGE ) {
+    buffer_view = get_image_buffer_view_index( json.json_string, json.json_char_count );
+  }
+  
+  if( content_type == GLTF_IMAGE ) {
+    buffer_view = get_image_buffer_view_index( json.json_string, json.json_char_count );
+  } else {
+    buffer_view = accessor_data.buffer_view;
+  }
+  
+  BufferViewData  buffer_view_data  = get_buffer_view_data( buffer_view, json_string, json_char_count );
+  uint32          bin_start_offset  = get_bin_start_offset( gltf_header );
+  uint32          total_offset      = bin_start_offset + buffer_view_data.byte_offset;
+  
+  result = ( void* )( ( char* )gltf_contents + total_offset );
+  
+  return result;
+}
+
+uint32 get_gltf_data_count( uint32 target_mesh_index, const char* gltf_contents, JsonString json, int32 content_type ) {
+  
+  uint32 result = 0;
+  
+  char*   json_string     = json.json_string;
+  uint32  json_char_count = json.json_char_count;
+  uint32  count_per_value = 0;
+  
+  MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
+  AccessorData        accessor_data;
+  
+  if( content_type == GLTF_VERTICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.vertices, json_string, json_char_count );
+    count_per_value = 3;
+  } else if( content_type == GLTF_INDICES ) {
+    accessor_data = get_accessor_data( mesh_position_indices.indices, json_string, json_char_count );
+    count_per_value = 1;
+  } else if( content_type == GLTF_NORMALS ) {
+    accessor_data = get_accessor_data( mesh_position_indices.normals, json_string, json_char_count );
+    count_per_value = 3;
+  } else if( content_type == GLTF_TEX_COORD0 ) {
+    accessor_data = get_accessor_data( mesh_position_indices.texcoord_0, json_string, json_char_count );
+    count_per_value = 2;
+  } else {
+    return result;
+  }
+  
+  result = count_per_value * accessor_data.count;
+  
+  return result;
+}
 
 #endif //JSON_HPP

@@ -50,7 +50,7 @@ bool32      launch_fullscreen = false;
 
 struct ReadFileResult
 {
-    uint32  contentsSize;
+    uint32  contents_size;
     void*   contents;
 };
 
@@ -119,7 +119,7 @@ inline ReadFileResult read_entire_file( const char* filename ) {
     result.contents = VirtualAlloc( 0, filesize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE );
     DWORD BytesRead;
     if( ReadFile( fh, result.contents, filesize, &BytesRead, 0 ) && filesize == BytesRead ) {
-      result.contentsSize = filesize;
+      result.contents_size = filesize;
     }
   }
   CloseHandle( fh );
@@ -138,17 +138,17 @@ void read_entire_file_into_memory( const char* filename, ReadFileResult* result 
     return;
   }
   
-  result -> contentsSize = get_filesize( filepath );
+  result -> contents_size = get_filesize( filepath );
   
-  result -> contents = VirtualAlloc( 0, result -> contentsSize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE );
+  result -> contents = VirtualAlloc( 0, result -> contents_size, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE );
   
   DWORD bytesRead;
-  if( ReadFile( fh, result -> contents, result -> contentsSize, &bytesRead, 0 ) && result -> contentsSize == bytesRead ) {
+  if( ReadFile( fh, result -> contents, result -> contents_size, &bytesRead, 0 ) && result -> contents_size == bytesRead ) {
     // file read successfully
   } else {
-    VirtualFree( result -> contents, result -> contentsSize, MEM_RELEASE );
+    VirtualFree( result -> contents, result -> contents_size, MEM_RELEASE );
     result -> contents = 0;
-    result -> contentsSize = 0;
+    result -> contents_size = 0;
   }
   
   CloseHandle( fh );
@@ -208,24 +208,24 @@ ReadFileResult read_entire_file( const char* filename ) {
     return result;
   }
   
-  result.contentsSize = fileStatus.st_size;
+  result.contents_size = fileStatus.st_size;
   
-  result.contents = malloc( result.contentsSize );
+  result.contents = malloc( result.contents_size );
   
   if( !result.contents ) {
     close( fh );
-    result.contentsSize = 0;
+    result.contents_size = 0;
     return result;
   }
   
-  uint32 bytesToRead = result.contentsSize;
+  uint32 bytesToRead = result.contents_size;
   uint8*  nextByteLocation = ( uint8* )result.contents;
   while( bytesToRead ) {
     ssize_t bytesRead = read( fh, nextByteLocation, bytesToRead );
     if( bytesRead  == -1 ) {
       free( result.contents );
       result.contents = 0;
-      result.contentsSize = 0;
+      result.contents_size = 0;
       close( fh );
       return result;
     }
@@ -244,7 +244,7 @@ void free_memory( void* memory, uint32 size ) {
 
 #endif
 
-struct SDLObjects {
+struct SDLParams {
   SDL_Window*   window;
   SDL_GLContext glContext;
   int windowWidth;
@@ -265,9 +265,9 @@ struct game_memory {
   uint32  tempNextMemoryOffset;
 };
 
-uint32 shaderProgramID;
+uint32 shader_program_id;
 
-void init_sdl( SDLObjects* sdlObjects ) {
+void init_sdl( SDLParams* sdl_params ) {
   
   int windowWidth   = 1280;
   int windowHeight  = 720;
@@ -299,17 +299,17 @@ void init_sdl( SDLObjects* sdlObjects ) {
     SDL_ShowCursor( SDL_DISABLE );
   }
   
-  sdlObjects -> window = SDL_CreateWindow( "Alpha Flight", windowX, windowY, windowWidth, windowHeight, sdlFlags );
-  if( !sdlObjects -> window ) {
+  sdl_params -> window = SDL_CreateWindow( "Alpha Flight", windowX, windowY, windowWidth, windowHeight, sdlFlags );
+  if( !sdl_params -> window ) {
     SDL_LogError( SDL_LOG_CATEGORY_ERROR, "The window could not be created! SDL_Error : %s\n", SDL_GetError() );
   }
   
   if( launch_fullscreen ) {
-    SDL_SetWindowFullscreen( sdlObjects -> window, SDL_WINDOW_FULLSCREEN );
+    SDL_SetWindowFullscreen( sdl_params -> window, SDL_WINDOW_FULLSCREEN );
   }
   
-  sdlObjects -> glContext = SDL_GL_CreateContext( sdlObjects -> window );
-  if( !( sdlObjects -> glContext ) ) {
+  sdl_params -> glContext = SDL_GL_CreateContext( sdl_params -> window );
+  if( !( sdl_params -> glContext ) ) {
     SDL_LogError( SDL_LOG_CATEGORY_ERROR, "Failed to create GL context : %s\n", SDL_GetError());
   }
   
@@ -327,8 +327,8 @@ void init_sdl( SDLObjects* sdlObjects ) {
   glViewport( 0, 0, ( float )windowWidth, ( float )windowHeight );
   glClearColor( 0.0f, 0.65f, 1.0f, 1.0f );
   
-  sdlObjects -> windowWidth   = windowWidth;
-  sdlObjects -> windowHeight  = windowHeight;
+  sdl_params -> windowWidth   = windowWidth;
+  sdl_params -> windowHeight  = windowHeight;
   
 };
 
@@ -346,111 +346,116 @@ bool32 strings_are_equal( const char* str1, const char* str2 ) {
   return true;
 }
 
-
 uint32 compileShader( uint32 type, const char* source ) {
   
-  // std::cout << "##source is " << "\n\n" << source << std::endl;
+  uint32 result;
   
-  uint32 id = glCreateShader( type );
-  glShaderSource( id, 1, &source, nullptr );
-  glCompileShader( id );
+  uint32 shader_program_id = glCreateShader( type );
+  glShaderSource( shader_program_id, 1, &source, nullptr );
+  glCompileShader( shader_program_id );
   
-  int result;
-  glGetShaderiv( id, GL_COMPILE_STATUS, &result );
-  if( result == GL_FALSE ) {
+  int compile_result;
+  glGetShaderiv( shader_program_id, GL_COMPILE_STATUS, &compile_result );
+  if( compile_result == GL_FALSE ) {
     int length;
-    glGetShaderiv( id, GL_INFO_LOG_LENGTH, &length );
+    glGetShaderiv( shader_program_id, GL_INFO_LOG_LENGTH, &length );
     char* message = ( char* )alloca( length * sizeof( char ) );
-    glGetShaderInfoLog( id, length, &length, message );
+    glGetShaderInfoLog( shader_program_id, length, &length, message );
     
     SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Failed to complile %s shader : %s\n", ( type == GL_VERTEX_SHADER ? "vertex" : "fragment" ), message );
     SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "### SOURCE ### \n %s \n", source );
-    glDeleteShader( id );
+    glDeleteShader( shader_program_id );
     return 0;
   }
-  
-  return id;
+  result = shader_program_id;
+  return result;
 }
 
-uint32 createShader( const char* shaderSource, uint32 filesizeMax ) {
+enum ShaderType {
+  SHADERTYPENONE = -1, VERTEXSHADER = 0, FRAGMENTSHADER = 1
+};
+
+uint32 createShader( ReadFileResult shader_file ) {
   
-  enum ShaderType {
-    SHADERTYPENONE = -1, VERTEX = 0, FRAGMENT = 1
-  };
+  uint32 result;
+  
+  const char* shader_source = ( const char* )shader_file.contents;
+  uint32 filesize_max       = shader_file.contents_size;
   
   ShaderType type = SHADERTYPENONE;
   
+  char* vertex_shader_source    = ( char* )malloc( filesize_max );
+  char* fragment_shader_source  = ( char* )malloc( filesize_max );
+  char  current_line [ 4086 ];
   
-  char* vertexShaderSource    = ( char* )malloc( filesizeMax );
-  char* fragmentShaderSource  = ( char* )malloc( filesizeMax );
-  char currentLine [ 4086 ];
+  uint32 current_line_index     = 0;
+  uint32 line_start            = 0;
+  uint32 line_end;
   
-  uint32 currentLineIndex     = 0;
-  uint32 lineStart            = 0;
-  uint32 lineEnd;
+  uint32 vertex_current_index   = 0;
+  uint32 fragment_current_index = 0;
   
-  uint32 vertexCurrentIndex   = 0;
-  uint32 fragmentCurrentIndex = 0;
-  
-  for( uint32 i = 0; i < filesizeMax; i++ ) {
-    char myChar = ( char )shaderSource[ i ];
-    if( myChar == 10 || myChar == 13 ) {
+  for( uint32 i = 0; i < filesize_max; i++ ) {
+    char my_char = ( char )shader_source[ i ];
+    if( my_char == 10 || my_char == 13 ) {
       
-      lineEnd = i;
+      line_end = i;
       
-      if( strings_are_equal( ( const char* )currentLine, "#shader vertex" ) ) {
-        type = VERTEX;
-      } else if( strings_are_equal( ( const char* )currentLine, "#shader fragment" ) ) {
-        type = FRAGMENT;
+      if( strings_are_equal( ( const char* )current_line, "#shader vertex" ) ) {
+        type = VERTEXSHADER;
+      } else if( strings_are_equal( ( const char* )current_line, "#shader fragment" ) ) {
+        type = FRAGMENTSHADER;
       } else {
         
-        for( uint32 j = lineStart; j < lineEnd; j++ ) {
+        for( uint32 j = line_start; j < line_end; j++ ) {
           
-          if( type == VERTEX ) {
-            vertexShaderSource[ vertexCurrentIndex++ ] = ( char )shaderSource[ j ];
-          } else if( type == FRAGMENT ) {
-            fragmentShaderSource[ fragmentCurrentIndex++ ] = ( char )shaderSource[ j ];
+          if( type == VERTEXSHADER ) {
+            vertex_shader_source[ vertex_current_index++ ] = ( char )shader_source[ j ];
+          } else if( type == FRAGMENTSHADER ) {
+            fragment_shader_source[ fragment_current_index++ ] = ( char )shader_source[ j ];
           }
           
         }
         
-        if( type == VERTEX ) {
-          vertexShaderSource[ vertexCurrentIndex++ ] = 0x0a;
-        } else if( type == FRAGMENT ) {
-          fragmentShaderSource[ fragmentCurrentIndex++ ] = 0x0a;
+        if( type == VERTEXSHADER ) {
+          vertex_shader_source[ vertex_current_index++ ] = 0x0a;
+        } else if( type == FRAGMENTSHADER ) {
+          fragment_shader_source[ fragment_current_index++ ] = 0x0a;
         }
       }
       
-      for( uint32 j = 0; j < filesizeMax; j++ )
-        currentLine[ j ] = '\0';
-      currentLineIndex = 0;
-      lineStart = i + 1;
+      for( uint32 j = 0; j < filesize_max; j++ )
+        current_line[ j ] = '\0';
+      current_line_index = 0;
+      line_start = i + 1;
     } else {
-      currentLine[ currentLineIndex++ ] = myChar;
+      current_line[ current_line_index++ ] = my_char;
     }
   }
   
-  vertexShaderSource[ vertexCurrentIndex ] = '\0';
-  fragmentShaderSource[ fragmentCurrentIndex ] = '\0';
+  vertex_shader_source[ vertex_current_index ] = '\0';
+  fragment_shader_source[ fragment_current_index ] = '\0';
   
-  uint32 shaderProgramID = glCreateProgram();
-  uint32 vs = compileShader( GL_VERTEX_SHADER, vertexShaderSource );
-  uint32 fs = compileShader( GL_FRAGMENT_SHADER, fragmentShaderSource );
+  uint32 shader_program_id  = glCreateProgram();
+  uint32 vs                 = compileShader( GL_VERTEX_SHADER   , vertex_shader_source );
+  uint32 fs                 = compileShader( GL_FRAGMENT_SHADER , fragment_shader_source );
   
-  glAttachShader( shaderProgramID, vs );
-  glAttachShader( shaderProgramID, fs );
+  glAttachShader( shader_program_id, vs );
+  glAttachShader( shader_program_id, fs );
     
-  glLinkProgram( shaderProgramID );
-  glValidateProgram( shaderProgramID );
+  glLinkProgram( shader_program_id );
+  glValidateProgram( shader_program_id );
   
   glDeleteShader( vs );
   glDeleteShader( fs );
   
 
-  free( vertexShaderSource );
-  free( fragmentShaderSource );
+  free( vertex_shader_source );
+  free( fragment_shader_source );
   
-  return shaderProgramID;
+  result = shader_program_id;
+  
+  return result;
 }
 
 #endif //GAME_HPP

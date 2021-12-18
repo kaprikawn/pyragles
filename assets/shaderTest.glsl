@@ -1,4 +1,3 @@
-
 #shader vertex
 #version 100
 
@@ -13,6 +12,7 @@ uniform   float uAmbientLight;
 varying   float brightness;
 
 void main() {
+  
   vTexCoord         = aTexCoord;
   
   vec4  position    = vec4( aPosition, 1.0 );
@@ -40,7 +40,6 @@ precision mediump float;
 uniform sampler2D uTexture;
 varying vec2      vTexCoord;
 varying float     brightness;
-
 
 void main() {
   
