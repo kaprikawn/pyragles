@@ -12,19 +12,7 @@ int main( int argc, char* argv[] ) {
     //   invertY = true;
   }
   
-  game_memory memory  = {};
-  memory.permanentStorageSize = Megabytes( 64 );
-  memory.tempStorageSize      = Gigabytes( 1 );
-  
-  uint64 totalMemorySize = memory.permanentStorageSize + memory.tempStorageSize;
-  
-  memory.permanentStorage     = mmap( 0, memory.permanentStorageSize, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0 );
-  memory.tempStorage          = ( ( uint8 * )memory.permanentStorage + memory.permanentStorageSize );
-  
-  Assert( memory.permanentStorage );
-  Assert( memory.tempStorage );
-  
-  run_game( &memory );
+  int32 game_ret_val = run_game();
   
   return 0;
 }

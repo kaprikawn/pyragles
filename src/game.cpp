@@ -63,7 +63,7 @@ void load_level_objects( GameState* game_state ) {
     game_object.index = i;
     game_object.active = true;
     
-    const char* shader_filename = "shaderTest.glsl";
+    const char* shader_filename = "shaderLight.glsl";
     ReadFileResult shader_file  = read_entire_file( shader_filename );
     
     uint32 shader_program_id    = createShader( shader_file );
@@ -106,7 +106,7 @@ void load_level_objects( GameState* game_state ) {
     char* json_string         = ( char* )malloc( json_string_length + 1 );
     pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
     
-    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
     
     JsonString json;
     json.json_string      = json_string;
