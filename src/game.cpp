@@ -71,7 +71,7 @@ void load_level_objects( GameState* game_state ) {
     
     int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
     int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
-    // int32 tex_coord0_attribute_location   = glGetAttribLocation ( shader_program_id, "aTexCoord" );
+    int32 tex_coord0_attribute_location   = glGetAttribLocation ( shader_program_id, "aTexCoord" );
     int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
     // int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
     // int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
@@ -79,14 +79,14 @@ void load_level_objects( GameState* game_state ) {
     
     gl_id_positions[ i ]        = position_attribute_location;
     gl_id_normals[ i ]          = normal_attribute_location;
-    // gl_id_tex_coords0[ i ]      = tex_coord0_attribute_location;
+    gl_id_tex_coords0[ i ]      = tex_coord0_attribute_location;
     gl_id_mvp_mats[ i ]         = mvp_uniform_location;
     // gl_id_light_positions[ i ]  = model_uniform_location;
     // gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
     
     glEnableVertexAttribArray( position_attribute_location );
     glEnableVertexAttribArray( normal_attribute_location );
-    // glEnableVertexAttribArray( tex_coord0_attribute_location );
+    glEnableVertexAttribArray( tex_coord0_attribute_location );
     
     ReadFileResult gltf_file;
     if( i == 0 ) {
@@ -149,22 +149,22 @@ void load_level_objects( GameState* game_state ) {
     }
     game_state -> array_buffer_target += count;
     
-    // // tex_coord0 data
-    // buffer_view_info  = get_glft_buffer_view_info(  target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
-    // data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
-    // count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
-    // count *= 2; // two values per uv coordinate
-    // byte_length = ( count * sizeof( real32 ) );
+    // tex_coord0 data
+    buffer_view_info  = get_glft_buffer_view_info(  target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
+    data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
+    count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
+    count *= 2; // two values per uv coordinate
+    byte_length = ( count * sizeof( real32 ) );
     
-    // counts_tex_coord0_data[ i ]   = count;
-    // offsets_tex_coord0_data[ i ]  = game_state -> array_buffer_target;
-    // {
-    //   void*   dest  = ( void* )&gl_array_buffer_data[ offsets_tex_coord0_data[ i ] ];
-    //   void*   src   = ( void* )data;
-    //   uint32  bytes = byte_length;
-    //   memcpy( dest, src, bytes );
-    // }
-    // game_state -> array_buffer_target += count;
+    counts_tex_coord0_data[ i ]   = count;
+    offsets_tex_coord0_data[ i ]  = game_state -> array_buffer_target;
+    {
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_tex_coord0_data[ i ] ];
+      void*   src   = ( void* )data;
+      uint32  bytes = byte_length;
+      memcpy( dest, src, bytes );
+    }
+    game_state -> array_buffer_target += count;
     
     // indices
     buffer_view_info  = get_glft_buffer_view_info(  target_mesh_index, gltf_contents, json, GLTF_INDICES );
@@ -216,18 +216,18 @@ void upload_objects_data_to_gl( GameState* game_state ) {
       game_state -> target_gl_offsets_array_data += size;
     }
     
-    // // tex_coord0 data
-    // {
-    //   gl_offsets_tex_coord0_data[ i ] = game_state -> target_gl_offsets_array_data;
-    //   uint32      target          = GL_ARRAY_BUFFER;
-    //   uint32      offset          = gl_offsets_tex_coord0_data[ i ];
-    //   uint32      size            = ( sizeof( real32 ) * counts_tex_coord0_data[ i ] );
-    //   uint32      array_position  = offsets_tex_coord0_data[ i ];
-    //   const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+    // tex_coord0 data
+    {
+      gl_offsets_tex_coord0_data[ i ] = game_state -> target_gl_offsets_array_data;
+      uint32      target          = GL_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_tex_coord0_data[ i ];
+      uint32      size            = ( sizeof( real32 ) * counts_tex_coord0_data[ i ] );
+      uint32      array_position  = offsets_tex_coord0_data[ i ];
+      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
       
-    //   glBufferSubData( target, offset, size, data );
-      // game_state -> target_gl_offsets_array_data += size;
-    // }
+      glBufferSubData( target, offset, size, data );
+      game_state -> target_gl_offsets_array_data += size;
+    }
     
     // index data
     {
@@ -315,13 +315,24 @@ int32 run_game() {
         glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
       }
       
-      {
+      { // normals
         int32   index       = gl_id_normals[ i ];
         int32   size        = 3;
         uint32  type        = GL_FLOAT;
         bool32  normalized  = GL_FALSE;
         int32   stride      = 0;
         uint32  pointer     = gl_offsets_normal_data[ i ]; // misleading, it's not a pointer, it's where in the buffer it is - offset by number of bytes
+        
+        glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
+      }
+      
+      { // tex_coord0 s
+        int32   index       = gl_id_tex_coords0[ i ];
+        int32   size        = 2;
+        uint32  type        = GL_FLOAT;
+        bool32  normalized  = GL_FALSE;
+        int32   stride      = 0;
+        uint32  pointer     = gl_offsets_tex_coord0_data[ i ]; // misleading, it's not a pointer, it's where in the buffer it is - offset by number of bytes
         
         glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
       }
