@@ -358,7 +358,6 @@ int32 run_game() {
       
       { // tex_coord0 s
         
-        glBindTexture( GL_TEXTURE_2D, tbos[ i ] );
         
         int32   index       = gl_id_tex_coords0[ i ];
         int32   size        = 2;
@@ -368,6 +367,7 @@ int32 run_game() {
         uint32  pointer     = gl_offsets_tex_coord0_data[ i ]; // misleading, it's not a pointer, it's where in the buffer it is - offset by number of bytes
         
         glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
+        glBindTexture( GL_TEXTURE_2D, tbos[ i ] );
       }
       
       { // draw elements
