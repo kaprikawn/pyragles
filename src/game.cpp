@@ -227,7 +227,7 @@ void load_level_objects( GameState* game_state ) {
   uint32 i = game_object.index;
   shader_types [ i ] = SHADER_VERTEX_COLOURS;
   
-  const char* shader_filename = "shaderVertexColours.glsl";
+  const char* shader_filename = "shaderVertexColoursLightPerFrag.glsl";
   ReadFileResult shader_file  = read_entire_file( shader_filename );
   
   uint32 shader_program_id    = createShader( shader_file );
@@ -259,10 +259,10 @@ void load_level_objects( GameState* game_state ) {
   
   // vertices
   real32 vertices[ value_count ] = {
-      -1.0f, 0.0f, -1.0f
-    , -1.0f, 0.0f,  1.0f
-    ,  1.0f, 0.0f,  1.0f
-    ,  1.0f, 0.0f, -1.0f
+      -100.0f, -0.1f, -100.0f
+    , -100.0f, -0.1f,   10.0f
+    ,  100.0f, -0.1f,   10.0f
+    ,  100.0f, -0.1f, -100.0f
   };
   counts_vertex_data[ i ]   = value_count;
   offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
@@ -484,7 +484,6 @@ int32 run_game() {
   initialise_gamepads();
   
   SDL_Window* window          = sdl_params.window;
-  
   
   load_level_objects( &game_state );
   

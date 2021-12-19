@@ -41,7 +41,6 @@ precision mediump float;
 varying vec3      vColour;
 varying float     brightness;
 
-
 void main() {
   
   vec4 pixelColour = vec4( vColour, 1.0 );
