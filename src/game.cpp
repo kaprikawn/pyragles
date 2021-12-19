@@ -66,7 +66,7 @@ void load_level_objects( GameState* game_state ) {
     const char* shader_filename = "shaderLight.glsl";
     ReadFileResult shader_file  = read_entire_file( shader_filename );
     
-    shader_types[ i ] = SHADERS_LIGHT;
+    shader_types[ i ] = SHADER_LIGHT;
     
     uint32 shader_program_id    = createShader( shader_file );
     shader_program_ids[ i ]     = shader_program_id;
@@ -75,6 +75,7 @@ void load_level_objects( GameState* game_state ) {
     int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
     int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
     int32 tex_coord0_attribute_location   = glGetAttribLocation ( shader_program_id, "aTexCoord" );
+    // int32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
     int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
     int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
     int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
@@ -83,6 +84,7 @@ void load_level_objects( GameState* game_state ) {
     gl_id_positions[ i ]        = position_attribute_location;
     gl_id_normals[ i ]          = normal_attribute_location;
     gl_id_tex_coords0[ i ]      = tex_coord0_attribute_location;
+    // gl_id_colours[ i ]          = colour_attribute_location;
     gl_id_mvp_mats[ i ]         = mvp_uniform_location;
     gl_id_model_mats[ i ]       = model_uniform_location;
     gl_id_light_positions[ i ]  = light_position_uniform_location;
@@ -223,7 +225,7 @@ void load_level_objects( GameState* game_state ) {
   game_object.active  = true;
   
   uint32 i = game_object.index;
-  shader_types [ i ] = SHADERS_VERTEX_COLOURS;
+  shader_types [ i ] = SHADER_VERTEX_COLOURS;
   
   const char* shader_filename = "shaderVertexColours.glsl";
   ReadFileResult shader_file  = read_entire_file( shader_filename );
@@ -234,6 +236,7 @@ void load_level_objects( GameState* game_state ) {
   
   int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
   int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
+  int32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
   int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
   int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
   int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
@@ -241,6 +244,7 @@ void load_level_objects( GameState* game_state ) {
   
   gl_id_positions[ i ]        = position_attribute_location;
   gl_id_normals[ i ]          = normal_attribute_location;
+  gl_id_colours[ i ]          = colour_attribute_location;
   gl_id_mvp_mats[ i ]         = mvp_uniform_location;
   gl_id_model_mats[ i ]       = model_uniform_location;
   gl_id_light_positions[ i ]  = light_position_uniform_location;
@@ -248,6 +252,7 @@ void load_level_objects( GameState* game_state ) {
   
   glEnableVertexAttribArray( position_attribute_location );
   glEnableVertexAttribArray( normal_attribute_location );
+  glEnableVertexAttribArray( colour_attribute_location );
   
   const uint32 vertex_count = 4;
   const uint32 value_count  = vertex_count * 3;
@@ -322,7 +327,7 @@ void load_level_objects( GameState* game_state ) {
 
 void upload_objects_data_to_gl( GameState* game_state ) {
   
-  for( uint32 i = 0; i < object_count - 1; i++ ) {
+  for( uint32 i = 0; i < object_count; i++ ) {
     
     // vertex data
     {
@@ -351,7 +356,7 @@ void upload_objects_data_to_gl( GameState* game_state ) {
     }
     
     // tex_coord0 data
-    if( shader_types[ i ] == SHADERS_LIGHT ) {
+    if( shader_types[ i ] == SHADER_LIGHT ) {
       gl_offsets_tex_coord0_data[ i ] = game_state -> target_gl_offsets_array_data;
       uint32      target          = GL_ARRAY_BUFFER;
       uint32      offset          = gl_offsets_tex_coord0_data[ i ];
@@ -363,7 +368,7 @@ void upload_objects_data_to_gl( GameState* game_state ) {
       game_state -> target_gl_offsets_array_data += size;
     }
     
-    if( shader_types[ i ] == SHADERS_VERTEX_COLOURS ) {
+    if( shader_types[ i ] == SHADER_VERTEX_COLOURS ) {
       gl_offsets_colour_data[ i ] = game_state -> target_gl_offsets_array_data;
       uint32      target          = GL_ARRAY_BUFFER;
       uint32      offset          = gl_offsets_colour_data[ i ];
@@ -489,6 +494,7 @@ int32 run_game() {
   positions[ 1 ].x += 2.0f;
   positions[ 1 ].z -= 5.0f;
   positions[ 1 ].y += 5.0f;
+  positions[ 2 ].y -= 5.0f;
   
   bool32 running = true;
   
@@ -518,7 +524,7 @@ int32 run_game() {
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
-    for( uint32 i = 0; i < object_count - 1; i++ ) {
+    for( uint32 i = 0; i < object_count; i++ ) {
       render_object( i, &game_state.vp_mat[ 0 ] );
     }
     

@@ -23,8 +23,8 @@ uint8* texture_data_array = ( uint8* )malloc( 100000 );
 real32 light_position[ 3 ]  = { 0.0f, 5.0f, 0.0f };
 real32 ambient_light        = 0.3f;
 
-enum Shaders {
-  SHADERS_NONE, SHADERS_LIGHT, SHADERS_VERTEX_COLOURS
+enum ShaderTypes {
+  SHADERS_NONE, SHADER_LIGHT, SHADER_VERTEX_COLOURS
 };
 
 // object data
@@ -34,6 +34,7 @@ uint32    shader_program_ids        [ object_count ];
 int32     gl_id_positions           [ object_count ];
 int32     gl_id_normals             [ object_count ];
 int32     gl_id_tex_coords0         [ object_count ];
+int32     gl_id_colours             [ object_count ];
 int32     gl_id_mvp_mats            [ object_count ];
 int32     gl_id_model_mats          [ object_count ];
 int32     gl_id_light_positions     [ object_count ];
@@ -145,7 +146,7 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
   }
   
-  if( shader_types[ i ] == SHADERS_LIGHT ) { // tex_coord0 s
+  if( shader_types[ i ] == SHADER_LIGHT ) { // tex_coord0 s
     int32   index       = gl_id_tex_coords0[ i ];
     int32   size        = 2;
     uint32  type        = GL_FLOAT;
@@ -155,6 +156,17 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     
     glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
     glBindTexture( GL_TEXTURE_2D, tbos[ i ] );
+  }
+  
+  if( shader_types[ i ] == SHADER_VERTEX_COLOURS ) { // tex_coord0 s
+    int32   index       = gl_id_colours[ i ];
+    int32   size        = 3;
+    uint32  type        = GL_FLOAT;
+    bool32  normalized  = GL_FALSE;
+    int32   stride      = 0;
+    uint32  pointer     = gl_offsets_colour_data[ i ]; // misleading, it's not a pointer, it's where in the buffer it is - offset by number of bytes
+    
+    glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
   }
   
   { // draw elements

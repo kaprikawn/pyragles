@@ -371,7 +371,7 @@ uint32 compileShader( uint32 type, const char* source ) {
   return result;
 }
 
-enum ShaderType {
+enum ShaderCompilationTypes {
   SHADERTYPENONE = -1, VERTEXSHADER = 0, FRAGMENTSHADER = 1
 };
 
@@ -382,7 +382,7 @@ uint32 createShader( ReadFileResult shader_file ) {
   const char* shader_source = ( const char* )shader_file.contents;
   uint32 filesize_max       = shader_file.contents_size;
   
-  ShaderType type = SHADERTYPENONE;
+  uint32 type = SHADERTYPENONE;
   
   char* vertex_shader_source    = ( char* )malloc( filesize_max );
   char* fragment_shader_source  = ( char* )malloc( filesize_max );
