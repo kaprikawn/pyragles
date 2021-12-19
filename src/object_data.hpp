@@ -4,7 +4,7 @@
 #include "vector_maths.hpp"
 #include "types.hpp"
 
-const uint32 object_count = 2;
+const uint32 object_count = 3;
 
 struct GameObject {
   bool32    active = false;
@@ -21,7 +21,11 @@ uint16 gl_element_array_buffer_data [ 10000 ];
 uint8* texture_data_array = ( uint8* )malloc( 100000 );
 
 real32 light_position[ 3 ]  = { 0.0f, 5.0f, 0.0f };
-real32 ambient_light        = 0.3f;  
+real32 ambient_light        = 0.3f;
+
+enum Shaders {
+  SHADERS_NONE, SHADERS_LIGHT, SHADERS_VERTEX_COLOURS
+};
 
 // object data
 Position  positions                 [ object_count ];
@@ -40,16 +44,21 @@ uint32    texture_buffer_lengths    [ object_count ];
 uint32    offsets_vertex_data       [ object_count ];
 uint32    offsets_normal_data       [ object_count ];
 uint32    offsets_tex_coord0_data   [ object_count ];
+uint32    offsets_colour_data       [ object_count ];
 uint32    offsets_index_data        [ object_count ];
 uint32    gl_offsets_vertex_data    [ object_count ];
 uint32    gl_offsets_normal_data    [ object_count ];
 uint32    gl_offsets_tex_coord0_data[ object_count ];
+uint32    gl_offsets_colour_data    [ object_count ];
 uint32    gl_offsets_index_data     [ object_count ];
 uint32    counts_vertex_data        [ object_count ];
 uint32    counts_normal_data        [ object_count ];
 uint32    counts_tex_coord0_data    [ object_count ];
+uint32    counts_colour_data        [ object_count ];
 uint32    counts_index_data         [ object_count ];
+uint32    shader_types              [ object_count ];
 uint8*    image_data_locations      [ object_count ];
+
 
 void render_object( uint32 object_index, real32* vp_matrix ) {
   uint32 i = object_index;
@@ -136,7 +145,7 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
   }
   
-  { // tex_coord0 s
+  if( shader_types[ i ] == SHADERS_LIGHT ) { // tex_coord0 s
     int32   index       = gl_id_tex_coords0[ i ];
     int32   size        = 2;
     uint32  type        = GL_FLOAT;
