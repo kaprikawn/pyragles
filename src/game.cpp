@@ -224,7 +224,7 @@ void load_level_objects( GameState* game_state ) {
     object_active[ i ]  = true;
     shader_types[ i ]   = SHADER_VERTEX_COLOURS;
     
-    const char* shader_filename = "shaderVertexColoursLightPerFrag.glsl";
+    const char* shader_filename = "shaderVertexColoursNoLight.glsl";
     ReadFileResult shader_file  = read_entire_file( shader_filename );
     
     uint32 shader_program_id    = createShader( shader_file );
@@ -273,7 +273,8 @@ void load_level_objects( GameState* game_state ) {
       if( i == 2 ) {
         normals = get_underside_floor_normals( &counts_normal_data[ i ] );
       } else {
-        normals = get_overside_floor_normals( &counts_normal_data[ i ] );
+        uint32 count = counts_vertex_data[ i ];
+        normals = get_overside_floor_normals( count, &gl_array_buffer_data[ offsets_vertex_data[ i ] ] );
       }
       offsets_normal_data[ i ]  = game_state -> array_buffer_target;
       void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
