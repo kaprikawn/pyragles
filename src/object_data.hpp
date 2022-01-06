@@ -4,7 +4,7 @@
 #include "vector_maths.hpp"
 #include "types.hpp"
 
-const uint32 object_count = 3;
+const uint32 object_count = 4;
 
 struct GameObject {
   bool32    active = false;
@@ -58,11 +58,13 @@ uint32    counts_tex_coord0_data    [ object_count ];
 uint32    counts_colour_data        [ object_count ];
 uint32    counts_index_data         [ object_count ];
 uint32    shader_types              [ object_count ];
+bool32    object_active             [ object_count ];
 uint8*    image_data_locations      [ object_count ];
-
 
 void render_object( uint32 object_index, real32* vp_matrix ) {
   uint32 i = object_index;
+  
+  if( !object_active[ i ] ) { return; }
   
   real32 vp[ 16 ];
   memcpy( &vp[ 0 ], vp_matrix, ( sizeof( real32 ) * 16 ) );

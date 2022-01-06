@@ -6,6 +6,7 @@
 #include "vector_maths.hpp"
 #include "game.hpp"
 #include "object_data.hpp"
+#include "floor_vertex_data.hpp"
 
 struct GameState {
   real32  vp_mat[ 16 ]; // view perspective matrix
@@ -59,9 +60,7 @@ void load_level_objects( GameState* game_state ) {
   
   for( uint32 i = 0; i < object_count - 1; i++ ) {
     
-    GameObject game_object;
-    game_object.index = i;
-    game_object.active = true;
+    object_active[ i ] = true;
     
     const char* shader_filename = "shaderLight.glsl";
     ReadFileResult shader_file  = read_entire_file( shader_filename );
@@ -220,109 +219,103 @@ void load_level_objects( GameState* game_state ) {
     free( json_string );
   }
   
-  GameObject game_object;
-  game_object.index   = 2;
-  game_object.active  = true;
-  
-  uint32 i = game_object.index;
-  shader_types [ i ] = SHADER_VERTEX_COLOURS;
-  
-  const char* shader_filename = "shaderVertexColoursLightPerFrag.glsl";
-  ReadFileResult shader_file  = read_entire_file( shader_filename );
-  
-  uint32 shader_program_id    = createShader( shader_file );
-  shader_program_ids[ i ]     = shader_program_id;
-  glUseProgram( shader_program_id );
-  
-  int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
-  int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
-  int32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
-  int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
-  int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
-  int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
-  int32 ambient_light_uniform_location  = glGetUniformLocation( shader_program_id, "uAmbientLight" );
-  
-  gl_id_positions[ i ]        = position_attribute_location;
-  gl_id_normals[ i ]          = normal_attribute_location;
-  gl_id_colours[ i ]          = colour_attribute_location;
-  gl_id_mvp_mats[ i ]         = mvp_uniform_location;
-  gl_id_model_mats[ i ]       = model_uniform_location;
-  gl_id_light_positions[ i ]  = light_position_uniform_location;
-  gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
-  
-  glEnableVertexAttribArray( position_attribute_location );
-  glEnableVertexAttribArray( normal_attribute_location );
-  glEnableVertexAttribArray( colour_attribute_location );
-  
-  const uint32 vertex_count = 4;
-  const uint32 value_count  = vertex_count * 3;
-  
-  // vertices
-  real32 vertices[ value_count ] = {
-      -100.0f, -0.1f, -100.0f
-    , -100.0f, -0.1f,   10.0f
-    ,  100.0f, -0.1f,   10.0f
-    ,  100.0f, -0.1f, -100.0f
-  };
-  counts_vertex_data[ i ]   = value_count;
-  offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
-  {
-    void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
-    void*   src   = ( void* )&vertices[ 0 ];
-    uint32  bytes = ( sizeof( vertices[ 0 ] ) * counts_vertex_data[ i ] );
-    memcpy( dest, src, bytes );
+  // floor
+  for( uint32 i = 2; i < 4; i++ ) {
+    object_active[ i ]  = true;
+    shader_types[ i ]   = SHADER_VERTEX_COLOURS;
+    
+    const char* shader_filename = "shaderVertexColoursLightPerFrag.glsl";
+    ReadFileResult shader_file  = read_entire_file( shader_filename );
+    
+    uint32 shader_program_id    = createShader( shader_file );
+    shader_program_ids[ i ]     = shader_program_id;
+    
+    glUseProgram( shader_program_id );
+    
+    int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
+    int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
+    int32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
+    int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
+    int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
+    int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
+    int32 ambient_light_uniform_location  = glGetUniformLocation( shader_program_id, "uAmbientLight" );
+    
+    gl_id_positions[ i ]        = position_attribute_location;
+    gl_id_normals[ i ]          = normal_attribute_location;
+    gl_id_colours[ i ]          = colour_attribute_location;
+    gl_id_mvp_mats[ i ]         = mvp_uniform_location;
+    gl_id_model_mats[ i ]       = model_uniform_location;
+    gl_id_light_positions[ i ]  = light_position_uniform_location;
+    gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
+    
+    glEnableVertexAttribArray( position_attribute_location );
+    glEnableVertexAttribArray( normal_attribute_location );
+    glEnableVertexAttribArray( colour_attribute_location );
+    
+    { // vertices
+      real32* vertices;
+      if( i == 2 ) {
+        vertices = get_underside_floor_vertices( &counts_vertex_data[ i ] );
+      } else {
+        vertices = get_overside_floor_vertices( &counts_vertex_data[ i ] );
+      }
+      offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
+      void*   src   = ( void* )&vertices[ 0 ];
+      uint32  bytes = ( sizeof( vertices[ 0 ] ) * counts_vertex_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( vertices );
+      game_state -> array_buffer_target += counts_vertex_data[ i ];
+    }
+    
+    { // normals
+      real32* normals;
+      if( i == 2 ) {
+        normals = get_underside_floor_normals( &counts_normal_data[ i ] );
+      } else {
+        normals = get_overside_floor_normals( &counts_normal_data[ i ] );
+      }
+      offsets_normal_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
+      void*   src   = ( void* )&normals[ 0 ];
+      uint32  bytes = ( sizeof( normals[ 0 ] ) * counts_normal_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( normals );
+      game_state -> array_buffer_target += counts_normal_data[ i ];
+    }
+    
+    { // colours
+      real32* colours;
+      if( i == 2 ) {
+        colours = get_underside_floor_colours( &counts_colour_data[ i ] );
+      } else {
+        colours = get_overside_floor_colours( &counts_colour_data[ i ] );
+      }
+      offsets_colour_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_colour_data[ i ] ];
+      void*   src   = ( void* )&colours[ 0 ];
+      uint32  bytes = ( sizeof( colours[ 0 ] ) * counts_colour_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( colours );
+      game_state -> array_buffer_target += counts_colour_data[ i ];
+    }
+    
+    { // indices
+      uint16* indices;
+      if( i == 2 ) {
+        indices = get_underside_floor_indices( &counts_index_data[ i ] );
+      } else {
+        indices = get_overside_floor_indices( &counts_index_data[ i ] );
+      }
+      offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
+      void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
+      void*   src   = ( void* )&indices[ 0 ];
+      uint32  bytes = ( sizeof( indices[ 0 ] ) * counts_index_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( indices );
+      game_state -> element_array_buffer_target += counts_index_data[ i ];
+    }
   }
-  game_state -> array_buffer_target += counts_vertex_data[ i ];
-  
-  // normals
-  real32 normals[ value_count ] = {
-      -1.0f, 1.0f, -1.0f
-    , -1.0f, 1.0f,  1.0f
-    ,  1.0f, 1.0f,  1.0f
-    ,  1.0f, 1.0f, -1.0f
-  };
-  counts_normal_data[ i ]   = value_count;
-  offsets_normal_data[ i ]  = game_state -> array_buffer_target;
-  {
-    void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
-    void*   src   = ( void* )&normals[ 0 ];
-    uint32  bytes = ( sizeof( normals[ 0 ] ) * counts_vertex_data[ i ] );
-    memcpy( dest, src, bytes );
-  }
-  game_state -> array_buffer_target += counts_normal_data[ i ];
-  
-  // colours
-  real32 colours[ value_count ] = {
-      0.87f, 0.733f, 0.129f
-    , 0.87f, 0.733f, 0.129f
-    , 0.87f, 0.733f, 0.129f
-    , 0.87f, 0.733f, 0.129f
-  };
-  counts_colour_data[ i ]   = value_count;
-  offsets_colour_data[ i ]  = game_state -> array_buffer_target;
-  {
-    void*   dest  = ( void* )&gl_array_buffer_data[ offsets_colour_data[ i ] ];
-    void*   src   = ( void* )&colours[ 0 ];
-    uint32  bytes = ( sizeof( colours[ 0 ] ) * counts_vertex_data[ i ] );
-    memcpy( dest, src, bytes );
-  }
-  game_state -> array_buffer_target += counts_colour_data[ i ];
-  
-  // indices
-  const uint32 index_count = 6;
-  uint16 indices[ index_count ] = { 
-    0, 1, 2, 2, 3, 0
-  };
-  counts_index_data[ i ]   = index_count;
-  offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
-  {
-    void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
-    void*   src   = ( void* )&indices[ 0 ];
-    uint32  bytes = ( sizeof( indices[ 0 ] ) * counts_index_data[ i ] );
-    memcpy( dest, src, bytes );
-  }
-  game_state -> element_array_buffer_target += index_count;
-  
 }
 
 void upload_objects_data_to_gl( GameState* game_state ) {
@@ -490,6 +483,7 @@ int32 run_game() {
   upload_objects_data_to_gl( &game_state );
   
   positions[ 0 ].x -= 2.0f;
+  positions[ 0 ].y += 2.0f;
   positions[ 1 ].x += 2.0f;
   positions[ 1 ].z -= 5.0f;
   positions[ 1 ].y += 5.0f;
@@ -518,8 +512,13 @@ int32 run_game() {
       running = false;
     
     calculate_ship_rotation( &game_input, dt );
-    rotations[ 1 ].x += 0.02f;
-    rotations[ 1 ].y += 2.0f;
+    rotations[ 1 ].x += ( 2.0f * dt );
+    rotations[ 1 ].y += ( 200.0f * dt );
+    
+    positions[ 3 ].z += ( 1.0f * dt );
+    if( positions[ 3 ].z > 4.0f ) {
+      positions[ 3 ].z -= 4.0f;
+    }
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
