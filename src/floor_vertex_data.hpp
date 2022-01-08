@@ -5,76 +5,75 @@
 #include <cstdlib>
 #include "types.hpp"
 
-const uint32 tile_count_x  = 10;
-const uint32 tile_count_z  = 10;
+const uint32 tile_count_x  = 4;
+const uint32 tile_count_z  = 4;
 
-const int32 initial_x_offset = -20;
-const int32 initial_z_offset = -20;
+const int32 initial_x_offset = 0;
+const int32 initial_z_offset = 0;
 
 real32* get_underside_floor_vertices( uint32* count ) {
   const uint32 value_count = 12;
   real32* result = ( real32* )malloc( sizeof( real32 ) * value_count );
   real32 vertices[ value_count ] = {
-      -100.0f, -0.1f, -100.0f
-    , -100.0f, -0.1f,   10.0f
-    ,  100.0f, -0.1f,   10.0f
-    ,  100.0f, -0.1f, -100.0f
+        0.0f, 0.0f, 0.0f
+    , 200.0f, 0.0f, 0.0f
+    , 200.0f, 0.0f, 200.0f
+    ,   0.0f, 0.0f, 200.0f
   };
   memcpy( result, &vertices[ 0 ], ( value_count * sizeof( vertices[ 0 ] ) ) );
   *count = value_count;
   return result;
 }
 
+uint16* get_underside_floor_indices( uint32* count ) {
+  const uint32 value_count = 6;
+  uint16* result = ( uint16* )malloc( sizeof( uint16 ) * value_count );
+  uint16 indices[ value_count ] = { 
+    0, 1, 2, 2, 3, 0
+  };
+  memcpy( result, &indices[ 0 ], ( value_count * sizeof( indices[ 0 ] ) ) );
+  *count = value_count;
+  return result;
+}
+
 real32* get_overside_floor_vertices( uint32* count ) {
   
-  const uint32 value_count = ( tile_count_x * tile_count_z * 12 * 2 );
+  const uint32 value_count = ( ( ( tile_count_x * tile_count_z ) / 2 ) * 12 );
   real32* result = ( real32* )malloc( sizeof( real32 ) * value_count );
   real32 vertices[ value_count ] = {};
   
   uint32 i = 0;
-  for( int32 x = 0; x < ( tile_count_x * 4 ); x += 4 ) {
-    for( int32 z = 0; z < ( tile_count_z * 4 ); z += 4 ) {
+  for( int32 x = 0; x < tile_count_x; x++ ) {
+    for( int32 z = 0; z < tile_count_z; z++ ) {
       
-      real32 initial_x = ( real32 )x;
-      real32 initial_z = ( real32 )z;
       
-      initial_x += initial_x_offset;
-      initial_z += initial_z_offset;
-      
-      vertices[ i++ ] = initial_x;
-      vertices[ i++ ] = 0.0f;
-      vertices[ i++ ] = initial_z;
-      
-      vertices[ i++ ] = initial_x;
-      vertices[ i++ ] = 0.0f;
-      vertices[ i++ ] = ( initial_z + 2.0f );
-      
-      vertices[ i++ ] = ( initial_x + 2.0f );
-      vertices[ i++ ] = 0.0f;
-      vertices[ i++ ] = ( initial_z + 2.0f );
-      
-      vertices[ i++ ] = ( initial_x + 2.0f );
-      vertices[ i++ ] = 0.0f;
-      vertices[ i++ ] = initial_z;
-      
-      initial_x += 2.0f;
-      initial_z += 2.0f;
-      
-      vertices[ i++ ] = initial_x;
-      vertices[ i++ ] = 0.0f;
-      vertices[ i++ ] = initial_z;
-      
-      vertices[ i++ ] = initial_x;
-      vertices[ i++ ] = 0.0f;
-      vertices[ i++ ] = ( initial_z + 2.0f );
-      
-      vertices[ i++ ] = ( initial_x + 2.0f );
-      vertices[ i++ ] = 0.0f;
-      vertices[ i++ ] = ( initial_z + 2.0f );
-      
-      vertices[ i++ ] = ( initial_x + 2.0f );
-      vertices[ i++ ] = 0.0f;
-      vertices[ i++ ] = initial_z;
+      if( ( x % 2 == 0 && z % 2 == 0 ) || ( x % 2 != 0 && z % 2 != 0 ) ) {
+        
+        int32 start_x = ( x * 2 );
+        int32 start_z = ( z * 2 );
+        
+        real32 this_x = ( real32 )start_x;
+        real32 this_z = ( real32 )start_z;
+        
+        this_x += ( real32 )initial_x_offset;
+        this_z += ( real32 )initial_z_offset;
+        
+        vertices[ i++ ] = this_x;
+        vertices[ i++ ] = 0.0f;
+        vertices[ i++ ] = this_z;
+        
+        vertices[ i++ ] = this_x;
+        vertices[ i++ ] = 0.0f;
+        vertices[ i++ ] = ( this_z + 2.0f );
+        
+        vertices[ i++ ] = ( this_x + 2.0f );
+        vertices[ i++ ] = 0.0f;
+        vertices[ i++ ] = ( this_z + 2.0f );
+        
+        vertices[ i++ ] = ( this_x + 2.0f );
+        vertices[ i++ ] = 0.0f;
+        vertices[ i++ ] = this_z;
+      }
     }
   }
   
@@ -174,17 +173,6 @@ real32* get_overside_floor_colours( uint32* count ) {
   }
   
   memcpy( result, &colours[ 0 ], ( value_count * sizeof( colours[ 0 ] ) ) );
-  *count = value_count;
-  return result;
-}
-
-uint16* get_underside_floor_indices( uint32* count ) {
-  const uint32 value_count = 6;
-  uint16* result = ( uint16* )malloc( sizeof( uint16 ) * value_count );
-  uint16 indices[ value_count ] = { 
-    0, 1, 2, 2, 3, 0
-  };
-  memcpy( result, &indices[ 0 ], ( value_count * sizeof( indices[ 0 ] ) ) );
   *count = value_count;
   return result;
 }

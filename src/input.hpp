@@ -19,6 +19,10 @@ struct ButtonsPressed {
   bool32 a          = false;
   bool32 s          = false;
   bool32 d          = false;
+  bool32 arrow_up   = false;
+  bool32 arrow_down = false;
+  bool32 pg_up      = false;
+  bool32 pg_down    = false;
   real32 joy_axis_x = 0.0f;
   real32 joy_axis_y = 0.0f;
 };
@@ -41,13 +45,27 @@ struct GameInput {
   // bool d_pressed    = false;
   // bool d_held       = false;
   // bool d_released   = false;
+  bool arrow_up_pressed     = false;
+  bool arrow_up_held        = false;
+  bool arrow_up_released    = false;
+  bool arrow_down_pressed   = false;
+  bool arrow_down_held      = false;
+  bool arrow_down_released  = false;
+  bool pg_up_pressed        = false;
+  bool pg_up_held           = false;
+  bool pg_up_released       = false;
+  bool pg_down_pressed      = false;
+  bool pg_down_held         = false;
+  bool pg_down_released     = false;
 };
 
 void reset_game_inputs_pressed( ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
-  old_buttons -> w = new_buttons -> w;
-  old_buttons -> a = new_buttons -> a;
-  old_buttons -> s = new_buttons -> s;
-  old_buttons -> d = new_buttons -> d;
+  old_buttons -> w          = new_buttons -> w;
+  old_buttons -> a          = new_buttons -> a;
+  old_buttons -> s          = new_buttons -> s;
+  old_buttons -> d          = new_buttons -> d;
+  old_buttons -> arrow_up   = new_buttons -> arrow_up;
+  old_buttons -> arrow_down = new_buttons -> arrow_down;
 }
 
 GameInput get_game_input_state( ButtonsPressed old_buttons, ButtonsPressed new_buttons, bool32 invert_y ) {
@@ -92,6 +110,42 @@ GameInput get_game_input_state( ButtonsPressed old_buttons, ButtonsPressed new_b
   // } else if( old_buttons.d && !new_buttons.d ) {
   //   result.d_released = true;
   // }
+  
+  if( !old_buttons.arrow_up && new_buttons.arrow_up ) {
+    result.arrow_up_pressed  = true;
+    result.arrow_up_held     = true;
+  } else if( old_buttons.arrow_up && new_buttons.arrow_up ) {
+    result.arrow_up_held     = true;
+  } else if( old_buttons.arrow_up && !new_buttons.arrow_up ) {
+    result.arrow_up_released = true;
+  }
+  
+  if( !old_buttons.arrow_down && new_buttons.arrow_down ) {
+    result.arrow_down_pressed  = true;
+    result.arrow_down_held     = true;
+  } else if( old_buttons.arrow_down && new_buttons.arrow_down ) {
+    result.arrow_down_held     = true;
+  } else if( old_buttons.arrow_down && !new_buttons.arrow_down ) {
+    result.arrow_down_released = true;
+  }
+  
+  if( !old_buttons.pg_up && new_buttons.pg_up ) {
+    result.pg_up_pressed  = true;
+    result.pg_up_held     = true;
+  } else if( old_buttons.pg_up && new_buttons.pg_up ) {
+    result.pg_up_held     = true;
+  } else if( old_buttons.pg_up && !new_buttons.pg_up ) {
+    result.pg_up_released = true;
+  }
+  
+  if( !old_buttons.pg_down && new_buttons.pg_down ) {
+    result.pg_down_pressed  = true;
+    result.pg_down_held     = true;
+  } else if( old_buttons.pg_down && new_buttons.pg_down ) {
+    result.pg_down_held     = true;
+  } else if( old_buttons.pg_down && !new_buttons.pg_down ) {
+    result.pg_down_released = true;
+  }
   
   real32 joy_axis_x = new_buttons.joy_axis_x;
   real32 joy_axis_y = new_buttons.joy_axis_y;
@@ -155,6 +209,26 @@ void input_on_key_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPr
       old_buttons -> d = false;
     } break;
     
+    case SDL_SCANCODE_UP : {
+      new_buttons -> arrow_up = true;
+      old_buttons -> arrow_up = false;
+    } break;
+    
+    case SDL_SCANCODE_DOWN : {
+      new_buttons -> arrow_down = true;
+      old_buttons -> arrow_down = false;
+    } break;
+    
+    case SDL_SCANCODE_PAGEUP : {
+      new_buttons -> pg_up = true;
+      old_buttons -> pg_up = false;
+    } break;
+    
+    case SDL_SCANCODE_PAGEDOWN : {
+      new_buttons -> pg_down = true;
+      old_buttons -> pg_down = false;
+    } break;
+    
     default : break;
   }
 }
@@ -188,6 +262,26 @@ void input_on_key_up( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPres
     case SDL_SCANCODE_D : {
       new_buttons -> d = false;
       old_buttons -> d = true;
+    } break;
+    
+    case SDL_SCANCODE_UP : {
+      new_buttons -> arrow_up = false;
+      old_buttons -> arrow_up = true;
+    } break;
+    
+    case SDL_SCANCODE_DOWN : {
+      new_buttons -> arrow_down = false;
+      old_buttons -> arrow_down = true;
+    } break;
+    
+    case SDL_SCANCODE_PAGEUP : {
+      new_buttons -> pg_up = false;
+      old_buttons -> pg_up = true;
+    } break;
+    
+    case SDL_SCANCODE_PAGEDOWN : {
+      new_buttons -> pg_down = false;
+      old_buttons -> pg_down = true;
     } break;
     
     default : break;

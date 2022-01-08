@@ -10,6 +10,9 @@
 
 struct GameState {
   real32  vp_mat[ 16 ]; // view perspective matrix
+  real32  p_mat[ 16 ]; // projection matrix
+  Position eye      = { 0.0f, 10.0f, 10.0f };
+  Position look_at  = { 0.0f, 0.0f, 9.0f };
   int32   vbo;
   int32   ibo;
   uint32  array_buffer_target           = 0;
@@ -29,14 +32,12 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   real32 v[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };    // view
   real32 p[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; // projection
   real32 fov        = 70.0f;
-  real32 near_plane = 0.1f;
-  real32 far_plane  = 100.0f;
+  real32 near_plane = 0.01f;
+  real32 far_plane  = 65.0f;
   populate_perspective_matrix( &p[ 0 ], fov, aspect, near_plane, far_plane );
+  memcpy( &game_state -> p_mat[ 0 ], &p[ 0 ], sizeof( p[ 0 ] ) * 16 );
   
-  Position eye      = { 7.0f, 7.0f, 7.0f };
-  Position centre   = { 1.0f, 1.0f, 1.0f };
-  
-  populate_view_matrix( &v[ 0 ], eye, centre );
+  populate_view_matrix( &v[ 0 ], game_state -> eye, game_state -> look_at );
   
   mat4_multiply( &game_state -> vp_mat[ 0 ], &v[ 0 ], &p[ 0 ] );
   
@@ -317,6 +318,9 @@ void load_level_objects( GameState* game_state ) {
       game_state -> element_array_buffer_target += counts_index_data[ i ];
     }
   }
+  
+  // positions[ 2 ].x = -100.0f;
+  // positions[ 2 ].z = -100.0f;
 }
 
 void upload_objects_data_to_gl( GameState* game_state ) {
@@ -387,6 +391,26 @@ void upload_objects_data_to_gl( GameState* game_state ) {
       game_state -> target_gl_offsets_index_data += size;
     }
   }
+}
+
+void caculate_camera( GameState* game_state, GameInput* game_input, real32 dt ) {
+  
+  if( game_input -> arrow_up_held ) {
+    game_state -> eye.y -= ( 1.0f * dt );
+  } else if( game_input -> arrow_down_held ) {
+    game_state -> eye.y += ( 1.0f * dt );
+  }
+  
+  if( game_input -> pg_up_held ) {
+    game_state -> look_at.z += ( 1.0f * dt );
+  } else if( game_input -> pg_down_held ) {
+    game_state -> look_at.z -= ( 1.0f * dt );
+  }
+  
+  real32 v[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };    // view
+  
+  populate_view_matrix( &v[ 0 ], game_state -> eye, game_state -> look_at );
+  mat4_multiply( &game_state -> vp_mat[ 0 ], &v[ 0 ], &game_state -> p_mat[ 0 ] );
 }
 
 void calculate_ship_rotation( GameInput* game_input, real32 dt, uint32 ship_index = 0 ) {
@@ -488,7 +512,7 @@ int32 run_game() {
   positions[ 1 ].x += 2.0f;
   positions[ 1 ].z -= 5.0f;
   positions[ 1 ].y += 5.0f;
-  positions[ 2 ].y -= 5.0f;
+  positions[ 2 ].y -= 0.05f;
   
   bool32 running = true;
   
@@ -513,6 +537,7 @@ int32 run_game() {
       running = false;
     
     calculate_ship_rotation( &game_input, dt );
+    caculate_camera( &game_state, &game_input, dt );
     rotations[ 1 ].x += ( 2.0f * dt );
     rotations[ 1 ].y += ( 200.0f * dt );
     
