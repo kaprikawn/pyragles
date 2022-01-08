@@ -5,8 +5,8 @@
 #include <cstdlib>
 #include "types.hpp"
 
-const uint32 tile_count_x  = 4;
-const uint32 tile_count_z  = 4;
+const uint32 tile_count_x  = 40;
+const uint32 tile_count_z  = 40;
 
 const int32 initial_x_offset = 0;
 const int32 initial_z_offset = 0;
@@ -25,16 +25,6 @@ real32* get_underside_floor_vertices( uint32* count ) {
   return result;
 }
 
-uint16* get_underside_floor_indices( uint32* count ) {
-  const uint32 value_count = 6;
-  uint16* result = ( uint16* )malloc( sizeof( uint16 ) * value_count );
-  uint16 indices[ value_count ] = { 
-    0, 1, 2, 2, 3, 0
-  };
-  memcpy( result, &indices[ 0 ], ( value_count * sizeof( indices[ 0 ] ) ) );
-  *count = value_count;
-  return result;
-}
 
 real32* get_overside_floor_vertices( uint32* count ) {
   
@@ -177,41 +167,45 @@ real32* get_overside_floor_colours( uint32* count ) {
   return result;
 }
 
+uint16* get_underside_floor_indices( uint32* count ) {
+  const uint32 value_count = 6;
+  uint16* result = ( uint16* )malloc( sizeof( uint16 ) * value_count );
+  uint16 indices[ value_count ] = { 
+    0, 1, 2, 2, 3, 0
+  };
+  memcpy( result, &indices[ 0 ], ( value_count * sizeof( indices[ 0 ] ) ) );
+  *count = value_count;
+  return result;
+}
+
 uint16* get_overside_floor_indices( uint32* count ) {
   
-  const uint32 value_count = ( tile_count_x * tile_count_z * 6 * 2 );
-  uint16* result = ( uint16* )malloc( sizeof( uint16 ) * value_count );
+  const uint32 value_count = ( tile_count_x * tile_count_z * 6 ) / 2;
+  const uint32 bytes = ( sizeof( uint16 ) * value_count );
+  uint16* result = ( uint16* )malloc( bytes );
   uint16 indices[ value_count ] = {}; // = { 
   //   0, 1, 2, 2, 3, 0
   // };
   uint32 indices_offset = 0;
   uint32 i = 0;
-  for( uint32 x = 0; x < ( tile_count_x * 4 ); x += 4 ) {
-    for( uint32 z = 0; z < ( tile_count_z * 4 ); z += 4 ) {
+  for( uint32 x = 0; x < tile_count_x; x++ ) {
+    for( uint32 z = 0; z < tile_count_z; z++ ) {
       
-      indices[ i++ ] = indices_offset;
-      indices[ i++ ] = ( indices_offset + 1 );
-      indices[ i++ ] = ( indices_offset + 2 );
-      indices[ i++ ] = ( indices_offset + 2 );
-      indices[ i++ ] = ( indices_offset + 3 );
-      indices[ i++ ] = indices_offset;
-      
-      indices_offset += 4;
-      
-      indices[ i++ ] = indices_offset;
-      indices[ i++ ] = ( indices_offset + 1 );
-      indices[ i++ ] = ( indices_offset + 2 );
-      indices[ i++ ] = ( indices_offset + 2 );
-      indices[ i++ ] = ( indices_offset + 3 );
-      indices[ i++ ] = indices_offset;
-      
-      indices_offset += 4;
-      
+      if( ( x % 2 == 0 && z % 2 == 0 ) || ( x % 2 != 0 && z % 2 != 0 ) ) {
+        indices[ i++ ] = indices_offset;
+        indices[ i++ ] = ( indices_offset + 1 );
+        indices[ i++ ] = ( indices_offset + 2 );
+        indices[ i++ ] = ( indices_offset + 2 );
+        indices[ i++ ] = ( indices_offset + 3 );
+        indices[ i++ ] = indices_offset;
+        
+        indices_offset += 4;
+      }
     }
   }
   
   
-  memcpy( result, &indices[ 0 ], ( value_count * sizeof( indices[ 0 ] ) ) );
+  memcpy( result, &indices[ 0 ], bytes );
   *count = value_count;
   return result;
 }

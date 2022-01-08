@@ -11,8 +11,8 @@
 struct GameState {
   real32  vp_mat[ 16 ]; // view perspective matrix
   real32  p_mat[ 16 ]; // projection matrix
-  Position eye      = { 0.0f, 10.0f, 10.0f };
-  Position look_at  = { 0.0f, 0.0f, 9.0f };
+  Position eye      = { 0.0f, 5.0f, 10.0f };
+  Position look_at  = { 0.0f, 5.0f, 9.0f };
   int32   vbo;
   int32   ibo;
   uint32  array_buffer_target           = 0;
@@ -47,11 +47,11 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   // set up gl buffers
   glGenBuffers( 1, &vbo );
   glBindBuffer( GL_ARRAY_BUFFER, vbo );
-  glBufferData( GL_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
+  glBufferData( GL_ARRAY_BUFFER, Megabytes( 3000 ), 0, GL_STATIC_DRAW );
   
   glGenBuffers( 1, &ibo );
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 200 ), 0, GL_STATIC_DRAW );
   
   game_state -> vbo = vbo;
   game_state -> ibo = ibo;
@@ -59,7 +59,7 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
 
 void load_level_objects( GameState* game_state ) {
   
-  for( uint32 i = 0; i < object_count - 1; i++ ) {
+  for( uint32 i = 0; i < object_count - 2; i++ ) {
     
     object_active[ i ] = true;
     
@@ -319,6 +319,12 @@ void load_level_objects( GameState* game_state ) {
     }
   }
   
+  positions[ 2 ].y -= 0.05f; // avoid z fighting on the floor
+  positions[ 2 ].x -= 100.0f;
+  positions[ 2 ].z -= 60.0f;
+  positions[ 3 ].x -= 100.0f;
+  positions[ 3 ].z -= 60.0f;
+  
   // positions[ 2 ].x = -100.0f;
   // positions[ 2 ].z = -100.0f;
 }
@@ -396,15 +402,15 @@ void upload_objects_data_to_gl( GameState* game_state ) {
 void caculate_camera( GameState* game_state, GameInput* game_input, real32 dt ) {
   
   if( game_input -> arrow_up_held ) {
-    game_state -> eye.y -= ( 1.0f * dt );
+    game_state -> eye.y -= ( 10.0f * dt );
   } else if( game_input -> arrow_down_held ) {
-    game_state -> eye.y += ( 1.0f * dt );
+    game_state -> eye.y += ( 10.0f * dt );
   }
   
   if( game_input -> pg_up_held ) {
-    game_state -> look_at.z += ( 1.0f * dt );
+    game_state -> look_at.z += ( 10.0f * dt );
   } else if( game_input -> pg_down_held ) {
-    game_state -> look_at.z -= ( 1.0f * dt );
+    game_state -> look_at.z -= ( 10.0f * dt );
   }
   
   real32 v[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };    // view
@@ -512,7 +518,6 @@ int32 run_game() {
   positions[ 1 ].x += 2.0f;
   positions[ 1 ].z -= 5.0f;
   positions[ 1 ].y += 5.0f;
-  positions[ 2 ].y -= 0.05f;
   
   bool32 running = true;
   
