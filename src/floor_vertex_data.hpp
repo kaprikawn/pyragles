@@ -5,11 +5,8 @@
 #include <cstdlib>
 #include "types.hpp"
 
-const uint32 tile_count_x  = 40;
-const uint32 tile_count_z  = 40;
-
-const int32 initial_x_offset = 0;
-const int32 initial_z_offset = 0;
+const uint32 tile_count_x  = 140;
+const uint32 tile_count_z  = 140;
 
 real32* get_underside_floor_vertices( uint32* count ) {
   const uint32 value_count = 12;
@@ -36,7 +33,6 @@ real32* get_overside_floor_vertices( uint32* count ) {
   for( int32 x = 0; x < tile_count_x; x++ ) {
     for( int32 z = 0; z < tile_count_z; z++ ) {
       
-      
       if( ( x % 2 == 0 && z % 2 == 0 ) || ( x % 2 != 0 && z % 2 != 0 ) ) {
         
         int32 start_x = ( x * 2 );
@@ -44,9 +40,6 @@ real32* get_overside_floor_vertices( uint32* count ) {
         
         real32 this_x = ( real32 )start_x;
         real32 this_z = ( real32 )start_z;
-        
-        this_x += ( real32 )initial_x_offset;
-        this_z += ( real32 )initial_z_offset;
         
         vertices[ i++ ] = this_x;
         vertices[ i++ ] = 0.0f;
@@ -117,53 +110,25 @@ real32* get_underside_floor_colours( uint32* count ) {
   return result;
 }
 
-real32* get_overside_floor_colours( uint32* count ) {
+real32* get_overside_floor_colours( const uint32 count ) {
   
-  const uint32 value_count = ( tile_count_x * tile_count_z * 12 * 2 );
+  const uint32 value_count = count;
   real32* result = ( real32* )malloc( sizeof( real32 ) * value_count );
-  real32 colours[ value_count ] = {};
   
-  uint32 i = 0;
-  for( uint32 x = 0; x < ( tile_count_x * 4 ); x += 4 ) {
-    for( uint32 z = 0; z < ( tile_count_z * 4 ); z += 4 ) {
-      
-      colours[ i++ ] = 0.87f;
-      colours[ i++ ] = 0.733f;
-      colours[ i++ ] = 0.129f;
-      
-      colours[ i++ ] = 0.87f;
-      colours[ i++ ] = 0.733f;
-      colours[ i++ ] = 0.129f;
-      
-      colours[ i++ ] = 0.87f;
-      colours[ i++ ] = 0.733f;
-      colours[ i++ ] = 0.129f;
-      
-      colours[ i++ ] = 0.87f;
-      colours[ i++ ] = 0.733f;
-      colours[ i++ ] = 0.129f;
-      
-      colours[ i++ ] = 0.87f;
-      colours[ i++ ] = 0.733f;
-      colours[ i++ ] = 0.129f;
-      
-      colours[ i++ ] = 0.87f;
-      colours[ i++ ] = 0.733f;
-      colours[ i++ ] = 0.129f;
-      
-      colours[ i++ ] = 0.87f;
-      colours[ i++ ] = 0.733f;
-      colours[ i++ ] = 0.129f;
-      
-      colours[ i++ ] = 0.87f;
-      colours[ i++ ] = 0.733f;
-      colours[ i++ ] = 0.129f;
-      
+  uint32 j = 0;
+  for( uint32 i = 0; i < value_count; i++  ) {
+    
+    if( j == 0 ) {
+      result[ i ] = 0.87f;
+    } else if( j == 1 ) {
+      result[ i ] = 0.733f;
+    } else if( j == 2 ) {
+      result[ i ] = 0.129f;
     }
+    
+    j++;
+    if( j >= 3 ) { j = 0; }
   }
-  
-  memcpy( result, &colours[ 0 ], ( value_count * sizeof( colours[ 0 ] ) ) );
-  *count = value_count;
   return result;
 }
 

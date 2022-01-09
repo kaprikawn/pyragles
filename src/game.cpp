@@ -267,6 +267,10 @@ void load_level_objects( GameState* game_state ) {
       memcpy( dest, src, bytes );
       free( vertices );
       game_state -> array_buffer_target += counts_vertex_data[ i ];
+      
+      // normals and colours have same amount as vertices
+      counts_normal_data[ i ] = counts_vertex_data[ i ];
+      counts_colour_data[ i ] = counts_vertex_data[ i ];
     }
     
     { // normals
@@ -274,8 +278,7 @@ void load_level_objects( GameState* game_state ) {
       if( i == 2 ) {
         normals = get_underside_floor_normals( &counts_normal_data[ i ] );
       } else {
-        uint32 count = counts_vertex_data[ i ];
-        normals = get_overside_floor_normals( count, &gl_array_buffer_data[ offsets_vertex_data[ i ] ] );
+        normals = get_overside_floor_normals( counts_normal_data[ i ], &gl_array_buffer_data[ offsets_vertex_data[ i ] ] );
       }
       offsets_normal_data[ i ]  = game_state -> array_buffer_target;
       void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
@@ -291,7 +294,8 @@ void load_level_objects( GameState* game_state ) {
       if( i == 2 ) {
         colours = get_underside_floor_colours( &counts_colour_data[ i ] );
       } else {
-        colours = get_overside_floor_colours( &counts_colour_data[ i ] );
+        uint32 count = counts_vertex_data[ i ];
+        colours = get_overside_floor_colours( counts_colour_data[ i ] );
       }
       offsets_colour_data[ i ]  = game_state -> array_buffer_target;
       void*   dest  = ( void* )&gl_array_buffer_data[ offsets_colour_data[ i ] ];
@@ -519,6 +523,8 @@ int32 run_game() {
   positions[ 1 ].z -= 5.0f;
   positions[ 1 ].y += 5.0f;
   
+  real32 floor_start_z = positions[ 3 ].z;
+  
   bool32 running = true;
   
   do {
@@ -546,8 +552,8 @@ int32 run_game() {
     rotations[ 1 ].x += ( 2.0f * dt );
     rotations[ 1 ].y += ( 200.0f * dt );
     
-    positions[ 3 ].z += ( 1.0f * dt );
-    if( positions[ 3 ].z > 4.0f ) {
+    positions[ 3 ].z += ( 10.0f * dt );
+    while( positions[ 3 ].z > ( floor_start_z + 4.0f ) ) {
       positions[ 3 ].z -= 4.0f;
     }
     

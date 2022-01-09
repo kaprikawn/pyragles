@@ -16,11 +16,11 @@ struct GameObject {
 GameObject game_objects[ object_count ];
 
 // gl data
-real32 gl_array_buffer_data         [ 100000 ];
-uint16 gl_element_array_buffer_data [ 10000 ];
-uint8* texture_data_array = ( uint8* )malloc( 100000 );
+real32 gl_array_buffer_data         [ 1000000 ];
+uint16 gl_element_array_buffer_data [ 100000 ];
+uint8* texture_data_array = ( uint8* )malloc( 1000000 );
 
-real32 light_position[ 3 ]  = { 0.0f, 5.0f, 0.0f };
+real32 light_position[ 3 ]  = { 0.0f, 20.0f, 0.0f };
 real32 ambient_light        = 0.3f;
 
 enum ShaderTypes {
