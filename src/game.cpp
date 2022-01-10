@@ -6,9 +6,13 @@
 #include "vector_maths.hpp"
 #include "game.hpp"
 #include "object_data.hpp"
+#include "floor_vertex_data.hpp"
 
 struct GameState {
   real32  vp_mat[ 16 ]; // view perspective matrix
+  real32  p_mat[ 16 ]; // projection matrix
+  Position eye      = { 0.0f, 5.0f, 10.0f };
+  Position look_at  = { 0.0f, 5.0f, 9.0f };
   int32   vbo;
   int32   ibo;
   uint32  array_buffer_target           = 0;
@@ -28,14 +32,12 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   real32 v[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };    // view
   real32 p[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; // projection
   real32 fov        = 70.0f;
-  real32 near_plane = 0.1f;
-  real32 far_plane  = 100.0f;
+  real32 near_plane = 0.01f;
+  real32 far_plane  = 65.0f;
   populate_perspective_matrix( &p[ 0 ], fov, aspect, near_plane, far_plane );
+  memcpy( &game_state -> p_mat[ 0 ], &p[ 0 ], sizeof( p[ 0 ] ) * 16 );
   
-  Position eye      = { 7.0f, 7.0f, 7.0f };
-  Position centre   = { 1.0f, 1.0f, 1.0f };
-  
-  populate_view_matrix( &v[ 0 ], eye, centre );
+  populate_view_matrix( &v[ 0 ], game_state -> eye, game_state -> look_at );
   
   mat4_multiply( &game_state -> vp_mat[ 0 ], &v[ 0 ], &p[ 0 ] );
   
@@ -45,11 +47,11 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   // set up gl buffers
   glGenBuffers( 1, &vbo );
   glBindBuffer( GL_ARRAY_BUFFER, vbo );
-  glBufferData( GL_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
+  glBufferData( GL_ARRAY_BUFFER, Megabytes( 3000 ), 0, GL_STATIC_DRAW );
   
   glGenBuffers( 1, &ibo );
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 50 ), 0, GL_STATIC_DRAW );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 200 ), 0, GL_STATIC_DRAW );
   
   game_state -> vbo = vbo;
   game_state -> ibo = ibo;
@@ -57,14 +59,14 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
 
 void load_level_objects( GameState* game_state ) {
   
-  for( uint32 i = 0; i < object_count; i++ ) {
+  for( uint32 i = 0; i < object_count - 2; i++ ) {
     
-    GameObject game_object;
-    game_object.index = i;
-    game_object.active = true;
+    object_active[ i ] = true;
     
     const char* shader_filename = "shaderLight.glsl";
     ReadFileResult shader_file  = read_entire_file( shader_filename );
+    
+    shader_types[ i ] = SHADER_LIGHT;
     
     uint32 shader_program_id    = createShader( shader_file );
     shader_program_ids[ i ]     = shader_program_id;
@@ -73,6 +75,7 @@ void load_level_objects( GameState* game_state ) {
     int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
     int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
     int32 tex_coord0_attribute_location   = glGetAttribLocation ( shader_program_id, "aTexCoord" );
+    // int32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
     int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
     int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
     int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
@@ -81,6 +84,7 @@ void load_level_objects( GameState* game_state ) {
     gl_id_positions[ i ]        = position_attribute_location;
     gl_id_normals[ i ]          = normal_attribute_location;
     gl_id_tex_coords0[ i ]      = tex_coord0_attribute_location;
+    // gl_id_colours[ i ]          = colour_attribute_location;
     gl_id_mvp_mats[ i ]         = mvp_uniform_location;
     gl_id_model_mats[ i ]       = model_uniform_location;
     gl_id_light_positions[ i ]  = light_position_uniform_location;
@@ -215,6 +219,118 @@ void load_level_objects( GameState* game_state ) {
     
     free( json_string );
   }
+  
+  // floor
+  for( uint32 i = 2; i < 4; i++ ) {
+    object_active[ i ]  = true;
+    shader_types[ i ]   = SHADER_VERTEX_COLOURS;
+    
+    const char* shader_filename = "shaderVertexColoursNoLight.glsl";
+    ReadFileResult shader_file  = read_entire_file( shader_filename );
+    
+    uint32 shader_program_id    = createShader( shader_file );
+    shader_program_ids[ i ]     = shader_program_id;
+    
+    glUseProgram( shader_program_id );
+    
+    int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
+    int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
+    int32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
+    int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
+    int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
+    int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
+    int32 ambient_light_uniform_location  = glGetUniformLocation( shader_program_id, "uAmbientLight" );
+    
+    gl_id_positions[ i ]        = position_attribute_location;
+    gl_id_normals[ i ]          = normal_attribute_location;
+    gl_id_colours[ i ]          = colour_attribute_location;
+    gl_id_mvp_mats[ i ]         = mvp_uniform_location;
+    gl_id_model_mats[ i ]       = model_uniform_location;
+    gl_id_light_positions[ i ]  = light_position_uniform_location;
+    gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
+    
+    glEnableVertexAttribArray( position_attribute_location );
+    glEnableVertexAttribArray( normal_attribute_location );
+    glEnableVertexAttribArray( colour_attribute_location );
+    
+    { // vertices
+      real32* vertices;
+      if( i == 2 ) {
+        vertices = get_underside_floor_vertices( &counts_vertex_data[ i ] );
+      } else {
+        vertices = get_overside_floor_vertices( &counts_vertex_data[ i ] );
+      }
+      offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
+      void*   src   = ( void* )&vertices[ 0 ];
+      uint32  bytes = ( sizeof( vertices[ 0 ] ) * counts_vertex_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( vertices );
+      game_state -> array_buffer_target += counts_vertex_data[ i ];
+      
+      // normals and colours have same amount as vertices
+      counts_normal_data[ i ] = counts_vertex_data[ i ];
+      counts_colour_data[ i ] = counts_vertex_data[ i ];
+    }
+    
+    { // normals
+      real32* normals;
+      if( i == 2 ) {
+        normals = get_underside_floor_normals( &counts_normal_data[ i ] );
+      } else {
+        normals = get_overside_floor_normals( counts_normal_data[ i ], &gl_array_buffer_data[ offsets_vertex_data[ i ] ] );
+      }
+      offsets_normal_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
+      void*   src   = ( void* )&normals[ 0 ];
+      uint32  bytes = ( sizeof( normals[ 0 ] ) * counts_normal_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( normals );
+      game_state -> array_buffer_target += counts_normal_data[ i ];
+    }
+    
+    { // colours
+      real32* colours;
+      if( i == 2 ) {
+        colours = get_underside_floor_colours( &counts_colour_data[ i ] );
+      } else {
+        uint32 count = counts_vertex_data[ i ];
+        colours = get_overside_floor_colours( counts_colour_data[ i ] );
+      }
+      offsets_colour_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_colour_data[ i ] ];
+      void*   src   = ( void* )&colours[ 0 ];
+      uint32  bytes = ( sizeof( colours[ 0 ] ) * counts_colour_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( colours );
+      game_state -> array_buffer_target += counts_colour_data[ i ];
+    }
+    
+    { // indices
+      uint16* indices;
+      if( i == 2 ) {
+        indices = get_underside_floor_indices( &counts_index_data[ i ] );
+      } else {
+        indices = get_overside_floor_indices( &counts_index_data[ i ] );
+      }
+      offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
+      void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
+      void*   src   = ( void* )&indices[ 0 ];
+      uint32  bytes = ( sizeof( indices[ 0 ] ) * counts_index_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( indices );
+      game_state -> element_array_buffer_target += counts_index_data[ i ];
+    }
+  }
+  
+  positions[ 2 ].y -= 0.05f; // avoid z fighting on the floor
+  positions[ 2 ].x -= 100.0f;
+  positions[ 2 ].z -= 60.0f;
+  positions[ 3 ].x -= 100.0f;
+  positions[ 3 ].z -= 60.0f;
+  
+  // positions[ 2 ].x = -100.0f;
+  // positions[ 2 ].z = -100.0f;
 }
 
 void upload_objects_data_to_gl( GameState* game_state ) {
@@ -248,12 +364,24 @@ void upload_objects_data_to_gl( GameState* game_state ) {
     }
     
     // tex_coord0 data
-    {
+    if( shader_types[ i ] == SHADER_LIGHT ) {
       gl_offsets_tex_coord0_data[ i ] = game_state -> target_gl_offsets_array_data;
       uint32      target          = GL_ARRAY_BUFFER;
       uint32      offset          = gl_offsets_tex_coord0_data[ i ];
       uint32      size            = ( sizeof( real32 ) * counts_tex_coord0_data[ i ] );
       uint32      array_position  = offsets_tex_coord0_data[ i ];
+      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      
+      glBufferSubData( target, offset, size, data );
+      game_state -> target_gl_offsets_array_data += size;
+    }
+    
+    if( shader_types[ i ] == SHADER_VERTEX_COLOURS ) {
+      gl_offsets_colour_data[ i ] = game_state -> target_gl_offsets_array_data;
+      uint32      target          = GL_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_colour_data[ i ];
+      uint32      size            = ( sizeof( real32 ) * counts_colour_data[ i ] );
+      uint32      array_position  = offsets_colour_data[ i ];
       const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
       
       glBufferSubData( target, offset, size, data );
@@ -273,6 +401,26 @@ void upload_objects_data_to_gl( GameState* game_state ) {
       game_state -> target_gl_offsets_index_data += size;
     }
   }
+}
+
+void caculate_camera( GameState* game_state, GameInput* game_input, real32 dt ) {
+  
+  if( game_input -> arrow_up_held ) {
+    game_state -> eye.y -= ( 10.0f * dt );
+  } else if( game_input -> arrow_down_held ) {
+    game_state -> eye.y += ( 10.0f * dt );
+  }
+  
+  if( game_input -> pg_up_held ) {
+    game_state -> look_at.z += ( 10.0f * dt );
+  } else if( game_input -> pg_down_held ) {
+    game_state -> look_at.z -= ( 10.0f * dt );
+  }
+  
+  real32 v[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };    // view
+  
+  populate_view_matrix( &v[ 0 ], game_state -> eye, game_state -> look_at );
+  mat4_multiply( &game_state -> vp_mat[ 0 ], &v[ 0 ], &game_state -> p_mat[ 0 ] );
 }
 
 void calculate_ship_rotation( GameInput* game_input, real32 dt, uint32 ship_index = 0 ) {
@@ -365,17 +513,17 @@ int32 run_game() {
   
   SDL_Window* window          = sdl_params.window;
   
-  real32 light_position[ 3 ]  = { 0.0f, 5.0f, 0.0f };
-  real32 ambient_light        = 0.3f;  
-  
   load_level_objects( &game_state );
   
   upload_objects_data_to_gl( &game_state );
   
   positions[ 0 ].x -= 2.0f;
+  positions[ 0 ].y += 2.0f;
   positions[ 1 ].x += 2.0f;
   positions[ 1 ].z -= 5.0f;
   positions[ 1 ].y += 5.0f;
+  
+  real32 floor_start_z = positions[ 3 ].z;
   
   bool32 running = true;
   
@@ -399,116 +547,20 @@ int32 run_game() {
     if( game_input.quit )
       running = false;
     
-    real32 vp[ 16 ]; // view projection matrix
-    memcpy( &vp[ 0 ], &game_state.vp_mat[ 0 ], ( sizeof( game_state.vp_mat[ 0 ] ) * 16 ) ); // dirty, I know, sue me
-    
     calculate_ship_rotation( &game_input, dt );
-    rotations[ 1 ].x += 0.02f;
-    rotations[ 1 ].y += 2.0f;
+    caculate_camera( &game_state, &game_input, dt );
+    rotations[ 1 ].x += ( 2.0f * dt );
+    rotations[ 1 ].y += ( 200.0f * dt );
+    
+    positions[ 3 ].z += ( 10.0f * dt );
+    while( positions[ 3 ].z > ( floor_start_z + 4.0f ) ) {
+      positions[ 3 ].z -= 4.0f;
+    }
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     for( uint32 i = 0; i < object_count; i++ ) {
-      
-      real32 model_matrix[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-      
-      // move object in world space
-      translate( &model_matrix[ 0 ], positions[ i ] );
-      // do rotations
-      real32 rot_mat_x[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-      real32 rot_mat_y[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-      real32 rot_mat_z[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-      
-      rotate_x( &rot_mat_x[ 0 ], rotations[ i ].x );
-      rotate_y( &rot_mat_y[ 0 ], rotations[ i ].y );
-      rotate_z( &rot_mat_z[ 0 ], rotations[ i ].z );
-      
-      real32 rot_mat_xy[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-      real32 rot_mat_xyz[ 16 ] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-      mat4_multiply( &rot_mat_xy[ 0 ], &rot_mat_y[ 0 ], &rot_mat_x[ 0 ] );
-      mat4_multiply( &rot_mat_xyz[ 0 ], &rot_mat_z[ 0 ], &rot_mat_xy[ 0 ] );
-      
-      mat4_multiply( &model_matrix[ 0 ], &rot_mat_xyz[ 0 ], &model_matrix[ 0 ] );
-      
-      // model view projection matrix
-      real32 mvp[ 16 ];
-      mat4_multiply( &mvp[ 0 ], &model_matrix[ 0 ], &vp[ 0 ] );
-      
-      glUseProgram( shader_program_ids[ i ] );
-      
-      { // mvp
-        int32   location    = gl_id_mvp_mats[ i ];
-        int32   count       = 1;
-        bool32  transpose   = GL_FALSE;
-        real32* mvp_position  = &mvp[ 0 ];
-        glUniformMatrix4fv( location, count, transpose, mvp_position );
-      }
-      
-      { // model matrix
-        int32   location    = gl_id_model_mats[ i ];
-        int32   count       = 1;
-        bool32  transpose   = GL_FALSE;
-        real32* mvp_position  = &model_matrix[ 0 ];
-        glUniformMatrix4fv( location, count, transpose, mvp_position );
-      }
-      
-      { // light position
-        int32   location    = gl_id_light_positions[ i ];
-        real32  v0          = light_position[ 0 ];
-        real32  v1          = light_position[ 1 ];
-        real32  v2          = light_position[ 2 ];
-        
-        glUniform3f( location, v0, v1, v2 );
-      }
-      
-      { // ambient light
-        int32   location    = gl_id_ambient_lights[ i ];
-        real32  v0          = ambient_light;
-        glUniform1f( location, v0 );
-      }
-      
-      { // vertices
-        int32   index       = gl_id_positions[ i ];
-        int32   size        = 3;
-        uint32  type        = GL_FLOAT;
-        bool32  normalized  = GL_FALSE;
-        int32   stride      = 0;
-        uint32  pointer     = gl_offsets_vertex_data[ i ]; // misleading, it's not a pointer, it's where in the buffer it is - offset by number of bytes
-        
-        glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
-      }
-      
-      { // normals
-        int32   index       = gl_id_normals[ i ];
-        int32   size        = 3;
-        uint32  type        = GL_FLOAT;
-        bool32  normalized  = GL_FALSE;
-        int32   stride      = 0;
-        uint32  pointer     = gl_offsets_normal_data[ i ]; // misleading, it's not a pointer, it's where in the buffer it is - offset by number of bytes
-        
-        glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
-      }
-      
-      { // tex_coord0 s
-        int32   index       = gl_id_tex_coords0[ i ];
-        int32   size        = 2;
-        uint32  type        = GL_FLOAT;
-        bool32  normalized  = GL_FALSE;
-        int32   stride      = 0;
-        uint32  pointer     = gl_offsets_tex_coord0_data[ i ]; // misleading, it's not a pointer, it's where in the buffer it is - offset by number of bytes
-        
-        glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
-        glBindTexture( GL_TEXTURE_2D, tbos[ i ] );
-      }
-      
-      { // draw elements
-        int32   mode        = GL_TRIANGLES;
-        int32   count       = counts_index_data[ i ];
-        uint32  type        = GL_UNSIGNED_SHORT;
-        uint32 indices      = gl_offsets_index_data[ i ];
-        
-        glDrawElements( mode, count, type, ( const GLvoid* )indices );
-      }
+      render_object( i, &game_state.vp_mat[ 0 ] );
     }
     
     SDL_GL_SwapWindow( window );
