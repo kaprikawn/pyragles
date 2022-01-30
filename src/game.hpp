@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include "types.hpp"
+#include "gl_debug.hpp"
 #include <stdlib.h>
 
 #ifdef _WIN32
@@ -23,21 +24,6 @@
 #include <cstring>
 
 #endif
-
-/*
-#include <signal.h>
-
-#define ASSERT(x) if( !(x)) raise(SIGINT);
-#define GLCall(x) GLClearError();\
-  x;\
-  ASSERT( GLLogCall( #x, __FILE__, __LINE__ ) )
-
-  
-void GLClearError();
-
-bool GLLogCall( const char* function, const char* file, int line );
-*/
-
 
 #if DEBUG
 #define Assert( expression ) if( !( expression ) ) {*(int * )0 = 0; }
@@ -318,14 +304,14 @@ void init_sdl( SDLParams* sdl_params ) {
   GLenum err = glewInit();
 #endif
   
-  SDL_GL_SetSwapInterval( 1 );
-  SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
-  SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
-  glEnable( GL_DEPTH_TEST );
-  glEnable( GL_BLEND );
-  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-  glViewport( 0, 0, ( float )windowWidth, ( float )windowHeight );
-  glClearColor( 0.0f, 0.65f, 1.0f, 1.0f );
+  GLCall( SDL_GL_SetSwapInterval( 1 ) );
+  GLCall( SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 ) );
+  GLCall( SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 ) );
+  GLCall( glEnable( GL_DEPTH_TEST ) );
+  GLCall( glEnable( GL_BLEND ) );
+  GLCall( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
+  GLCall( glViewport( 0, 0, ( float )windowWidth, ( float )windowHeight ) );
+  GLCall( glClearColor( 0.0f, 0.65f, 1.0f, 1.0f ) );
   
   sdl_params -> windowWidth   = windowWidth;
   sdl_params -> windowHeight  = windowHeight;
