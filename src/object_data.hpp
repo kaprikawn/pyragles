@@ -1,6 +1,13 @@
 #ifndef OBJECT_DATA_HPP
 #define OBJECT_DATA_HPP
 
+#ifdef __linux__
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+
+#endif
+
 #include "vector_maths.hpp"
 #include "types.hpp"
 
@@ -180,5 +187,11 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     glDrawElements( mode, count, type, ( const GLvoid* )indices );
   }
 }
+
+#ifdef __linux__
+
+#pragma GCC diagnostic pop
+
+#endif
 
 #endif //OBJECT_DATA_HPP

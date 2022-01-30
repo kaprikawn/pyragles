@@ -1,0 +1,25 @@
+This sets up your build task if you're building in Linux, copy/move this file to 'tasks.json', remove this comment, then press CTRL+Shift+b to build or F5 to enter debug mode
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Linux",
+      "command": "./build.sh",
+      "type": "shell",
+      "args": [],
+      "problemMatcher": [
+        "$tsc"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/misc"
+      },
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
