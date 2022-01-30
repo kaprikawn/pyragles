@@ -45,16 +45,27 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   GLuint  ibo;
   
   // set up gl buffers
-  glGenBuffers( 1, &vbo );
-  glBindBuffer( GL_ARRAY_BUFFER, vbo );
-  glBufferData( GL_ARRAY_BUFFER, Megabytes( 10 ), 0, GL_STATIC_DRAW );
-  
-  glGenBuffers( 1, &ibo );
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 10 ), 0, GL_STATIC_DRAW );
+  GLCall( glGenBuffers( 1, &vbo ) );
+  GLCall( glBindBuffer( GL_ARRAY_BUFFER, vbo ) );
+  GLCall( glBufferData( GL_ARRAY_BUFFER, Megabytes( 10 ), 0, GL_STATIC_DRAW ) );
+  GLCall( glGenBuffers( 1, &ibo ) );
+  GLCall( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo ) );
+  GLCall( glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 10 ), 0, GL_STATIC_DRAW ) );
   
   game_state -> vbo = vbo;
   game_state -> ibo = ibo;
+}
+
+void check_gltf_file( void* gltf_file_contents ) {
+  GltfHeader* gltf_header = ( GltfHeader* )gltf_file_contents;
+  
+  uint32 magic = gltf_header -> magic;
+  
+  if( magic != 1179937895 ) {
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Error - expected gltf2 file not found\n" );
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "  Please make sure you have git-lfs installed and you have run git lfs install\n" );
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "  Once this is done, delete the stub glb files in the 'assets' directory and refresh your repo\n\n" );
+  }
 }
 
 void load_level_objects( GameState* game_state ) {
@@ -90,9 +101,9 @@ void load_level_objects( GameState* game_state ) {
     gl_id_light_positions[ i ]  = light_position_uniform_location;
     gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
     
-    glEnableVertexAttribArray( position_attribute_location );
-    glEnableVertexAttribArray( normal_attribute_location );
-    glEnableVertexAttribArray( tex_coord0_attribute_location );
+    GLCall( glEnableVertexAttribArray( position_attribute_location ) );
+    GLCall( glEnableVertexAttribArray( normal_attribute_location ) );
+    GLCall( glEnableVertexAttribArray( tex_coord0_attribute_location ) );
     
     ReadFileResult gltf_file;
     if( i == 0 ) {
@@ -102,6 +113,8 @@ void load_level_objects( GameState* game_state ) {
       const char* gltf_filename = "modelEnemyPod.glb";
       gltf_file  = read_entire_file( gltf_filename );
     }
+    
+    check_gltf_file( gltf_file.contents );
     
     // const char* gltf_filename = "modelCube.glb";
     // gltf_file  = read_entire_file( gltf_filename );
@@ -203,17 +216,16 @@ void load_level_objects( GameState* game_state ) {
       
       uchar* texture_data = stbi_load_from_memory( ( const uchar* )data, image_data_bytes, &texture_width, &texture_height, &texture_bpp, 4 );
       
-      glGenTextures( 1, &tbos[ i ] );
-      glBindTexture( GL_TEXTURE_2D, tbos[ i ] );
-      
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+      GLCall( glGenTextures( 1, &tbos[ i ] ) );
+      GLCall( glBindTexture( GL_TEXTURE_2D, tbos[ i ] ) );
+      GLCall( glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR ) );
+      GLCall( glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR ) );
+      GLCall( glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE ) );
+      GLCall( glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE ) );
       // https://stackoverflow.com/questions/23150123/loading-png-with-stb-image-for-opengl-texture-gives-wrong-colors
-      glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-      glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data );
-      glBindTexture( GL_TEXTURE_2D, tbos[ i ] );
+      GLCall( glPixelStorei( GL_UNPACK_ALIGNMENT, 1 ) );
+      GLCall( glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data ) );
+      GLCall( glBindTexture( GL_TEXTURE_2D, tbos[ i ] ) );
     
     }
     
@@ -231,7 +243,7 @@ void load_level_objects( GameState* game_state ) {
     uint32 shader_program_id    = createShader( shader_file );
     shader_program_ids[ i ]     = shader_program_id;
     
-    glUseProgram( shader_program_id );
+    GLCall( glUseProgram( shader_program_id ) );
     
     int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
     int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
@@ -249,9 +261,9 @@ void load_level_objects( GameState* game_state ) {
     gl_id_light_positions[ i ]  = light_position_uniform_location;
     gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
     
-    glEnableVertexAttribArray( position_attribute_location );
-    glEnableVertexAttribArray( normal_attribute_location );
-    glEnableVertexAttribArray( colour_attribute_location );
+    GLCall( glEnableVertexAttribArray( position_attribute_location ) );
+    GLCall( glEnableVertexAttribArray( normal_attribute_location ) );
+    GLCall( glEnableVertexAttribArray( colour_attribute_location ) );
     
     { // vertices
       real32* vertices;
@@ -346,7 +358,7 @@ void upload_objects_data_to_gl( GameState* game_state ) {
       uint32      array_position  = offsets_vertex_data[ i ];
       const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
       
-      glBufferSubData( target, offset, size, data );
+      GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_array_data += size;
     }
     
@@ -359,7 +371,7 @@ void upload_objects_data_to_gl( GameState* game_state ) {
       uint32      array_position  = offsets_normal_data[ i ];
       const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
       
-      glBufferSubData( target, offset, size, data );
+      GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_array_data += size;
     }
     
@@ -372,7 +384,7 @@ void upload_objects_data_to_gl( GameState* game_state ) {
       uint32      array_position  = offsets_tex_coord0_data[ i ];
       const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
       
-      glBufferSubData( target, offset, size, data );
+      GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_array_data += size;
     }
     
@@ -384,7 +396,7 @@ void upload_objects_data_to_gl( GameState* game_state ) {
       uint32      array_position  = offsets_colour_data[ i ];
       const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
       
-      glBufferSubData( target, offset, size, data );
+      GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_array_data += size;
     }
     
@@ -397,7 +409,7 @@ void upload_objects_data_to_gl( GameState* game_state ) {
       uint32      array_position  = offsets_index_data[ i ];
       const void* data            = ( const void* )&gl_element_array_buffer_data[ array_position ];
       
-      glBufferSubData( target, offset, size, data );
+      GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_index_data += size;
     }
   }
@@ -557,7 +569,7 @@ int32 run_game() {
       positions[ 3 ].z -= 4.0f;
     }
     
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    GLCall( glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) );
     
     for( uint32 i = 0; i < object_count; i++ ) {
       render_object( i, &game_state.vp_mat[ 0 ] );
