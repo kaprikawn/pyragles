@@ -47,11 +47,11 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   // set up gl buffers
   glGenBuffers( 1, &vbo );
   glBindBuffer( GL_ARRAY_BUFFER, vbo );
-  glBufferData( GL_ARRAY_BUFFER, Megabytes( 3000 ), 0, GL_STATIC_DRAW );
+  glBufferData( GL_ARRAY_BUFFER, Megabytes( 10 ), 0, GL_STATIC_DRAW );
   
   glGenBuffers( 1, &ibo );
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 200 ), 0, GL_STATIC_DRAW );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, Megabytes( 10 ), 0, GL_STATIC_DRAW );
   
   game_state -> vbo = vbo;
   game_state -> ibo = ibo;
