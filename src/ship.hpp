@@ -75,17 +75,26 @@ void calculate_ship_rotation( GameInput* game_input, real32 dt, uint32 ship_inde
 
 void update_ship_position( GameInput* game_input, real32 dt, uint32 ship_index = 0 ) {
   
-  uint32 i      = ship_index;
-  real32 joy_y  = game_input -> joy_axis_y;
-  real32 joy_x  = game_input -> joy_axis_x;
+  uint32  i                 = ship_index;
+  real32  joy_y             = game_input -> joy_axis_y;
+  real32  joy_x             = game_input -> joy_axis_x;
+  real32  multiplier        = 8.0f;
+  real32  lerp_smoothing    = 0.05f;
   
-  if( joy_y != 0.0f )
-    positions[ i ].y -= joy_y * 6.0f * dt;
+  real32 target_velocity_y  = -joy_y * multiplier;
+  real32 current_velocity_y = velocities[ i ].y;
+  real32 new_velocity_y     = lerp_dt( current_velocity_y, target_velocity_y, lerp_smoothing, dt );
+  velocities[ i ].y         = new_velocity_y;
   
-  if( joy_x != 0.0f )
-    positions[ i ].x += joy_x * 6.0f * dt;
+  real32 target_velocity_x  = joy_x * multiplier;
+  real32 current_velocity_x = velocities[ i ].x;
+  real32 new_velocity_x     = lerp_dt( current_velocity_x, target_velocity_x, lerp_smoothing, dt );
+  velocities[ i ].x         = new_velocity_x;
   
+  positions[ i ].y = positions[ i ].y + ( velocities[ i ].y * dt );
+  positions[ i ].x = positions[ i ].x + ( velocities[ i ].x * dt );
   
+  int y = 7;
 }
 
 #endif //SHIP_HPP
