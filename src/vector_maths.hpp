@@ -8,9 +8,9 @@
 const real32 DEGREES_TO_RADIANS_FACTOR = 0.01745329251994329576923690768489f;
 
 struct Position {
-  real32 x;
-  real32 y;
-  real32 z;
+  real32 x = 0.0f;
+  real32 y = 0.0f;
+  real32 z = 0.0f;
 };
 
 inline void mat4_multiply( real32* dest, real32* mat1, real32* mat2 ) {

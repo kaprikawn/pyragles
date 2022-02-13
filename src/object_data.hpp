@@ -37,6 +37,7 @@ enum ShaderTypes {
 // object data
 Position  positions                 [ object_count ];
 Position  rotations                 [ object_count ];
+Position  velocities                [ object_count ];
 uint32    shader_program_ids        [ object_count ];
 int32     gl_id_positions           [ object_count ];
 int32     gl_id_normals             [ object_count ];
