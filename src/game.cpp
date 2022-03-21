@@ -9,21 +9,6 @@
 #include "floor_vertex_data.hpp"
 #include "ship.hpp"
 
-struct GameState {
-  real32  vp_mat[ 16 ]; // view perspective matrix
-  real32  p_mat[ 16 ]; // projection matrix
-  Position eye      = { 0.0f, 5.0f, 10.0f };
-  Position look_at  = { 0.0f, 5.0f, 9.0f };
-  int32   vbo;
-  int32   ibo;
-  uint32  array_buffer_target           = 0;
-  uint32  element_array_buffer_target   = 0;
-  uint32  target_gl_offsets_array_data  = 0;
-  uint32  target_gl_offsets_index_data  = 0;
-  uint32  target_texture_data_array_pos = 0;
-  bool32  invert_y                      = false;
-};
-
 // for delta time ( dt )
 uint32 current_time, previous_time, before_frame_flip_time;
 
@@ -71,7 +56,7 @@ void check_gltf_file( void* gltf_file_contents ) {
 
 void load_level_objects( GameState* game_state ) {
   
-  for( uint32 i = 0; i < object_count - 2; i++ ) {
+  for( uint32 i = 0; i < OBJECT_COUNT - 2; i++ ) {
     
     object_active[ i ] = true;
     
@@ -348,7 +333,7 @@ void load_level_objects( GameState* game_state ) {
 
 void upload_objects_data_to_gl( GameState* game_state ) {
   
-  for( uint32 i = 0; i < object_count; i++ ) {
+  for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
     
     // vertex data
     {
@@ -502,7 +487,7 @@ int32 run_game() {
     
     GLCall( glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) );
     
-    for( uint32 i = 0; i < object_count; i++ ) {
+    for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
       render_object( i, &game_state.vp_mat[ 0 ] );
     }
     

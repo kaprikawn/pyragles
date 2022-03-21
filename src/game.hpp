@@ -251,6 +251,21 @@ struct game_memory {
   uint32  tempNextMemoryOffset;
 };
 
+struct GameState {
+  real32    vp_mat[ 16 ]; // view perspective matrix
+  real32    p_mat [ 16 ]; // projection matrix
+  Position  eye      = { 0.0f, 5.0f, 10.0f };
+  Position  look_at  = { 0.0f, 5.0f, 9.0f };
+  int32     vbo;
+  int32     ibo;
+  uint32    array_buffer_target           = 0;
+  uint32    element_array_buffer_target   = 0;
+  uint32    target_gl_offsets_array_data  = 0;
+  uint32    target_gl_offsets_index_data  = 0;
+  uint32    target_texture_data_array_pos = 0;
+  bool32    invert_y                      = false;
+};
+
 uint32 shader_program_id;
 
 void init_sdl( SDLParams* sdl_params ) {

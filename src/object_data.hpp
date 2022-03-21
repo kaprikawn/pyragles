@@ -10,8 +10,9 @@
 
 #include "vector_maths.hpp"
 #include "types.hpp"
+#include "sdl.hpp"
 
-const uint32 object_count = 4;
+const uint32 OBJECT_COUNT = 4;
 
 struct GameObject {
   bool32    active = false;
@@ -20,7 +21,7 @@ struct GameObject {
   Position  rotation;
 };
 
-GameObject game_objects[ object_count ];
+GameObject game_objects[ OBJECT_COUNT ];
 
 // gl data
 real32 gl_array_buffer_data         [ 1000000 ];
@@ -35,39 +36,48 @@ enum ShaderTypes {
 };
 
 // object data
-Position  positions                 [ object_count ];
-Position  rotations                 [ object_count ];
-Position  velocities                [ object_count ];
-uint32    shader_program_ids        [ object_count ];
-int32     gl_id_positions           [ object_count ];
-int32     gl_id_normals             [ object_count ];
-int32     gl_id_tex_coords0         [ object_count ];
-int32     gl_id_colours             [ object_count ];
-int32     gl_id_mvp_mats            [ object_count ];
-int32     gl_id_model_mats          [ object_count ];
-int32     gl_id_light_positions     [ object_count ];
-int32     gl_id_ambient_lights      [ object_count ];
-uint32    tbos                      [ object_count ];
-uint32    texture_buffer_offsets    [ object_count ];
-uint32    texture_buffer_lengths    [ object_count ];
-uint32    offsets_vertex_data       [ object_count ];
-uint32    offsets_normal_data       [ object_count ];
-uint32    offsets_tex_coord0_data   [ object_count ];
-uint32    offsets_colour_data       [ object_count ];
-uint32    offsets_index_data        [ object_count ];
-uint32    gl_offsets_vertex_data    [ object_count ];
-uint32    gl_offsets_normal_data    [ object_count ];
-uint32    gl_offsets_tex_coord0_data[ object_count ];
-uint32    gl_offsets_colour_data    [ object_count ];
-uint32    gl_offsets_index_data     [ object_count ];
-uint32    counts_vertex_data        [ object_count ];
-uint32    counts_normal_data        [ object_count ];
-uint32    counts_tex_coord0_data    [ object_count ];
-uint32    counts_colour_data        [ object_count ];
-uint32    counts_index_data         [ object_count ];
-uint32    shader_types              [ object_count ];
-bool32    object_active             [ object_count ];
-uint8*    image_data_locations      [ object_count ];
+Position  positions                 [ OBJECT_COUNT ];
+Position  rotations                 [ OBJECT_COUNT ];
+Position  velocities                [ OBJECT_COUNT ];
+uint32    shader_program_ids        [ OBJECT_COUNT ];
+int32     gl_id_positions           [ OBJECT_COUNT ];
+int32     gl_id_normals             [ OBJECT_COUNT ];
+int32     gl_id_tex_coords0         [ OBJECT_COUNT ];
+int32     gl_id_colours             [ OBJECT_COUNT ];
+int32     gl_id_mvp_mats            [ OBJECT_COUNT ];
+int32     gl_id_model_mats          [ OBJECT_COUNT ];
+int32     gl_id_light_positions     [ OBJECT_COUNT ];
+int32     gl_id_ambient_lights      [ OBJECT_COUNT ];
+uint32    tbos                      [ OBJECT_COUNT ];
+uint32    texture_buffer_offsets    [ OBJECT_COUNT ];
+uint32    texture_buffer_lengths    [ OBJECT_COUNT ];
+uint32    offsets_vertex_data       [ OBJECT_COUNT ];
+uint32    offsets_normal_data       [ OBJECT_COUNT ];
+uint32    offsets_tex_coord0_data   [ OBJECT_COUNT ];
+uint32    offsets_colour_data       [ OBJECT_COUNT ];
+uint32    offsets_index_data        [ OBJECT_COUNT ];
+uint32    gl_offsets_vertex_data    [ OBJECT_COUNT ];
+uint32    gl_offsets_normal_data    [ OBJECT_COUNT ];
+uint32    gl_offsets_tex_coord0_data[ OBJECT_COUNT ];
+uint32    gl_offsets_colour_data    [ OBJECT_COUNT ];
+uint32    gl_offsets_index_data     [ OBJECT_COUNT ];
+uint32    counts_vertex_data        [ OBJECT_COUNT ];
+uint32    counts_normal_data        [ OBJECT_COUNT ];
+uint32    counts_tex_coord0_data    [ OBJECT_COUNT ];
+uint32    counts_colour_data        [ OBJECT_COUNT ];
+uint32    counts_index_data         [ OBJECT_COUNT ];
+uint32    shader_types              [ OBJECT_COUNT ];
+bool32    object_active             [ OBJECT_COUNT ];
+uint8*    image_data_locations      [ OBJECT_COUNT ];
+
+struct ObjectLoadParameters {
+  bool32  make_immediately_active = false;
+  char*   shader_filename;
+  int32   shader_type = SHADER_LIGHT;
+  bool32  from_gltf   = true;
+  char*   gltf_model_filename;
+  bool32  is_floor    = false;
+};
 
 void render_object( uint32 object_index, real32* vp_matrix ) {
   uint32 i = object_index;
