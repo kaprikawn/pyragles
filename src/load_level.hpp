@@ -2,6 +2,7 @@
 #define LOAD_LEVEL_HPP
 
 #include <string.h>
+#define STB_IMAGE_IMPLEMENTATION
 #include "../vendor/stb_image.h"
 #include "object_data.hpp"
 #include "types.hpp"
@@ -66,6 +67,10 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
     object_active[ i ] = true;
   }
   
+  positions[ i ].x = olp.initial_position.x;
+  positions[ i ].y = olp.initial_position.y;
+  positions[ i ].z = olp.initial_position.z;
+  
   const char* shader_filename = ( const char* )olp.shader_filename;
   ReadFileResult shader_file  = read_entire_file( shader_filename );
   
@@ -93,11 +98,16 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
   gl_id_light_positions[ i ]  = light_position_uniform_location;
   gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
   
+  if( shader_types[ i ] == SHADER_VERTEX_COLOURS_NO_LIGHT ) {
+    int32 colour_uniform_location = glGetUniformLocation( shader_program_id, "uColour" );
+    gl_id_colours[ i ]            = colour_uniform_location;
+  }
+  
   GLCall( glEnableVertexAttribArray( position_attribute_location ) );
   GLCall( glEnableVertexAttribArray( normal_attribute_location ) );
   GLCall( glEnableVertexAttribArray( tex_coord0_attribute_location ) );
   
-  if( olp.from_gltf ) {
+  if( olp.mesh_source == LOAD_MESH_FROM_GLTF ) {
     const char* gltf_filename = ( const char* )olp.gltf_model_filename;
     ReadFileResult gltf_file  = read_entire_file( gltf_filename );
     
@@ -213,17 +223,134 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
     }
     
     free( json_string );
+  } else if( olp.mesh_source == HM_TARGET ) {
+    {
+      real32* vertices  = get_target_vertices( &counts_vertex_data[ i ] );
+      offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
+      void*   src   = ( void* )&vertices[ 0 ];
+      uint32  bytes = ( sizeof( vertices[ 0 ] ) * counts_vertex_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( vertices );
+      game_state -> array_buffer_target += counts_vertex_data[ i ];
+    }
+    
+    {
+      uint16* indices   = get_target_indices( &counts_index_data[ i ] );
+      offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
+      void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
+      void*   src   = ( void* )&indices[ 0 ];
+      uint32  bytes = ( sizeof( indices[ 0 ] ) * counts_index_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( indices );
+      game_state -> element_array_buffer_target += counts_index_data[ i ];
+    }
+  } else {
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Mesh source not specified\n" );
   }
   
 }
 
+void upload_objects_data_to_gl( GameState* game_state ) {
+  
+  for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
+    
+    // vertex data
+    {
+      gl_offsets_vertex_data[ i ] = game_state -> target_gl_offsets_array_data;
+      uint32      target          = GL_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_vertex_data[ i ];
+      uint32      size            = ( sizeof( real32 ) * counts_vertex_data[ i ] );
+      uint32      array_position  = offsets_vertex_data[ i ];
+      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      
+      GLCall( glBufferSubData( target, offset, size, data ) );
+      game_state -> target_gl_offsets_array_data += size;
+    }
+    
+    // normal data
+    {
+      gl_offsets_normal_data[ i ] = game_state -> target_gl_offsets_array_data;
+      uint32      target          = GL_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_normal_data[ i ];
+      uint32      size            = ( sizeof( real32 ) * counts_normal_data[ i ] );
+      uint32      array_position  = offsets_normal_data[ i ];
+      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      
+      GLCall( glBufferSubData( target, offset, size, data ) );
+      game_state -> target_gl_offsets_array_data += size;
+    }
+    
+    // tex_coord0 data
+    if( shader_types[ i ] == SHADER_LIGHT ) {
+      gl_offsets_tex_coord0_data[ i ] = game_state -> target_gl_offsets_array_data;
+      uint32      target          = GL_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_tex_coord0_data[ i ];
+      uint32      size            = ( sizeof( real32 ) * counts_tex_coord0_data[ i ] );
+      uint32      array_position  = offsets_tex_coord0_data[ i ];
+      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      
+      GLCall( glBufferSubData( target, offset, size, data ) );
+      game_state -> target_gl_offsets_array_data += size;
+    }
+    
+    if( shader_types[ i ] == SHADER_VERTEX_COLOURS ) {
+      gl_offsets_colour_data[ i ] = game_state -> target_gl_offsets_array_data;
+      uint32      target          = GL_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_colour_data[ i ];
+      uint32      size            = ( sizeof( real32 ) * counts_colour_data[ i ] );
+      uint32      array_position  = offsets_colour_data[ i ];
+      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      
+      GLCall( glBufferSubData( target, offset, size, data ) );
+      game_state -> target_gl_offsets_array_data += size;
+    }
+    
+    // index data
+    {
+      gl_offsets_index_data[ i ]  = game_state -> target_gl_offsets_index_data;
+      uint32      target          = GL_ELEMENT_ARRAY_BUFFER;
+      uint32      offset          = gl_offsets_index_data[ i ];
+      uint32      size            = ( sizeof( uint16 ) * counts_index_data[ i ] );
+      uint32      array_position  = offsets_index_data[ i ];
+      const void* data            = ( const void* )&gl_element_array_buffer_data[ array_position ];
+      
+      GLCall( glBufferSubData( target, offset, size, data ) );
+      game_state -> target_gl_offsets_index_data += size;
+    }
+  }
+}
+
 void load_ship_and_target( GameState* game_state ) {
   
-  ObjectLoadParameters object_load_parameters;
-  object_load_parameters.make_immediately_active = true;
-  object_load_parameters.shader_filename = "modelShip.glb";
+  const uint32 ship_index   = 0;
+  const uint32 target_index = 1;
   
-  load_level_object( object_load_parameters, 0, game_state );
+  ObjectLoadParameters ship;
+  ship.make_immediately_active  = true;
+  ship.shader_filename          = "shaderLight.glsl";
+  ship.gltf_model_filename      = "modelShip.glb";
+  ship.initial_position.x       = -2.0f;
+  ship.initial_position.y       = 2.0f;
+  ship.initial_position.z       = 0.0f;
+  
+  load_level_object( ship, ship_index, game_state );
+  
+  ObjectLoadParameters target;
+  target.make_immediately_active  = true;
+  target.shader_filename          = "shaderVertexColoursNoLight.glsl";
+  // target.shader_filename          = "shaderDebug.glsl";
+  target.shader_type              = SHADER_VERTEX_COLOURS_NO_LIGHT;
+  target.initial_position.x       = ship.initial_position.x;
+  target.initial_position.y       = ship.initial_position.y;
+  target.initial_position.z       = ( ship.initial_position.z - 10.0f );
+  target.mesh_source              = HM_TARGET;
+  
+  load_level_object( target, target_index, game_state );
+  
+  flat_colours[ target_index ].x = 0.729f;
+  flat_colours[ target_index ].y = 0.129f;
+  flat_colours[ target_index ].z = 0.176f;
   
 }
 

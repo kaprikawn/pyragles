@@ -4,7 +4,7 @@
 
 attribute vec3  aPosition;
 attribute vec3  aNormal; // model space
-attribute vec3  aColour;
+uniform   vec3  uColour;
 varying   vec3  vColour;
 uniform   mat4  uMVP;
 uniform   mat4  uModelMatrix;
@@ -14,7 +14,7 @@ varying   float brightness;
 
 void main() {
   
-  vColour           = aColour;
+  vColour           = uColour;
   
   vec4  position    = vec4( aPosition, 1.0 );
   

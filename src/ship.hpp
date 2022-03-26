@@ -1,6 +1,8 @@
 #ifndef SHIP_HPP
 #define SHIP_HPP
 
+#include <math.h>
+
 void calculate_ship_rotation( GameInput* game_input, real32 dt, uint32 ship_index = 0 ) {
   
   uint32 i = ship_index;
@@ -95,6 +97,33 @@ void update_ship_position( GameInput* game_input, real32 dt, uint32 ship_index =
   positions[ i ].x = positions[ i ].x + ( velocities[ i ].x * dt );
   
   int y = 7;
+}
+
+void update_target_position( uint32 target_index = 1, uint32 ship_index = 0 ) {
+  
+  uint32 i = target_index;
+  uint32 s = ship_index;
+  
+  real32 dist_from_ship = 10.0f;
+  
+  { // x / left and right
+    real32 ship_rotation = rotations[ s ].y;
+    real32 radians = ship_rotation * DEGREES_TO_RADIANS_FACTOR;
+    real32 tan_of_angle = tan( radians );
+    real32 offset = ( dist_from_ship * tan_of_angle );
+    positions[ i ].x = positions[ s ].x - offset;
+  }
+  
+  { // y / up and down
+    real32 ship_rotation = rotations[ s ].x;
+    real32 radians = ship_rotation * DEGREES_TO_RADIANS_FACTOR;
+    real32 tan_of_angle = tan( radians );
+    real32 offset = ( dist_from_ship * tan_of_angle );
+    positions[ i ].y = positions[ s ].y + offset;
+  }
+  
+  positions[ i ].z = ( positions[ s ].z - dist_from_ship );
+  
 }
 
 void update_ship_velocity( GameInput* game_input, real32 dt, uint32 ship_index = 0 ) {

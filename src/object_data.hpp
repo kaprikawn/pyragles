@@ -32,7 +32,7 @@ real32 light_position[ 3 ]  = { 0.0f, 20.0f, 0.0f };
 real32 ambient_light        = 0.3f;
 
 enum ShaderTypes {
-  SHADERS_NONE, SHADER_LIGHT, SHADER_VERTEX_COLOURS
+  SHADERS_NONE, SHADER_LIGHT, SHADER_VERTEX_COLOURS, SHADER_VERTEX_COLOURS_NO_LIGHT
 };
 
 // object data
@@ -68,15 +68,20 @@ uint32    counts_colour_data        [ OBJECT_COUNT ];
 uint32    counts_index_data         [ OBJECT_COUNT ];
 uint32    shader_types              [ OBJECT_COUNT ];
 bool32    object_active             [ OBJECT_COUNT ];
+Position  flat_colours              [ OBJECT_COUNT ];
 uint8*    image_data_locations      [ OBJECT_COUNT ];
 
+// HM = hardcoded mesh
+enum mesh_source { LOAD_MESH_FROM_GLTF, HM_TARGET, HM_FLOOR1, HM_FLOOR2 };
+
 struct ObjectLoadParameters {
-  bool32  make_immediately_active = false;
-  char*   shader_filename;
-  int32   shader_type = SHADER_LIGHT;
-  bool32  from_gltf   = true;
-  char*   gltf_model_filename;
-  bool32  is_floor    = false;
+  bool32    make_immediately_active = false;
+  char*     shader_filename;
+  int32     shader_type             = SHADER_LIGHT;
+  char*     gltf_model_filename;
+  bool32    is_floor                = false;
+  Position  initial_position;
+  uint32    mesh_source             = 0;
 };
 
 void render_object( uint32 object_index, real32* vp_matrix ) {
@@ -129,7 +134,7 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     glUniformMatrix4fv( location, count, transpose, mvp_position );
   }
   
-  { // light position
+  if( shader_types[ i ] != SHADER_VERTEX_COLOURS_NO_LIGHT ) { // light position
     int32   location    = gl_id_light_positions[ i ];
     real32  v0          = light_position[ 0 ];
     real32  v1          = light_position[ 1 ];
@@ -138,7 +143,7 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     glUniform3f( location, v0, v1, v2 );
   }
   
-  { // ambient light
+  if( shader_types[ i ] != SHADER_VERTEX_COLOURS_NO_LIGHT ) { // ambient light
     int32   location    = gl_id_ambient_lights[ i ];
     real32  v0          = ambient_light;
     glUniform1f( location, v0 );
@@ -155,7 +160,7 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
   }
   
-  { // normals
+  if( shader_types[ i ] != SHADER_VERTEX_COLOURS_NO_LIGHT ) { // normals
     int32   index       = gl_id_normals[ i ];
     int32   size        = 3;
     uint32  type        = GL_FLOAT;
@@ -187,6 +192,16 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     uint32  pointer     = gl_offsets_colour_data[ i ]; // misleading, it's not a pointer, it's where in the buffer it is - offset by number of bytes
     
     glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
+  }
+  
+  if( shader_types[ i ] == SHADER_VERTEX_COLOURS_NO_LIGHT ) {
+    // upload flat colour
+    int32   location    = gl_id_colours[ i ];
+    real32  v0          = flat_colours[ i ].x;
+    real32  v1          = flat_colours[ i ].y;
+    real32  v2          = flat_colours[ i ].z;
+    
+    glUniform3f( location, v0, v1, v2 );
   }
   
   { // draw elements

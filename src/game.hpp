@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include "types.hpp"
+#include "vector_maths.hpp"
 #include "gl_debug.hpp"
 #include <stdlib.h>
 
