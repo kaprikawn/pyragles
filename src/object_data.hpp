@@ -13,6 +13,7 @@
 #include "sdl.hpp"
 
 const uint32 OBJECT_COUNT = 4;
+real32 floor_start_z = 0.0f;
 
 struct GameObject {
   bool32    active = false;

@@ -8,6 +8,7 @@
 #include "ship.hpp"
 #include "camera.hpp"
 #include "load_level.hpp"
+#include "floor.hpp"
 
 // for delta time ( dt )
 uint32 current_time, previous_time, before_frame_flip_time;
@@ -60,6 +61,7 @@ int32 run_game() {
   
   reset_data();
   load_ship_and_target( &game_state );
+  load_floor( &game_state );
   
   upload_objects_data_to_gl( &game_state );
   
@@ -91,6 +93,7 @@ int32 run_game() {
     update_ship_position( &game_input, dt );
     update_target_position();
     caculate_camera( &game_state, &game_input, dt );
+    scroll_floor( floor2_index, dt );
     
     GLCall( glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) );
     

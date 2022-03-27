@@ -101,11 +101,19 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
   if( shader_types[ i ] == SHADER_VERTEX_COLOURS_NO_LIGHT ) {
     int32 colour_uniform_location = glGetUniformLocation( shader_program_id, "uColour" );
     gl_id_colours[ i ]            = colour_uniform_location;
+  } else if( shader_types[ i ] == SHADER_VERTEX_COLOURS ) {
+    int32 colour_uniform_location = glGetUniformLocation( shader_program_id, "aColour" );
+    gl_id_colours[ i ]            = colour_uniform_location;
   }
   
   GLCall( glEnableVertexAttribArray( position_attribute_location ) );
-  GLCall( glEnableVertexAttribArray( normal_attribute_location ) );
-  GLCall( glEnableVertexAttribArray( tex_coord0_attribute_location ) );
+  
+  if( normal_attribute_location >= 0 ) {
+    GLCall( glEnableVertexAttribArray( normal_attribute_location ) );
+  }
+  if( tex_coord0_attribute_location >= 0 ) {
+    GLCall( glEnableVertexAttribArray( tex_coord0_attribute_location ) );
+  }
   
   if( olp.mesh_source == LOAD_MESH_FROM_GLTF ) {
     const char* gltf_filename = ( const char* )olp.gltf_model_filename;
@@ -245,6 +253,75 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
       free( indices );
       game_state -> element_array_buffer_target += counts_index_data[ i ];
     }
+  } else if( olp.mesh_source == HM_FLOOR1 || olp.mesh_source == HM_FLOOR2 ) {
+    
+    {
+      real32* vertices;
+      if( olp.mesh_source == HM_FLOOR1 ) {
+        vertices = get_underside_floor_vertices( &counts_vertex_data[ i ] );
+      } else if( olp.mesh_source == HM_FLOOR2 ) {
+        vertices = get_overside_floor_vertices( &counts_vertex_data[ i ] );
+      }
+      offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
+      void*   src   = ( void* )&vertices[ 0 ];
+      uint32  bytes = ( sizeof( vertices[ 0 ] ) * counts_vertex_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( vertices );
+      game_state -> array_buffer_target += counts_vertex_data[ i ];
+      
+      counts_normal_data[ i ] = counts_vertex_data[ i ];
+      counts_colour_data[ i ] = counts_vertex_data[ i ];
+    }
+    
+    { // normals
+      real32* normals;
+      if( olp.mesh_source == HM_FLOOR1 ) {
+        normals = get_underside_floor_normals( &counts_normal_data[ i ] );
+      } else {
+        normals = get_overside_floor_normals( counts_normal_data[ i ], &gl_array_buffer_data[ offsets_vertex_data[ i ] ] );
+      }
+      offsets_normal_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
+      void*   src   = ( void* )&normals[ 0 ];
+      uint32  bytes = ( sizeof( normals[ 0 ] ) * counts_normal_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( normals );
+      game_state -> array_buffer_target += counts_normal_data[ i ];
+    }
+    
+    { // colours
+      real32* colours;
+      if( olp.mesh_source == HM_FLOOR1 ) {
+        colours = get_underside_floor_colours( &counts_colour_data[ i ] );
+      } else {
+        uint32 count = counts_vertex_data[ i ];
+        colours = get_overside_floor_colours( counts_colour_data[ i ] );
+      }
+      offsets_colour_data[ i ]  = game_state -> array_buffer_target;
+      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_colour_data[ i ] ];
+      void*   src   = ( void* )&colours[ 0 ];
+      uint32  bytes = ( sizeof( colours[ 0 ] ) * counts_colour_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( colours );
+      game_state -> array_buffer_target += counts_colour_data[ i ];
+    }
+    
+    {
+      uint16* indices;
+      if( olp.mesh_source == HM_FLOOR1 ) {
+        indices = get_underside_floor_indices( &counts_index_data[ i ] );
+      } else if( olp.mesh_source == HM_FLOOR2 ) {
+        indices = get_overside_floor_indices( &counts_index_data[ i ] );
+      }
+      offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
+      void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
+      void*   src   = ( void* )&indices[ 0 ];
+      uint32  bytes = ( sizeof( indices[ 0 ] ) * counts_index_data[ i ] );
+      memcpy( dest, src, bytes );
+      free( indices );
+      game_state -> element_array_buffer_target += counts_index_data[ i ];
+    }
   } else {
     SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Mesh source not specified\n" );
   }
@@ -339,7 +416,6 @@ void load_ship_and_target( GameState* game_state ) {
   ObjectLoadParameters target;
   target.make_immediately_active  = true;
   target.shader_filename          = "shaderVertexColoursNoLight.glsl";
-  // target.shader_filename          = "shaderDebug.glsl";
   target.shader_type              = SHADER_VERTEX_COLOURS_NO_LIGHT;
   target.initial_position.x       = ship.initial_position.x;
   target.initial_position.y       = ship.initial_position.y;
@@ -351,6 +427,45 @@ void load_ship_and_target( GameState* game_state ) {
   flat_colours[ target_index ].x = 0.729f;
   flat_colours[ target_index ].y = 0.129f;
   flat_colours[ target_index ].z = 0.176f;
+  
+}
+
+const uint32 floor1_index = 2;
+const uint32 floor2_index = 3;
+
+void load_floor( GameState* game_state ) {
+  
+  
+  // underside
+  ObjectLoadParameters floor1;
+  floor1.make_immediately_active  = true;
+  floor1.shader_filename          = "shaderVertexColoursNoLight.glsl";
+  floor1.shader_type              = SHADER_VERTEX_COLOURS_NO_LIGHT;
+  floor1.mesh_source              = HM_FLOOR1;
+  floor1.initial_position.x       = -100.0f;
+  floor1.initial_position.y       = -0.05f; // avoid z fighting
+  floor1.initial_position.z       = -60.0f;
+  flat_colours[ floor1_index ].x  = 0.87f;
+  flat_colours[ floor1_index ].y  = 0.87f;
+  flat_colours[ floor1_index ].z  = 0.623f;
+  
+  load_level_object( floor1, floor1_index, game_state );
+  
+  ObjectLoadParameters floor2;
+  floor2.make_immediately_active  = true;
+  floor2.shader_filename          = "shaderVertexColoursNoLight.glsl";
+  floor2.shader_type              = SHADER_VERTEX_COLOURS_NO_LIGHT;
+  floor2.mesh_source              = HM_FLOOR2;
+  floor2.initial_position.x       = -100.0f;
+  floor2.initial_position.y       = 0.0f;
+  floor2.initial_position.z       = -60.0f;
+  flat_colours[ floor2_index ].x  = 0.87f;
+  flat_colours[ floor2_index ].y  = 0.733f;
+  flat_colours[ floor2_index ].z  = 0.129f;
+  
+  load_level_object( floor2, floor2_index, game_state );
+  
+  floor_start_z = floor2.initial_position.z;
   
 }
 

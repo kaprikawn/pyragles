@@ -187,4 +187,17 @@ inline void translate( real32* matrix, Position position ) {
   *matrix = position.z;
 }
 
+inline real32 tan_degrees( real32 degrees ) {
+  real32 result;
+  real32 radians  = degrees * DEGREES_TO_RADIANS_FACTOR;
+  result = tan( radians );
+  return result;
+}
+
+inline real32 tan_radians( real32 radians ) {
+  real32 result;
+  result = tan( radians );
+  return result;
+}
+
 #endif //VECTOR_MATHS_HPP
