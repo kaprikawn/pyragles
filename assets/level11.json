@@ -10,6 +10,7 @@
         , "initPosition"    : [ 40, 5, -30 ]
         , "canFire"         : true
         , "timeUntilSpawn"  : 0
+        , "health"          : 1
         , "path"            : [
           {
               "x" : 0

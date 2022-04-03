@@ -63,6 +63,8 @@ int32 run_game() {
   load_ship_and_target( &game_state );
   load_floor( &game_state );
   
+  load_yaml( "level11.yaml" );
+  
   upload_objects_data_to_gl( &game_state );
   
   SDL_Window* window          = sdl_params.window;

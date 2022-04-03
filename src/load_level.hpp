@@ -435,7 +435,6 @@ const uint32 floor2_index = 3;
 
 void load_floor( GameState* game_state ) {
   
-  
   // underside
   ObjectLoadParameters floor1;
   floor1.make_immediately_active  = true;
@@ -451,6 +450,7 @@ void load_floor( GameState* game_state ) {
   
   load_level_object( floor1, floor1_index, game_state );
   
+  // overside
   ObjectLoadParameters floor2;
   floor2.make_immediately_active  = true;
   floor2.shader_filename          = "shaderVertexColoursNoLight.glsl";
@@ -467,6 +467,137 @@ void load_floor( GameState* game_state ) {
   
   floor_start_z = floor2.initial_position.z;
   
+}
+
+struct key_value_pair {
+  char*   key;
+  char*   value;
+  uint32  key_length;
+  uint32  value_length;
+};
+
+struct yaml_line_result {
+  char*   key;
+  char*   value;
+  uint32  key_length;
+  uint32  value_length;
+  uint32  array_depth;
+  bool32  do_nothing = false;
+};
+
+enum yaml_content_type {
+  YAML_NULL, YAML_KEY, YAML_VALUE
+};
+
+const uint32  char_buffer_size = 100;
+
+inline void null_char_buffer( char* target, uint32 length ) {
+  for( uint32 i = 0; i < length; i++ ) {
+    target[ i ] = '\0';
+  }
+}
+
+yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 current_yaml_section ) {
+  
+  yaml_line_result result;
+  
+  if( strings_are_equal( yaml_line, "---" ) ) {
+    result.do_nothing = true;
+    return result;
+  }
+  
+  bool32  passed_colon = false;
+  uint32  content_type = YAML_NULL;
+  
+  char key[ char_buffer_size ];
+  char value[ char_buffer_size ];
+  
+  uint32  key_index   = 0;
+  uint32  value_index = 0;
+  
+  null_char_buffer( &key[ 0 ], char_buffer_size );
+  null_char_buffer( &value[ 0 ], char_buffer_size );
+  
+  char* line = ( char* )malloc( length + 1 );
+  for( uint32 i = 0; i < length + 1; i++ ) {
+    line[ i ] = '\0';
+  }
+  memcpy( line, yaml_line, length );
+  
+  for( uint32 i = 0; i < length; i++ ) {
+    char this_char = line[ i ];
+    
+    if( this_char == ASCII_COLON ) {
+      passed_colon = true;
+    } else if( this_char >= ASCII_0 && this_char <= ASCII_z ) {
+      if( passed_colon ) {
+        content_type = YAML_VALUE;
+      } else {
+        content_type = YAML_KEY;
+      }
+    } else {
+      content_type = ASCII_NUL;
+    }
+    
+    if( content_type == YAML_KEY ) {
+      key[ key_index++ ] = this_char;
+    } else if( content_type == YAML_VALUE ) {
+      value[ value_index++ ] = this_char;
+    }
+    
+  }
+  
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key = %s value = %s\n", key, value );
+  
+  free( line );
+}
+
+void load_yaml( const char* filename ) {
+  
+  enum yaml_section { YAML_SECTION_NULL, YAML_SECTION_LEVEL_DETAILS, YAML_SECTION_LEVEL_OBJECTS };
+  
+  ReadFileResult yaml_file  = read_entire_file( filename );
+  
+  char this_char;
+  char next_char;
+  
+  char    this_line[ char_buffer_size ];
+  uint32  line_index            = 0;
+  uint32  current_yaml_section  = 0;
+  
+  const char* data = ( const char* )yaml_file.contents;
+  
+  for( uint32 i = 0; i < yaml_file.contents_size; i++ ) {
+    
+    this_char = data[ i ];
+    if( this_char == ASCII_LF ) {
+      
+      if( strings_are_equal( this_line, "levelDetails:" ) ) {
+        current_yaml_section = YAML_SECTION_LEVEL_DETAILS;
+      } else if( strings_are_equal( this_line, "levelObjects:" ) ) {
+        current_yaml_section = YAML_SECTION_LEVEL_OBJECTS;
+      } else {
+        yaml_line_result yaml_line = process_line( ( const char* )this_line, line_index, current_yaml_section );
+        if( !yaml_line.do_nothing ) {
+          
+        }
+      }
+      
+      for( uint32 i = 0; i < char_buffer_size; i++ ) {
+        this_line[ i ] = '\0';
+      }
+      line_index = 0;
+    } else if( this_char != ASCII_CR ) {
+      
+      this_line[ line_index++ ] = this_char;
+      
+    }
+    
+    
+    
+  }
+  
+  free_memory( yaml_file.contents, yaml_file.contents_size );
 }
 
 #endif //LOAD_LEVEL_HPP

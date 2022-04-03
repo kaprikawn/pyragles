@@ -12,7 +12,7 @@
 #include "types.hpp"
 #include "sdl.hpp"
 
-const uint32 OBJECT_COUNT = 4;
+const uint32 OBJECT_COUNT = 10;
 real32 floor_start_z = 0.0f;
 
 struct GameObject {

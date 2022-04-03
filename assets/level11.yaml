@@ -11,6 +11,7 @@ levelObjects:
   - -30
   canFire: true
   timeUntilSpawn: 0
+  health: 1
   path:
   - x: 0
     y: 0
