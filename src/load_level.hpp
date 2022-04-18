@@ -1,6 +1,7 @@
 #ifndef LOAD_LEVEL_HPP
 #define LOAD_LEVEL_HPP
 
+#include <iostream>
 #include <string.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "../vendor/stb_image.h"
@@ -45,6 +46,9 @@ void reset_data() {
   memset( shader_types              , 0, ( OBJECT_COUNT * sizeof( shader_types[ 0 ] ) ) );
   memset( object_active             , 0, ( OBJECT_COUNT * sizeof( object_active[ 0 ] ) ) );
   
+  for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
+    slot_available[ i ] = true;
+  }
 }
 
 void check_gltf_file( void* gltf_file_contents ) {
@@ -66,6 +70,8 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
   if( olp.make_immediately_active ) {
     object_active[ i ] = true;
   }
+  
+  slot_available[ i ] = false;
   
   positions[ i ].x = olp.initial_position.x;
   positions[ i ].y = olp.initial_position.y;
@@ -476,26 +482,27 @@ struct key_value_pair {
   uint32  value_length;
 };
 
+enum yaml_content_type { YAML_NULL, YAML_KEY, YAML_VALUE };
+enum yaml_section { YAML_SECTION_NULL, YAML_SECTION_LEVEL_DETAILS, YAML_SECTION_LEVEL_OBJECTS, YAML_SECTION_INIT_POS };
+
+const uint32  char_buffer_size = 100;
+
 struct yaml_line_result {
   char*   key;
   char*   value;
   uint32  key_length;
   uint32  value_length;
-  uint32  array_depth;
-  bool32  do_nothing = false;
+  bool32  is_key_value_pair = false;
+  bool32  start_new_object  = false;
+  bool32  do_nothing        = false;
 };
 
-enum yaml_content_type {
-  YAML_NULL, YAML_KEY, YAML_VALUE
-};
-
-const uint32  char_buffer_size = 100;
-
-inline void null_char_buffer( char* target, uint32 length ) {
-  for( uint32 i = 0; i < length; i++ ) {
-    target[ i ] = '\0';
-  }
-}
+// struct yaml_line_type {
+//   bool32 key_value_pair   = false;
+//   bool32 array_starter    = false;
+//   bool32 object_starter   = false;
+//   bool32 anon_array_entry = false;
+// };
 
 yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 current_yaml_section ) {
   
@@ -503,20 +510,24 @@ yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 curr
   
   if( strings_are_equal( yaml_line, "---" ) ) {
     result.do_nothing = true;
-    return result;
+    // return result;
   }
   
-  bool32  passed_colon = false;
-  uint32  content_type = YAML_NULL;
+  bool32  passed_colon  = false;
+  uint32  content_type  = YAML_NULL;
+  bool32  has_key       = false;
+  bool32  has_value     = false;
+  uint32  key_length    = 0;
+  uint32  value_length  = 0;
   
-  char key[ char_buffer_size ];
+  char key  [ char_buffer_size ];
   char value[ char_buffer_size ];
   
   uint32  key_index   = 0;
   uint32  value_index = 0;
   
-  null_char_buffer( &key[ 0 ], char_buffer_size );
-  null_char_buffer( &value[ 0 ], char_buffer_size );
+  null_char_buffer( &key[ 0 ]   , char_buffer_size );
+  null_char_buffer( &value[ 0 ] , char_buffer_size );
   
   char* line = ( char* )malloc( length + 1 );
   for( uint32 i = 0; i < length + 1; i++ ) {
@@ -529,41 +540,61 @@ yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 curr
     
     if( this_char == ASCII_COLON ) {
       passed_colon = true;
-    } else if( this_char >= ASCII_0 && this_char <= ASCII_z ) {
+      content_type  = YAML_NULL;
+    } else if( ( this_char >= ASCII_0 && this_char <= ASCII_z ) || this_char == ASCII_DECIMAL_POINT ) {
       if( passed_colon ) {
-        content_type = YAML_VALUE;
+        content_type  = YAML_VALUE;
+        has_value     = true;
       } else {
-        content_type = YAML_KEY;
+        content_type  = YAML_KEY;
+        has_key       = true;
       }
+    } else if( this_char == ASCII_HYPHEN && content_type == YAML_NULL && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS && i == 0 ) {
+      result.start_new_object = true;
     } else {
       content_type = ASCII_NUL;
     }
     
     if( content_type == YAML_KEY ) {
       key[ key_index++ ] = this_char;
+      key_length++;
     } else if( content_type == YAML_VALUE ) {
       value[ value_index++ ] = this_char;
+      value_length++;
     }
-    
   }
   
-  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key = %s value = %s\n", key, value );
+  // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "line %s\n", line );
+  // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key = %s value = %s\n", key, value );
   
   free( line );
+  
+  result.key_length   = key_length;
+  result.value_length = value_length;
+  result.key          = init_char_star( key_length + 1 );
+  result.value        = init_char_star( value_length + 1 );
+  
+  memcpy( result.key, &key[ 0 ], key_length );
+  memcpy( result.value, &value[ 0 ], value_length );
+  
+  if( has_key && has_value ) {
+    result.is_key_value_pair = true;
+  }
+  
+  return result;
 }
 
-void load_yaml( const char* filename ) {
+void load_yaml( const char* filename, GameState* game_state ) {
   
-  enum yaml_section { YAML_SECTION_NULL, YAML_SECTION_LEVEL_DETAILS, YAML_SECTION_LEVEL_OBJECTS };
+  ReadFileResult  yaml_file  = read_entire_file( filename );
+  ObjectLoadParameters olp;
   
-  ReadFileResult yaml_file  = read_entire_file( filename );
-  
-  char this_char;
-  char next_char;
-  
-  char    this_line[ char_buffer_size ];
-  uint32  line_index            = 0;
+  char    this_char;
+  uint32  line_start            = 0;
+  uint32  line_end              = 0;
   uint32  current_yaml_section  = 0;
+  bool32  submit_olp            = false;
+  uint32  first_object          = true;
   
   const char* data = ( const char* )yaml_file.contents;
   
@@ -571,6 +602,90 @@ void load_yaml( const char* filename ) {
     
     this_char = data[ i ];
     if( this_char == ASCII_LF ) {
+      line_end = i;
+      
+      uint32 length = ( line_end - line_start );
+      char* line = init_char_star( length + 1 );
+      memcpy( line, &data[ line_start ], length );
+      
+      // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "line %s\n", line );
+      
+      if( strings_are_equal( line, "levelObjects:" ) ) {
+        current_yaml_section = YAML_SECTION_LEVEL_OBJECTS;
+      }
+      
+      yaml_line_result yaml_line = process_line( line, length, current_yaml_section );
+      
+      // int g = 2;
+      
+      if( ( yaml_line.start_new_object || strings_are_equal( line, "nullTerminator: 1" ) ) && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
+        submit_olp = true;
+      }
+      
+      if( yaml_line.is_key_value_pair && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
+        // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key is %s - value is %s\n", yaml_line.key, yaml_line.value );
+        
+        if( strings_are_equal( yaml_line.key, "glbFile" ) ) {
+          olp.gltf_model_filename = init_char_star( yaml_line.value_length + 1 );
+          memcpy( olp.gltf_model_filename, yaml_line.value, yaml_line.value_length );
+        } else if( strings_are_equal( yaml_line.key, "shaderFile" ) ) {
+          olp.shader_filename = init_char_star( yaml_line.value_length + 1 );
+          memcpy( olp.shader_filename, yaml_line.value, yaml_line.value_length );
+        }
+        
+      }
+      
+      if( submit_olp ) {
+        int y = 7;
+        
+        if( first_object ) {
+          first_object = false;
+        } else {
+          free( olp.gltf_model_filename );
+          free( olp.shader_filename );
+        }
+        submit_olp = false;
+      }
+      
+      line_start = i;
+      line_start++;
+      free( line );
+      free( yaml_line.key );
+      free( yaml_line.value );
+    }
+  }
+  
+  free_memory( yaml_file.contents, yaml_file.contents_size );
+}
+
+void load_yaml_old( const char* filename, GameState* game_state ) {
+  
+  ReadFileResult yaml_file  = read_entire_file( filename );
+  
+  char this_char;
+  char next_char;
+  
+  char    this_line [ char_buffer_size ];
+  uint32  line_index            = 0;
+  uint32  current_yaml_section  = 0;
+  uint32  array_depth           = 0;
+  bool32  submit_olp            = false;
+  bool32  allocation_failed;
+  uint32  object_index;
+  ObjectLoadParameters olp;
+  
+  // load_level_object( ObjectLoadParameters olp, uint32 array_position_index, GameState* game_state ) {
+
+  const char* data = ( const char* )yaml_file.contents;
+  
+  for( uint32 i = 0; i < yaml_file.contents_size; i++ ) {
+    
+    this_char = data[ i ];
+    if( this_char == ASCII_LF ) {
+      
+      if( strings_are_equal( this_line, "nullTerminator: 1" ) ) {
+        submit_olp = true;
+      }
       
       if( strings_are_equal( this_line, "levelDetails:" ) ) {
         current_yaml_section = YAML_SECTION_LEVEL_DETAILS;
@@ -578,9 +693,39 @@ void load_yaml( const char* filename ) {
         current_yaml_section = YAML_SECTION_LEVEL_OBJECTS;
       } else {
         yaml_line_result yaml_line = process_line( ( const char* )this_line, line_index, current_yaml_section );
+        
+        if( submit_olp ) {
+          olp.make_immediately_active = true;
+          load_level_object( olp, object_index, game_state );
+          submit_olp = false;
+        }
+        
         if( !yaml_line.do_nothing ) {
           
+          if( yaml_line.start_new_object ) {
+            object_index = get_free_object_index( &allocation_failed );
+          }
+          
+          if( yaml_line.is_key_value_pair ) {
+            int y = 7;
+            if( strings_are_equal( yaml_line.key, "glbFile" ) ) {
+              olp.gltf_model_filename = yaml_line.value;
+            } else if( strings_are_equal( yaml_line.key, "shaderFile" ) ) {
+              olp.gltf_model_filename = yaml_line.value;
+            } else if( strings_are_equal( yaml_line.key, "initPosition" ) ) {
+              current_yaml_section = YAML_SECTION_INIT_POS;
+            } else if( strings_are_equal( yaml_line.key, "x" ) && current_yaml_section == YAML_SECTION_INIT_POS ) {
+              olp.initial_position.x = std::atoi( yaml_line.value );
+            } else if( strings_are_equal( yaml_line.key, "y" ) && current_yaml_section == YAML_SECTION_INIT_POS ) {
+              olp.initial_position.y = std::atoi( yaml_line.value );
+            } else if( strings_are_equal( yaml_line.key, "z" ) && current_yaml_section == YAML_SECTION_INIT_POS ) {
+              olp.initial_position.z = std::atoi( yaml_line.value );
+            }
+          }
         }
+        
+        free( yaml_line.key );
+        free( yaml_line.value );
       }
       
       for( uint32 i = 0; i < char_buffer_size; i++ ) {
@@ -588,13 +733,8 @@ void load_yaml( const char* filename ) {
       }
       line_index = 0;
     } else if( this_char != ASCII_CR ) {
-      
       this_line[ line_index++ ] = this_char;
-      
     }
-    
-    
-    
   }
   
   free_memory( yaml_file.contents, yaml_file.contents_size );

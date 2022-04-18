@@ -264,7 +264,7 @@ struct GameState {
   uint32    target_gl_offsets_array_data  = 0;
   uint32    target_gl_offsets_index_data  = 0;
   uint32    target_texture_data_array_pos = 0;
-  bool32    invert_y                      = false;
+  bool32    invert_y                      = true;
 };
 
 uint32 shader_program_id;
@@ -346,6 +346,18 @@ bool32 strings_are_equal( const char* str1, const char* str2 ) {
       return false;
   }
   return true;
+}
+
+inline void null_char_buffer( char* target, uint32 length ) {
+  for( uint32 i = 0; i < length; i++ ) {
+    target[ i ] = '\0';
+  }
+}
+
+inline char* init_char_star( uint32 length ) {
+  char* result = ( char* )malloc( length );
+  null_char_buffer( result, length );
+  return result;
 }
 
 uint32 compileShader( uint32 type, const char* source ) {

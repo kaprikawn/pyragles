@@ -69,6 +69,7 @@ uint32    counts_colour_data        [ OBJECT_COUNT ];
 uint32    counts_index_data         [ OBJECT_COUNT ];
 uint32    shader_types              [ OBJECT_COUNT ];
 bool32    object_active             [ OBJECT_COUNT ];
+bool32    slot_available            [ OBJECT_COUNT ]; // whether we can (re)use this object index to load a new object into
 Position  flat_colours              [ OBJECT_COUNT ];
 uint8*    image_data_locations      [ OBJECT_COUNT ];
 
@@ -84,6 +85,19 @@ struct ObjectLoadParameters {
   Position  initial_position;
   uint32    mesh_source             = 0;
 };
+
+uint32 get_free_object_index( bool32* allocation_failed ) {
+  uint32 result = 0;
+  for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
+    if( slot_available[ i ] ) {
+      result = i;
+      return result;
+    }
+  }
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Object count limit exceeded\n" );
+  *allocation_failed = true;
+  return result;
+}
 
 void render_object( uint32 object_index, real32* vp_matrix ) {
   uint32 i = object_index;

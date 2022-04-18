@@ -63,7 +63,7 @@ int32 run_game() {
   load_ship_and_target( &game_state );
   load_floor( &game_state );
   
-  load_yaml( "level11.yaml" );
+  load_yaml( "level11.yaml", &game_state );
   
   upload_objects_data_to_gl( &game_state );
   

@@ -5,19 +5,14 @@
   },
   "levelObjects" : [
     {
-          "shapeType"       : "ENEMY_POD"
-        , "objectType"      : "ENEMY"
-        , "initPosition"    : [ 40, 5, -30 ]
-        , "canFire"         : true
-        , "timeUntilSpawn"  : 0
-        , "health"          : 1
-        , "path"            : [
-          {
-              "x" : 0
-            , "y" : 0
-            , "z" : -30
-          }
-        ]
+          "glbFile"       : "modelEnemyPod.glb"
+        , "shaderFile"    : "shaderLight.glsl"
+        , "initPosition"  : {
+            "x" : 40
+          , "y" : 5
+          , "z" : -30
+      }
     }
-  ]
+  ],
+  "nullTerminator" : 1
 }
