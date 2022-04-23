@@ -483,7 +483,8 @@ struct key_value_pair {
 };
 
 enum yaml_content_type { YAML_NULL, YAML_KEY, YAML_VALUE };
-enum yaml_section { YAML_SECTION_NULL, YAML_SECTION_LEVEL_DETAILS, YAML_SECTION_LEVEL_OBJECTS, YAML_SECTION_INIT_POS };
+enum yaml_section { YAML_SECTION_NULL, YAML_SECTION_LEVEL_DETAILS, YAML_SECTION_LEVEL_OBJECTS };
+enum yaml_section_sub { YAML_SECTION_SUB_NULL, YAML_SECTION_SUB_INIT_POS };
 
 const uint32  char_buffer_size = 100;
 
@@ -541,7 +542,9 @@ yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 curr
     if( this_char == ASCII_COLON ) {
       passed_colon = true;
       content_type  = YAML_NULL;
-    } else if( ( this_char >= ASCII_0 && this_char <= ASCII_z ) || this_char == ASCII_DECIMAL_POINT ) {
+    } else if( this_char == ASCII_HYPHEN && content_type == YAML_NULL && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS && i == 0 ) {
+      result.start_new_object = true;
+    } else if( ( this_char >= ASCII_0 && this_char <= ASCII_z ) || this_char == ASCII_DECIMAL_POINT || this_char == ASCII_HYPHEN ) {
       if( passed_colon ) {
         content_type  = YAML_VALUE;
         has_value     = true;
@@ -549,8 +552,6 @@ yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 curr
         content_type  = YAML_KEY;
         has_key       = true;
       }
-    } else if( this_char == ASCII_HYPHEN && content_type == YAML_NULL && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS && i == 0 ) {
-      result.start_new_object = true;
     } else {
       content_type = ASCII_NUL;
     }
@@ -590,11 +591,12 @@ void load_yaml( const char* filename, GameState* game_state ) {
   ObjectLoadParameters olp;
   
   char    this_char;
-  uint32  line_start            = 0;
-  uint32  line_end              = 0;
-  uint32  current_yaml_section  = 0;
-  bool32  submit_olp            = false;
-  uint32  first_object          = true;
+  uint32  line_start                = 0;
+  uint32  line_end                  = 0;
+  uint32  current_yaml_section      = 0;
+  uint32  current_yaml_section_sub  = 0;
+  bool32  submit_olp                = false;
+  uint32  first_object              = true;
   
   const char* data = ( const char* )yaml_file.contents;
   
@@ -620,6 +622,7 @@ void load_yaml( const char* filename, GameState* game_state ) {
       
       if( ( ( yaml_line.start_new_object && !first_object ) || strings_are_equal( line, "nullTerminator: 1" ) ) && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
         submit_olp = true;
+        current_yaml_section_sub  = YAML_SECTION_SUB_NULL;
       }
       
       if( yaml_line.is_key_value_pair && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
@@ -631,16 +634,27 @@ void load_yaml( const char* filename, GameState* game_state ) {
         } else if( strings_are_equal( yaml_line.key, "shaderFile" ) ) {
           olp.shader_filename = init_char_star( yaml_line.value_length + 1 );
           memcpy( olp.shader_filename, yaml_line.value, yaml_line.value_length );
+        } else if( strings_are_equal( yaml_line.key, "x" ) && current_yaml_section_sub == YAML_SECTION_SUB_INIT_POS ) {
+          olp.initial_position.x = atoi( yaml_line.value );
+        } else if( strings_are_equal( yaml_line.key, "y" ) && current_yaml_section_sub == YAML_SECTION_SUB_INIT_POS ) {
+          olp.initial_position.y = atoi( yaml_line.value );
+        } else if( strings_are_equal( yaml_line.key, "z" ) && current_yaml_section_sub == YAML_SECTION_SUB_INIT_POS ) {
+          olp.initial_position.z = atoi( yaml_line.value );
         }
-        
+      } else if( strings_are_equal( yaml_line.key, "initPosition" ) && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
+        current_yaml_section_sub = YAML_SECTION_SUB_INIT_POS;
       }
       
       if( submit_olp ) {
-        int y = 7;
         
         olp.make_immediately_active = true;
-        uint32 array_position_index = 4;
-        load_level_object( olp, array_position_index, game_state );
+        bool32 allocation_failed = false;
+        uint32 array_position_index = get_free_object_index( &allocation_failed );
+        if( allocation_failed ) {
+          SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "[ ERROR ] : Failed to allocate new object index\n" );
+        } else {
+          load_level_object( olp, array_position_index, game_state );
+        }
         
         if( first_object ) {
           first_object = false;
@@ -649,6 +663,9 @@ void load_yaml( const char* filename, GameState* game_state ) {
           free( olp.shader_filename );
         }
         submit_olp = false;
+        if( strings_are_equal( line, "nullTerminator: 1" ) ) {
+          current_yaml_section      = YAML_SECTION_NULL;
+        }
       }
       
       line_start = i;
@@ -661,7 +678,7 @@ void load_yaml( const char* filename, GameState* game_state ) {
   
   free_memory( yaml_file.contents, yaml_file.contents_size );
 }
-
+/*
 void load_yaml_old( const char* filename, GameState* game_state ) {
   
   ReadFileResult yaml_file  = read_entire_file( filename );
@@ -670,10 +687,11 @@ void load_yaml_old( const char* filename, GameState* game_state ) {
   char next_char;
   
   char    this_line [ char_buffer_size ];
-  uint32  line_index            = 0;
-  uint32  current_yaml_section  = 0;
-  uint32  array_depth           = 0;
-  bool32  submit_olp            = false;
+  uint32  line_index                = 0;
+  uint32  current_yaml_section      = 0;
+  uint32  current_yaml_sub_section  = 0;
+  uint32  array_depth               = 0;
+  bool32  submit_olp                = false;
   bool32  allocation_failed;
   uint32  object_index;
   ObjectLoadParameters olp;
@@ -718,7 +736,7 @@ void load_yaml_old( const char* filename, GameState* game_state ) {
               olp.gltf_model_filename = yaml_line.value;
             } else if( strings_are_equal( yaml_line.key, "initPosition" ) ) {
               current_yaml_section = YAML_SECTION_INIT_POS;
-            } else if( strings_are_equal( yaml_line.key, "x" ) && current_yaml_section == YAML_SECTION_INIT_POS ) {
+            } else if( strings_are_equal( yaml_line.key, "x" ) && current_yaml_sub == YAML_SECTION_INIT_POS ) {
               olp.initial_position.x = std::atoi( yaml_line.value );
             } else if( strings_are_equal( yaml_line.key, "y" ) && current_yaml_section == YAML_SECTION_INIT_POS ) {
               olp.initial_position.y = std::atoi( yaml_line.value );
@@ -743,5 +761,5 @@ void load_yaml_old( const char* filename, GameState* game_state ) {
   
   free_memory( yaml_file.contents, yaml_file.contents_size );
 }
-
+*/
 #endif //LOAD_LEVEL_HPP

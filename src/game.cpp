@@ -43,6 +43,45 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   game_state -> ibo = ibo;
 }
 
+void update_level_object( uint32 object_index, real32 dt ) {
+  uint32 i = object_index;
+  
+  if( !object_active[ i ] )
+    return;
+  
+  // some dirty hardcoding for now
+  if( i == 4 ) {
+    rotations[ i ].y += 200.0f * dt;
+    velocities[ i ].z = 2.0f;
+  }
+  
+  while( rotations[ i ].x > 360.0f )
+    rotations[ i ].x -= 360.0f;
+  while( rotations[ i ].x < 0.0f )
+    rotations[ i ].x += 360.0f;
+  while( rotations[ i ].y > 360.0f )
+    rotations[ i ].y -= 360.0f;
+  while( rotations[ i ].y < 0.0f )
+    rotations[ i ].y += 360.0f;
+  while( rotations[ i ].z > 360.0f )
+    rotations[ i ].z -= 360.0f;
+  while( rotations[ i ].z < 0.0f )
+    rotations[ i ].z += 360.0f;
+  
+  positions[ i ].y = positions[ i ].y + ( velocities[ i ].y * dt );
+  positions[ i ].x = positions[ i ].x + ( velocities[ i ].x * dt );
+  positions[ i ].z = positions[ i ].z + ( velocities[ i ].z * dt );
+  
+}
+
+void update_level_objects( uint32 index_start, uint32 index_end, real32 dt ) {
+  
+  for( uint32 i = index_start; i < index_end; i++ ) {
+    update_level_object( i, dt );
+  }
+  
+}
+
 int32 run_game() {
   
   SDLParams sdl_params;
@@ -96,6 +135,7 @@ int32 run_game() {
     update_target_position();
     caculate_camera( &game_state, &game_input, dt );
     scroll_floor( floor2_index, dt );
+    update_level_objects( 4, 5, dt );
     
     GLCall( glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) );
     
