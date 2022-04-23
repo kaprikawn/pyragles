@@ -608,7 +608,7 @@ void load_yaml( const char* filename, GameState* game_state ) {
       char* line = init_char_star( length + 1 );
       memcpy( line, &data[ line_start ], length );
       
-      // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "line %s\n", line );
+      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "line %s\n", line );
       
       if( strings_are_equal( line, "levelObjects:" ) ) {
         current_yaml_section = YAML_SECTION_LEVEL_OBJECTS;
@@ -618,12 +618,12 @@ void load_yaml( const char* filename, GameState* game_state ) {
       
       // int g = 2;
       
-      if( ( yaml_line.start_new_object || strings_are_equal( line, "nullTerminator: 1" ) ) && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
+      if( ( ( yaml_line.start_new_object && !first_object ) || strings_are_equal( line, "nullTerminator: 1" ) ) && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
         submit_olp = true;
       }
       
       if( yaml_line.is_key_value_pair && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
-        // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key is %s - value is %s\n", yaml_line.key, yaml_line.value );
+        SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key is %s - value is %s\n", yaml_line.key, yaml_line.value );
         
         if( strings_are_equal( yaml_line.key, "glbFile" ) ) {
           olp.gltf_model_filename = init_char_star( yaml_line.value_length + 1 );
@@ -637,6 +637,10 @@ void load_yaml( const char* filename, GameState* game_state ) {
       
       if( submit_olp ) {
         int y = 7;
+        
+        olp.make_immediately_active = true;
+        uint32 array_position_index = 4;
+        load_level_object( olp, array_position_index, game_state );
         
         if( first_object ) {
           first_object = false;

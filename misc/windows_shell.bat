@@ -1,6 +1,6 @@
 @echo off
 
-SET VCVARS_DIR=C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\
+SET VCVARS_DIR=C:\"Program Files"\"Microsoft Visual Studio"\2022\Community\VC\Auxiliary\Build\
 SET GAME_DIR=C:\dev\pyragles
 
 rem add scripts dir to path
