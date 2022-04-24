@@ -541,34 +541,33 @@ yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 curr
   for( uint32 i = 0; i < length; i++ ) {
     char this_char = line[ i ];
     
-    if( this_char == ASCII_COLON ) {
-      passed_colon = true;
-      content_type  = YAML_NULL;
-    } else if( this_char == ASCII_HYPHEN && content_type == YAML_NULL && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS && i == 0 ) {
-      result.start_new_object = true;
-    } else if( ( this_char >= ASCII_0 && this_char <= ASCII_z ) || this_char == ASCII_DECIMAL_POINT || this_char == ASCII_HYPHEN ) {
-      if( passed_colon ) {
-        content_type  = YAML_VALUE;
-        has_value     = true;
+    if( this_char != ASCII_CR ) {
+      if( this_char == ASCII_COLON ) {
+        passed_colon = true;
+        content_type  = YAML_NULL;
+      } else if( this_char == ASCII_HYPHEN && content_type == YAML_NULL && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS && i == 0 ) {
+        result.start_new_object = true;
+      } else if( ( this_char >= ASCII_0 && this_char <= ASCII_z ) || this_char == ASCII_DECIMAL_POINT || this_char == ASCII_HYPHEN ) {
+        if( passed_colon ) {
+          content_type  = YAML_VALUE;
+          has_value     = true;
+        } else {
+          content_type  = YAML_KEY;
+          has_key       = true;
+        }
       } else {
-        content_type  = YAML_KEY;
-        has_key       = true;
+        content_type = ASCII_NUL;
       }
-    } else {
-      content_type = ASCII_NUL;
-    }
-    
-    if( content_type == YAML_KEY ) {
-      key[ key_index++ ] = this_char;
-      key_length++;
-    } else if( content_type == YAML_VALUE ) {
-      value[ value_index++ ] = this_char;
-      value_length++;
+      
+      if( content_type == YAML_KEY ) {
+        key[ key_index++ ] = this_char;
+        key_length++;
+      } else if( content_type == YAML_VALUE ) {
+        value[ value_index++ ] = this_char;
+        value_length++;
+      }
     }
   }
-  
-  // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "line %s\n", line );
-  // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key = %s value = %s\n", key, value );
   
   free( line );
   
@@ -618,6 +617,9 @@ void load_yaml( const char* filename, GameState* game_state ) {
     this_char = data[ i ];
     if( this_char == ASCII_LF ) {
       line_end = i;
+      
+      if( data[ line_end ] == ASCII_CR || data[ line_end ] == ASCII_LF )
+        line_end--;
       
       uint32 length = ( line_end - line_start );
       char* line = init_char_star( length + 1 );
