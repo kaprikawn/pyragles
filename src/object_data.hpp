@@ -32,7 +32,7 @@ uint8* texture_data_array = ( uint8* )malloc( 1000000 );
 real32 light_position[ 3 ]  = { 0.0f, 20.0f, 0.0f };
 real32 ambient_light        = 0.3f;
 
-enum ShaderTypes { SHADERS_NONE, SHADER_LIGHT, SHADER_VERTEX_COLOURS, SHADER_VERTEX_COLOURS_NO_LIGHT };
+enum ShaderTypes { SHADER_LIGHT, SHADER_VERTEX_COLOURS, SHADER_VERTEX_COLOURS_NO_LIGHT };
 enum ObjectTypes { OBJECT_TYPE_NONE, OBJECT_TYPE_SCENARY, OBJECT_TYPE_ENEMY };
 
 // object data

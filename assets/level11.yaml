@@ -9,5 +9,12 @@ levelObjects:
   initPosition:
     x: 10
     y: 5
+    z: -20
+- glbFile: modelArch.glb
+  shaderFile: shaderVertexColours.glsl
+  objectType: 1
+  initPosition:
+    x: -10
+    y: 0
     z: -30
 nullTerminator: 1

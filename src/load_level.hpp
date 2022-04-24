@@ -587,8 +587,9 @@ yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 curr
 
 void load_yaml( const char* filename, GameState* game_state ) {
   
-  ReadFileResult  yaml_file  = read_entire_file( filename );
-  ObjectLoadParameters olp;
+  ReadFileResult        yaml_file = read_entire_file( filename );
+  ObjectLoadParameters* olp       = NULL;
+  ObjectLoadParameters* to_submit = NULL;
   
   char    this_char;
   uint32  line_start                = 0;
@@ -596,7 +597,7 @@ void load_yaml( const char* filename, GameState* game_state ) {
   uint32  current_yaml_section      = 0;
   uint32  current_yaml_section_sub  = 0;
   bool32  submit_olp                = false;
-  uint32  first_object              = true;
+  bool32  is_first_object           = true;
   
   const char* data = ( const char* )yaml_file.contents;
   
@@ -612,58 +613,54 @@ void load_yaml( const char* filename, GameState* game_state ) {
       
       SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "line %s\n", line );
       
-      if( strings_are_equal( line, "levelObjects:" ) ) {
-        current_yaml_section = YAML_SECTION_LEVEL_OBJECTS;
-      }
-      
       yaml_line_result yaml_line = process_line( line, length, current_yaml_section );
       
-      // int g = 2;
-      
-      if( ( ( yaml_line.start_new_object && !first_object ) || strings_are_equal( line, "nullTerminator: 1" ) ) && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
-        submit_olp = true;
-        current_yaml_section_sub  = YAML_SECTION_SUB_NULL;
+      if( yaml_line.start_new_object ) {
+        if( is_first_object ) {
+          is_first_object = false;
+        } else {
+          to_submit = olp;
+        }
+        olp = ( ObjectLoadParameters* )malloc( sizeof( ObjectLoadParameters ) );
+      } else if( strings_are_equal( line, "nullTerminator: 1" ) ) {
+        to_submit = olp;
+        current_yaml_section_sub = YAML_SECTION_SUB_NULL;
       }
       
-      if( yaml_line.is_key_value_pair && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
+      if( strings_are_equal( line, "levelObjects:" ) ) {
+          current_yaml_section = YAML_SECTION_LEVEL_OBJECTS;
+      } else if( yaml_line.is_key_value_pair && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
         SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key is %s - value is %s\n", yaml_line.key, yaml_line.value );
         
         if( strings_are_equal( yaml_line.key, "glbFile" ) ) {
-          olp.gltf_model_filename = init_char_star( yaml_line.value_length + 1 );
-          memcpy( olp.gltf_model_filename, yaml_line.value, yaml_line.value_length );
+          olp -> gltf_model_filename = init_char_star( yaml_line.value_length + 1 );
+          memcpy( olp -> gltf_model_filename, yaml_line.value, yaml_line.value_length );
         } else if( strings_are_equal( yaml_line.key, "shaderFile" ) ) {
-          olp.shader_filename = init_char_star( yaml_line.value_length + 1 );
-          memcpy( olp.shader_filename, yaml_line.value, yaml_line.value_length );
+          olp -> shader_filename = init_char_star( yaml_line.value_length + 1 );
+          memcpy( olp -> shader_filename, yaml_line.value, yaml_line.value_length );
         } else if( strings_are_equal( yaml_line.key, "x" ) && current_yaml_section_sub == YAML_SECTION_SUB_INIT_POS ) {
-          olp.initial_position.x = atoi( yaml_line.value );
+          olp -> initial_position.x = atoi( yaml_line.value );
         } else if( strings_are_equal( yaml_line.key, "y" ) && current_yaml_section_sub == YAML_SECTION_SUB_INIT_POS ) {
-          olp.initial_position.y = atoi( yaml_line.value );
+          olp -> initial_position.y = atoi( yaml_line.value );
         } else if( strings_are_equal( yaml_line.key, "z" ) && current_yaml_section_sub == YAML_SECTION_SUB_INIT_POS ) {
-          olp.initial_position.z = atoi( yaml_line.value );
+          olp -> initial_position.z = atoi( yaml_line.value );
         }
       } else if( strings_are_equal( yaml_line.key, "initPosition" ) && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
         current_yaml_section_sub = YAML_SECTION_SUB_INIT_POS;
       }
       
-      if( submit_olp ) {
-        
-        olp.make_immediately_active = true;
-        int32 array_position_index = get_free_object_index();
-        if( array_position_index == -1 ) {
+      if( to_submit != NULL ) {
+        int32 target_array_position = get_free_object_index();
+        if( target_array_position == -1 ) {
           SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "[ ERROR ] : Failed to allocate new object index\n" );
         } else {
-          load_level_object( &olp, array_position_index, game_state );
-        }
-        
-        if( first_object ) {
-          first_object = false;
-        } else {
-          free( olp.gltf_model_filename );
-          free( olp.shader_filename );
-        }
-        submit_olp = false;
-        if( strings_are_equal( line, "nullTerminator: 1" ) ) {
-          current_yaml_section      = YAML_SECTION_NULL;
+          uint32 index = ( uint32 )target_array_position;
+          SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Submitting object index %d\n", index );
+          to_submit -> make_immediately_active = true;
+          to_submit -> shader_type = SHADER_LIGHT;
+          load_level_object( to_submit, index, game_state );
+          free( to_submit );
+          to_submit = NULL;
         }
       }
       
