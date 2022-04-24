@@ -80,7 +80,7 @@ struct ObjectLoadParameters {
   bool32    make_immediately_active = false;
   char*     shader_filename;
   uint32    shader_type             = SHADER_LIGHT;
-  uint32    object_type             = 0;
+  uint32    object_type             = OBJECT_TYPE_NONE;
   char*     gltf_model_filename;
   bool32    is_floor                = false;
   Position  initial_position;

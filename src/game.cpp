@@ -79,7 +79,7 @@ void update_level_object( uint32 object_index, real32 dt ) {
 
 void update_level_objects( uint32 index_start, uint32 index_end, real32 dt ) {
   
-  for( uint32 i = index_start; i < index_end; i++ ) {
+  for( uint32 i = index_start; i <= index_end; i++ ) {
     update_level_object( i, dt );
   }
   

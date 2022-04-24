@@ -81,6 +81,8 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
   ReadFileResult shader_file  = read_entire_file( shader_filename );
   
   shader_types[ i ] = olp -> shader_type;
+  if( olp -> object_type > 0 )
+    object_types[ i ] = olp -> object_type;
   
   uint32 shader_program_id    = createShader( shader_file );
   shader_program_ids[ i ]     = shader_program_id;
@@ -89,7 +91,7 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
   int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
   int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
   int32 tex_coord0_attribute_location   = glGetAttribLocation ( shader_program_id, "aTexCoord" );
-  // int32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
+  int32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
   int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
   int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
   int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
@@ -98,7 +100,7 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
   gl_id_positions[ i ]        = position_attribute_location;
   gl_id_normals[ i ]          = normal_attribute_location;
   gl_id_tex_coords0[ i ]      = tex_coord0_attribute_location;
-  // gl_id_colours[ i ]          = colour_attribute_location;
+  gl_id_colours[ i ]          = colour_attribute_location;
   gl_id_mvp_mats[ i ]         = mvp_uniform_location;
   gl_id_model_mats[ i ]       = model_uniform_location;
   gl_id_light_positions[ i ]  = light_position_uniform_location;
@@ -130,7 +132,7 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     char* json_string         = ( char* )malloc( json_string_length + 1 );
     pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
     
-    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
     
     JsonString json;
     json.json_string      = json_string;
@@ -585,6 +587,16 @@ yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 curr
   return result;
 }
 
+inline uint32 get_shader_type( const char* shader_filename ) {
+  uint32 result = 0;
+  if( strings_are_equal( shader_filename, "shaderLight.glsl" ) ) {
+    return SHADER_LIGHT;
+  } else if( strings_are_equal( shader_filename, "shaderVertexColours.glsl") ) {
+    return SHADER_VERTEX_COLOURS;
+  }
+  return result;
+}
+
 void load_yaml( const char* filename, GameState* game_state ) {
   
   ReadFileResult        yaml_file = read_entire_file( filename );
@@ -638,6 +650,9 @@ void load_yaml( const char* filename, GameState* game_state ) {
         } else if( strings_are_equal( yaml_line.key, "shaderFile" ) ) {
           olp -> shader_filename = init_char_star( yaml_line.value_length + 1 );
           memcpy( olp -> shader_filename, yaml_line.value, yaml_line.value_length );
+          olp -> shader_type = get_shader_type( ( const char* )olp -> shader_filename );
+        } else if( strings_are_equal( yaml_line.key, "objectType" ) ) {
+          olp -> object_type = atoi( yaml_line.value );
         } else if( strings_are_equal( yaml_line.key, "x" ) && current_yaml_section_sub == YAML_SECTION_SUB_INIT_POS ) {
           olp -> initial_position.x = atoi( yaml_line.value );
         } else if( strings_are_equal( yaml_line.key, "y" ) && current_yaml_section_sub == YAML_SECTION_SUB_INIT_POS ) {

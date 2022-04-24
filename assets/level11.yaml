@@ -11,7 +11,7 @@ levelObjects:
     y: 5
     z: -20
 - glbFile: modelArch.glb
-  shaderFile: shaderVertexColours.glsl
+  shaderFile: shaderLight.glsl
   objectType: 1
   initPosition:
     x: -10
