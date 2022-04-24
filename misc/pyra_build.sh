@@ -15,7 +15,7 @@ mkdir -p $BUILD_DIR
 
 cd $BUILD_DIR
 
-gcc -g `pkg-config --cflags --libs sdl2 glesv2` -DFULLSCREEN_ONLY -DDEBUG $SRC_DIR/main_linux.cpp -o AlphaFlight
+g++ -g `pkg-config --cflags --libs sdl2 glesv2` -DFULLSCREEN_ONLY -DDEBUG $SRC_DIR/main_linux.cpp -o AlphaFlight
 
 cd $CWD
 
