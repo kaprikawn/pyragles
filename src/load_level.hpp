@@ -63,24 +63,24 @@ void check_gltf_file( void* gltf_file_contents ) {
   }
 }
 
-void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, GameState* game_state ) {
+void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position, GameState* game_state ) {
   
-  uint32 i = array_position_index;
+  uint32 i = target_array_position;
   
-  if( olp.make_immediately_active ) {
+  if( olp -> make_immediately_active ) {
     object_active[ i ] = true;
   }
   
   slot_available[ i ] = false;
   
-  positions[ i ].x = olp.initial_position.x;
-  positions[ i ].y = olp.initial_position.y;
-  positions[ i ].z = olp.initial_position.z;
+  positions[ i ].x = olp -> initial_position.x;
+  positions[ i ].y = olp -> initial_position.y;
+  positions[ i ].z = olp -> initial_position.z;
   
-  const char* shader_filename = ( const char* )olp.shader_filename;
+  const char* shader_filename = ( const char* )olp -> shader_filename;
   ReadFileResult shader_file  = read_entire_file( shader_filename );
   
-  shader_types[ i ] = olp.shader_type;
+  shader_types[ i ] = olp -> shader_type;
   
   uint32 shader_program_id    = createShader( shader_file );
   shader_program_ids[ i ]     = shader_program_id;
@@ -121,8 +121,8 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
     GLCall( glEnableVertexAttribArray( tex_coord0_attribute_location ) );
   }
   
-  if( olp.mesh_source == LOAD_MESH_FROM_GLTF ) {
-    const char* gltf_filename = ( const char* )olp.gltf_model_filename;
+  if( olp -> mesh_source == LOAD_MESH_FROM_GLTF ) {
+    const char* gltf_filename = ( const char* )olp -> gltf_model_filename;
     ReadFileResult gltf_file  = read_entire_file( gltf_filename );
     
     check_gltf_file( gltf_file.contents );
@@ -237,7 +237,7 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
     }
     
     free( json_string );
-  } else if( olp.mesh_source == HM_TARGET ) {
+  } else if( olp -> mesh_source == HM_TARGET ) {
     {
       real32* vertices  = get_target_vertices( &counts_vertex_data[ i ] );
       offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
@@ -259,13 +259,13 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
       free( indices );
       game_state -> element_array_buffer_target += counts_index_data[ i ];
     }
-  } else if( olp.mesh_source == HM_FLOOR1 || olp.mesh_source == HM_FLOOR2 ) {
+  } else if( olp -> mesh_source == HM_FLOOR1 || olp -> mesh_source == HM_FLOOR2 ) {
     
     {
       real32* vertices;
-      if( olp.mesh_source == HM_FLOOR1 ) {
+      if( olp -> mesh_source == HM_FLOOR1 ) {
         vertices = get_underside_floor_vertices( &counts_vertex_data[ i ] );
-      } else if( olp.mesh_source == HM_FLOOR2 ) {
+      } else if( olp -> mesh_source == HM_FLOOR2 ) {
         vertices = get_overside_floor_vertices( &counts_vertex_data[ i ] );
       }
       offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
@@ -282,7 +282,7 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
     
     { // normals
       real32* normals;
-      if( olp.mesh_source == HM_FLOOR1 ) {
+      if( olp -> mesh_source == HM_FLOOR1 ) {
         normals = get_underside_floor_normals( &counts_normal_data[ i ] );
       } else {
         normals = get_overside_floor_normals( counts_normal_data[ i ], &gl_array_buffer_data[ offsets_vertex_data[ i ] ] );
@@ -298,7 +298,7 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
     
     { // colours
       real32* colours;
-      if( olp.mesh_source == HM_FLOOR1 ) {
+      if( olp -> mesh_source == HM_FLOOR1 ) {
         colours = get_underside_floor_colours( &counts_colour_data[ i ] );
       } else {
         uint32 count = counts_vertex_data[ i ];
@@ -315,9 +315,9 @@ void load_level_object( ObjectLoadParameters olp, uint32 array_position_index, G
     
     {
       uint16* indices;
-      if( olp.mesh_source == HM_FLOOR1 ) {
+      if( olp -> mesh_source == HM_FLOOR1 ) {
         indices = get_underside_floor_indices( &counts_index_data[ i ] );
-      } else if( olp.mesh_source == HM_FLOOR2 ) {
+      } else if( olp -> mesh_source == HM_FLOOR2 ) {
         indices = get_overside_floor_indices( &counts_index_data[ i ] );
       }
       offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
@@ -417,7 +417,7 @@ void load_ship_and_target( GameState* game_state ) {
   ship.initial_position.y       = 2.0f;
   ship.initial_position.z       = 0.0f;
   
-  load_level_object( ship, ship_index, game_state );
+  load_level_object( &ship, ship_index, game_state );
   
   ObjectLoadParameters target;
   target.make_immediately_active  = true;
@@ -428,7 +428,7 @@ void load_ship_and_target( GameState* game_state ) {
   target.initial_position.z       = ( ship.initial_position.z - 10.0f );
   target.mesh_source              = HM_TARGET;
   
-  load_level_object( target, target_index, game_state );
+  load_level_object( &target, target_index, game_state );
   
   flat_colours[ target_index ].x = 0.729f;
   flat_colours[ target_index ].y = 0.129f;
@@ -454,7 +454,7 @@ void load_floor( GameState* game_state ) {
   flat_colours[ floor1_index ].y  = 0.87f;
   flat_colours[ floor1_index ].z  = 0.623f;
   
-  load_level_object( floor1, floor1_index, game_state );
+  load_level_object( &floor1, floor1_index, game_state );
   
   // overside
   ObjectLoadParameters floor2;
@@ -469,7 +469,7 @@ void load_floor( GameState* game_state ) {
   flat_colours[ floor2_index ].y  = 0.733f;
   flat_colours[ floor2_index ].z  = 0.129f;
   
-  load_level_object( floor2, floor2_index, game_state );
+  load_level_object( &floor2, floor2_index, game_state );
   
   floor_start_z = floor2.initial_position.z;
   
@@ -652,7 +652,7 @@ void load_yaml( const char* filename, GameState* game_state ) {
         if( array_position_index == -1 ) {
           SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "[ ERROR ] : Failed to allocate new object index\n" );
         } else {
-          load_level_object( olp, array_position_index, game_state );
+          load_level_object( &olp, array_position_index, game_state );
         }
         
         if( first_object ) {
@@ -677,88 +677,5 @@ void load_yaml( const char* filename, GameState* game_state ) {
   
   free_memory( yaml_file.contents, yaml_file.contents_size );
 }
-/*
-void load_yaml_old( const char* filename, GameState* game_state ) {
-  
-  ReadFileResult yaml_file  = read_entire_file( filename );
-  
-  char this_char;
-  char next_char;
-  
-  char    this_line [ char_buffer_size ];
-  uint32  line_index                = 0;
-  uint32  current_yaml_section      = 0;
-  uint32  current_yaml_sub_section  = 0;
-  uint32  array_depth               = 0;
-  bool32  submit_olp                = false;
-  bool32  allocation_failed;
-  uint32  object_index;
-  ObjectLoadParameters olp;
-  
-  // load_level_object( ObjectLoadParameters olp, uint32 array_position_index, GameState* game_state ) {
 
-  const char* data = ( const char* )yaml_file.contents;
-  
-  for( uint32 i = 0; i < yaml_file.contents_size; i++ ) {
-    
-    this_char = data[ i ];
-    if( this_char == ASCII_LF ) {
-      
-      if( strings_are_equal( this_line, "nullTerminator: 1" ) ) {
-        submit_olp = true;
-      }
-      
-      if( strings_are_equal( this_line, "levelDetails:" ) ) {
-        current_yaml_section = YAML_SECTION_LEVEL_DETAILS;
-      } else if( strings_are_equal( this_line, "levelObjects:" ) ) {
-        current_yaml_section = YAML_SECTION_LEVEL_OBJECTS;
-      } else {
-        yaml_line_result yaml_line = process_line( ( const char* )this_line, line_index, current_yaml_section );
-        
-        if( submit_olp ) {
-          olp.make_immediately_active = true;
-          load_level_object( olp, object_index, game_state );
-          submit_olp = false;
-        }
-        
-        if( !yaml_line.do_nothing ) {
-          
-          if( yaml_line.start_new_object ) {
-            object_index = get_free_object_index( &allocation_failed );
-          }
-          
-          if( yaml_line.is_key_value_pair ) {
-            int y = 7;
-            if( strings_are_equal( yaml_line.key, "glbFile" ) ) {
-              olp.gltf_model_filename = yaml_line.value;
-            } else if( strings_are_equal( yaml_line.key, "shaderFile" ) ) {
-              olp.gltf_model_filename = yaml_line.value;
-            } else if( strings_are_equal( yaml_line.key, "initPosition" ) ) {
-              current_yaml_section = YAML_SECTION_INIT_POS;
-            } else if( strings_are_equal( yaml_line.key, "x" ) && current_yaml_sub == YAML_SECTION_INIT_POS ) {
-              olp.initial_position.x = std::atoi( yaml_line.value );
-            } else if( strings_are_equal( yaml_line.key, "y" ) && current_yaml_section == YAML_SECTION_INIT_POS ) {
-              olp.initial_position.y = std::atoi( yaml_line.value );
-            } else if( strings_are_equal( yaml_line.key, "z" ) && current_yaml_section == YAML_SECTION_INIT_POS ) {
-              olp.initial_position.z = std::atoi( yaml_line.value );
-            }
-          }
-        }
-        
-        free( yaml_line.key );
-        free( yaml_line.value );
-      }
-      
-      for( uint32 i = 0; i < char_buffer_size; i++ ) {
-        this_line[ i ] = '\0';
-      }
-      line_index = 0;
-    } else if( this_char != ASCII_CR ) {
-      this_line[ line_index++ ] = this_char;
-    }
-  }
-  
-  free_memory( yaml_file.contents, yaml_file.contents_size );
-}
-*/
 #endif //LOAD_LEVEL_HPP
