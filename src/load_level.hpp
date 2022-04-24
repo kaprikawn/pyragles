@@ -132,7 +132,7 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     char* json_string         = ( char* )malloc( json_string_length + 1 );
     pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
     
-    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
+    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "JSON : \n%s\n\n", json_string );
     
     JsonString json;
     json.json_string      = json_string;
@@ -672,6 +672,7 @@ void load_yaml( const char* filename, GameState* game_state ) {
           uint32 index = ( uint32 )target_array_position;
           SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Submitting object index %d\n", index );
           to_submit -> make_immediately_active = true;
+          to_submit -> mesh_source = LOAD_MESH_FROM_GLTF;
           to_submit -> shader_type = SHADER_LIGHT;
           load_level_object( to_submit, index, game_state );
           free( to_submit );
