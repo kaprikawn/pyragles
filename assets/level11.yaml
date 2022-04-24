@@ -5,8 +5,9 @@ levelDetails:
 levelObjects:
 - glbFile: modelEnemyPod.glb
   shaderFile: shaderLight.glsl
+  objectType: 2
   initPosition:
     x: 10
     y: 5
-    z: -20
+    z: -30
 nullTerminator: 1

@@ -648,9 +648,8 @@ void load_yaml( const char* filename, GameState* game_state ) {
       if( submit_olp ) {
         
         olp.make_immediately_active = true;
-        bool32 allocation_failed = false;
-        uint32 array_position_index = get_free_object_index( &allocation_failed );
-        if( allocation_failed ) {
+        int32 array_position_index = get_free_object_index();
+        if( array_position_index == -1 ) {
           SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "[ ERROR ] : Failed to allocate new object index\n" );
         } else {
           load_level_object( olp, array_position_index, game_state );

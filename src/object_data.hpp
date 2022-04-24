@@ -32,9 +32,8 @@ uint8* texture_data_array = ( uint8* )malloc( 1000000 );
 real32 light_position[ 3 ]  = { 0.0f, 20.0f, 0.0f };
 real32 ambient_light        = 0.3f;
 
-enum ShaderTypes {
-  SHADERS_NONE, SHADER_LIGHT, SHADER_VERTEX_COLOURS, SHADER_VERTEX_COLOURS_NO_LIGHT
-};
+enum ShaderTypes { SHADERS_NONE, SHADER_LIGHT, SHADER_VERTEX_COLOURS, SHADER_VERTEX_COLOURS_NO_LIGHT };
+enum ObjectTypes { OBJECT_TYPE_NONE, OBJECT_TYPE_SCENARY, OBJECT_TYPE_ENEMY };
 
 // object data
 Position  positions                 [ OBJECT_COUNT ];
@@ -68,6 +67,7 @@ uint32    counts_tex_coord0_data    [ OBJECT_COUNT ];
 uint32    counts_colour_data        [ OBJECT_COUNT ];
 uint32    counts_index_data         [ OBJECT_COUNT ];
 uint32    shader_types              [ OBJECT_COUNT ];
+uint32    object_types              [ OBJECT_COUNT ];
 bool32    object_active             [ OBJECT_COUNT ];
 bool32    slot_available            [ OBJECT_COUNT ]; // whether we can (re)use this object index to load a new object into
 Position  flat_colours              [ OBJECT_COUNT ];
@@ -79,23 +79,22 @@ enum mesh_source { LOAD_MESH_FROM_GLTF, HM_TARGET, HM_FLOOR1, HM_FLOOR2 };
 struct ObjectLoadParameters {
   bool32    make_immediately_active = false;
   char*     shader_filename;
-  int32     shader_type             = SHADER_LIGHT;
+  uint32    shader_type             = SHADER_LIGHT;
+  uint32    object_type             = 0;
   char*     gltf_model_filename;
   bool32    is_floor                = false;
   Position  initial_position;
   uint32    mesh_source             = 0;
 };
 
-uint32 get_free_object_index( bool32* allocation_failed ) {
-  uint32 result = 0;
+int32 get_free_object_index() {
+  int32 result = -1;
   for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
     if( slot_available[ i ] ) {
       result = i;
       return result;
     }
   }
-  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Object count limit exceeded\n" );
-  *allocation_failed = true;
   return result;
 }
 

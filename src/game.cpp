@@ -68,10 +68,13 @@ void update_level_object( uint32 object_index, real32 dt ) {
   while( rotations[ i ].z < 0.0f )
     rotations[ i ].z += 360.0f;
   
-  positions[ i ].y = positions[ i ].y + ( velocities[ i ].y * dt );
-  positions[ i ].x = positions[ i ].x + ( velocities[ i ].x * dt );
-  positions[ i ].z = positions[ i ].z + ( velocities[ i ].z * dt );
-  
+  if( object_types[ i ] == OBJECT_TYPE_SCENARY ) {
+    positions[ i ].z += SCROLL_SPEED * dt;
+  } else {
+    positions[ i ].y = positions[ i ].y + ( velocities[ i ].y * dt );
+    positions[ i ].x = positions[ i ].x + ( velocities[ i ].x * dt );
+    positions[ i ].z = positions[ i ].z + ( velocities[ i ].z * dt );
+  }
 }
 
 void update_level_objects( uint32 index_start, uint32 index_end, real32 dt ) {
