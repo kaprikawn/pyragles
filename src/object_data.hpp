@@ -10,8 +10,10 @@
 
 #include "vector_maths.hpp"
 #include "types.hpp"
+#include "sdl.hpp"
 
-const uint32 object_count = 4;
+const uint32 OBJECT_COUNT = 10;
+real32 floor_start_z = 0.0f;
 
 struct GameObject {
   bool32    active = false;
@@ -20,7 +22,7 @@ struct GameObject {
   Position  rotation;
 };
 
-GameObject game_objects[ object_count ];
+GameObject game_objects[ OBJECT_COUNT ];
 
 // gl data
 real32 gl_array_buffer_data         [ 1000000 ];
@@ -30,44 +32,71 @@ uint8* texture_data_array = ( uint8* )malloc( 1000000 );
 real32 light_position[ 3 ]  = { 0.0f, 20.0f, 0.0f };
 real32 ambient_light        = 0.3f;
 
-enum ShaderTypes {
-  SHADERS_NONE, SHADER_LIGHT, SHADER_VERTEX_COLOURS
-};
+enum ShaderTypes { SHADER_LIGHT, SHADER_VERTEX_COLOURS, SHADER_VERTEX_COLOURS_NO_LIGHT };
+enum ObjectTypes { OBJECT_TYPE_NONE, OBJECT_TYPE_SCENARY, OBJECT_TYPE_ENEMY };
 
 // object data
-Position  positions                 [ object_count ];
-Position  rotations                 [ object_count ];
-Position  velocities                [ object_count ];
-uint32    shader_program_ids        [ object_count ];
-int32     gl_id_positions           [ object_count ];
-int32     gl_id_normals             [ object_count ];
-int32     gl_id_tex_coords0         [ object_count ];
-int32     gl_id_colours             [ object_count ];
-int32     gl_id_mvp_mats            [ object_count ];
-int32     gl_id_model_mats          [ object_count ];
-int32     gl_id_light_positions     [ object_count ];
-int32     gl_id_ambient_lights      [ object_count ];
-uint32    tbos                      [ object_count ];
-uint32    texture_buffer_offsets    [ object_count ];
-uint32    texture_buffer_lengths    [ object_count ];
-uint32    offsets_vertex_data       [ object_count ];
-uint32    offsets_normal_data       [ object_count ];
-uint32    offsets_tex_coord0_data   [ object_count ];
-uint32    offsets_colour_data       [ object_count ];
-uint32    offsets_index_data        [ object_count ];
-uint32    gl_offsets_vertex_data    [ object_count ];
-uint32    gl_offsets_normal_data    [ object_count ];
-uint32    gl_offsets_tex_coord0_data[ object_count ];
-uint32    gl_offsets_colour_data    [ object_count ];
-uint32    gl_offsets_index_data     [ object_count ];
-uint32    counts_vertex_data        [ object_count ];
-uint32    counts_normal_data        [ object_count ];
-uint32    counts_tex_coord0_data    [ object_count ];
-uint32    counts_colour_data        [ object_count ];
-uint32    counts_index_data         [ object_count ];
-uint32    shader_types              [ object_count ];
-bool32    object_active             [ object_count ];
-uint8*    image_data_locations      [ object_count ];
+Position  positions                 [ OBJECT_COUNT ];
+Position  rotations                 [ OBJECT_COUNT ];
+Position  velocities                [ OBJECT_COUNT ];
+uint32    shader_program_ids        [ OBJECT_COUNT ];
+int32     gl_id_positions           [ OBJECT_COUNT ];
+int32     gl_id_normals             [ OBJECT_COUNT ];
+int32     gl_id_tex_coords0         [ OBJECT_COUNT ];
+int32     gl_id_colours             [ OBJECT_COUNT ];
+int32     gl_id_mvp_mats            [ OBJECT_COUNT ];
+int32     gl_id_model_mats          [ OBJECT_COUNT ];
+int32     gl_id_light_positions     [ OBJECT_COUNT ];
+int32     gl_id_ambient_lights      [ OBJECT_COUNT ];
+uint32    tbos                      [ OBJECT_COUNT ];
+uint32    texture_buffer_offsets    [ OBJECT_COUNT ];
+uint32    texture_buffer_lengths    [ OBJECT_COUNT ];
+uint32    offsets_vertex_data       [ OBJECT_COUNT ];
+uint32    offsets_normal_data       [ OBJECT_COUNT ];
+uint32    offsets_tex_coord0_data   [ OBJECT_COUNT ];
+uint32    offsets_colour_data       [ OBJECT_COUNT ];
+uint32    offsets_index_data        [ OBJECT_COUNT ];
+uint32    gl_offsets_vertex_data    [ OBJECT_COUNT ];
+uint32    gl_offsets_normal_data    [ OBJECT_COUNT ];
+uint32    gl_offsets_tex_coord0_data[ OBJECT_COUNT ];
+uint32    gl_offsets_colour_data    [ OBJECT_COUNT ];
+uint32    gl_offsets_index_data     [ OBJECT_COUNT ];
+uint32    counts_vertex_data        [ OBJECT_COUNT ];
+uint32    counts_normal_data        [ OBJECT_COUNT ];
+uint32    counts_tex_coord0_data    [ OBJECT_COUNT ];
+uint32    counts_colour_data        [ OBJECT_COUNT ];
+uint32    counts_index_data         [ OBJECT_COUNT ];
+uint32    shader_types              [ OBJECT_COUNT ];
+uint32    object_types              [ OBJECT_COUNT ];
+bool32    object_active             [ OBJECT_COUNT ];
+bool32    slot_available            [ OBJECT_COUNT ]; // whether we can (re)use this object index to load a new object into
+Position  flat_colours              [ OBJECT_COUNT ];
+uint8*    image_data_locations      [ OBJECT_COUNT ];
+
+// HM = hardcoded mesh
+enum mesh_source { LOAD_MESH_FROM_GLTF, HM_TARGET, HM_FLOOR1, HM_FLOOR2 };
+
+struct ObjectLoadParameters {
+  bool32    make_immediately_active = false;
+  char*     shader_filename;
+  uint32    shader_type             = SHADER_LIGHT;
+  uint32    object_type             = OBJECT_TYPE_NONE;
+  char*     gltf_model_filename;
+  bool32    is_floor                = false;
+  Position  initial_position;
+  uint32    mesh_source             = 0;
+};
+
+int32 get_free_object_index() {
+  int32 result = -1;
+  for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
+    if( slot_available[ i ] ) {
+      result = i;
+      return result;
+    }
+  }
+  return result;
+}
 
 void render_object( uint32 object_index, real32* vp_matrix ) {
   uint32 i = object_index;
@@ -119,7 +148,7 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     glUniformMatrix4fv( location, count, transpose, mvp_position );
   }
   
-  { // light position
+  if( shader_types[ i ] != SHADER_VERTEX_COLOURS_NO_LIGHT ) { // light position
     int32   location    = gl_id_light_positions[ i ];
     real32  v0          = light_position[ 0 ];
     real32  v1          = light_position[ 1 ];
@@ -128,7 +157,7 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     glUniform3f( location, v0, v1, v2 );
   }
   
-  { // ambient light
+  if( shader_types[ i ] != SHADER_VERTEX_COLOURS_NO_LIGHT ) { // ambient light
     int32   location    = gl_id_ambient_lights[ i ];
     real32  v0          = ambient_light;
     glUniform1f( location, v0 );
@@ -145,7 +174,7 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
   }
   
-  { // normals
+  if( shader_types[ i ] != SHADER_VERTEX_COLOURS_NO_LIGHT ) { // normals
     int32   index       = gl_id_normals[ i ];
     int32   size        = 3;
     uint32  type        = GL_FLOAT;
@@ -177,6 +206,16 @@ void render_object( uint32 object_index, real32* vp_matrix ) {
     uint32  pointer     = gl_offsets_colour_data[ i ]; // misleading, it's not a pointer, it's where in the buffer it is - offset by number of bytes
     
     glVertexAttribPointer( index, size, type, normalized, stride, ( const GLvoid* )pointer );
+  }
+  
+  if( shader_types[ i ] == SHADER_VERTEX_COLOURS_NO_LIGHT ) {
+    // upload flat colour
+    int32   location    = gl_id_colours[ i ];
+    real32  v0          = flat_colours[ i ].x;
+    real32  v1          = flat_colours[ i ].y;
+    real32  v2          = flat_colours[ i ].z;
+    
+    glUniform3f( location, v0, v1, v2 );
   }
   
   { // draw elements

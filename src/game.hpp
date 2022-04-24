@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include "types.hpp"
+#include "vector_maths.hpp"
 #include "gl_debug.hpp"
 #include <stdlib.h>
 
@@ -48,7 +49,19 @@ inline uint32 string_length( const char* string ) {
   return result;
 }
 
-char* concat( const char* str1, const char* str2 ) {
+inline void null_char_buffer( char* target, uint32 length ) {
+  for( uint32 i = 0; i < length; i++ ) {
+    target[ i ] = '\0';
+  }
+}
+
+inline char* init_char_star( uint32 length ) {
+  char* result = ( char* )malloc( length );
+  null_char_buffer( result, length );
+  return result;
+}
+
+inline char* concat( const char* str1, const char* str2 ) {
   ///////////////////////////////////////////////////////
   // REMEMBER TO FREE RESULT AFTER YOU'RE DONE WITH IT //
   ///////////////////////////////////////////////////////
@@ -58,7 +71,7 @@ char* concat( const char* str1, const char* str2 ) {
   uint32 totalLength  = len1 + len2 + 1;
   uint32 currentIndex = 0;
   
-  char* result = ( char* )malloc( totalLength );
+  char* result = init_char_star( totalLength );
   
   for( uint32 i = 0; i < len1; i++ )
     result[ currentIndex++ ] = str1[ i ];
@@ -92,10 +105,12 @@ inline uint32 get_filesize( const char* filepath ) {
 
 
 inline ReadFileResult read_entire_file( const char* filename ) {
-  // TODO : memory leaks on failure
+  
   ReadFileResult result = {};
   
   char* filepath = concat( assetsDir, filename );
+  
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Reading file %s\n", filepath );
   
   HANDLE fh = CreateFileA( filepath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0 );
   if( fh != INVALID_HANDLE_VALUE ) {
@@ -107,6 +122,9 @@ inline ReadFileResult read_entire_file( const char* filename ) {
     if( ReadFile( fh, result.contents, filesize, &BytesRead, 0 ) && filesize == BytesRead ) {
       result.contents_size = filesize;
     }
+  } else {
+    CloseHandle( fh );
+    free( filepath );
   }
   CloseHandle( fh );
   free( filepath );
@@ -249,6 +267,21 @@ struct game_memory {
   uint64  tempStorageSize;
   void*   tempStorage;
   uint32  tempNextMemoryOffset;
+};
+
+struct GameState {
+  real32    vp_mat[ 16 ]; // view perspective matrix
+  real32    p_mat [ 16 ]; // projection matrix
+  Position  eye      = { 0.0f, 5.0f, 10.0f };
+  Position  look_at  = { 0.0f, 5.0f, 9.0f };
+  int32     vbo;
+  int32     ibo;
+  uint32    array_buffer_target           = 0;
+  uint32    element_array_buffer_target   = 0;
+  uint32    target_gl_offsets_array_data  = 0;
+  uint32    target_gl_offsets_index_data  = 0;
+  uint32    target_texture_data_array_pos = 0;
+  bool32    invert_y                      = true;
 };
 
 uint32 shader_program_id;

@@ -1,9 +1,64 @@
-#ifndef FLOOR_VERTEX_DATA_HPP
-#define FLOOR_VERTEX_DATA_HPP
+#ifndef HARDCODED_MESHES_HPP
+#define HARDCODED_MESHES_HPP
 
 #include <cstring>
 #include <cstdlib>
 #include "types.hpp"
+
+real32* get_target_vertices( uint32* count ) {
+  const uint32 value_count = 36;
+  real32* result = ( real32* )malloc( sizeof( real32 ) * value_count );
+  real32 vertices[ value_count ] = {
+      -0.9f,  0.9f, 0.0f
+    , -0.9f,  0.8f, 0.0f
+    ,  0.9f,  0.9f, 0.0f
+    ,  0.9f,  0.8f, 0.0f
+    , -0.8f,  0.8f, 0.0f
+    , -0.9f, -0.8f, 0.0f
+    , -0.8f, -0.8f, 0.0f
+    , -0.9f, -0.9f, 0.0f
+    ,  0.9f, -0.8f, 0.0f
+    ,  0.9f, -0.9f, 0.0f
+    ,  0.8f,  0.8f, 0.0f
+    ,  0.8f, -0.8f, 0.0f
+  };
+  memcpy( result, &vertices[ 0 ], ( value_count * sizeof( vertices[ 0 ] ) ) );
+  *count = value_count;
+  return result;
+}
+
+uint16* get_target_indices( uint32* count ) {
+  const uint32 value_count = 24;
+  uint16* result = ( uint16* )malloc( sizeof( uint16 ) * value_count );
+  uint16 indices[ value_count ] = { 
+      0,  1,  2
+    , 2,  1,  3
+    , 1,  4,  5
+    , 4,  5,  6
+    , 5,  8,  7
+    , 7,  8,  9
+    , 10, 11, 8
+    , 10, 8,  3
+  };
+  memcpy( result, &indices[ 0 ], ( value_count * sizeof( indices[ 0 ] ) ) );
+  *count = value_count;
+  return result;
+}
+
+real32* get_target_colours( uint32* count ) {
+  const uint32 value_count = 12;
+  real32* result = ( real32* )malloc( sizeof( real32 ) * value_count );
+  real32 colours[ value_count ] = {
+      0.87f, 0.87f, 0.623f
+    , 0.87f, 0.87f, 0.623f
+    , 0.87f, 0.87f, 0.623f
+    , 0.87f, 0.87f, 0.623f
+  };
+  memcpy( result, &colours[ 0 ], ( value_count * sizeof( colours[ 0 ] ) ) );
+  *count = value_count;
+  return result;
+}
+
 
 const uint32 tile_count_x  = 140;
 const uint32 tile_count_z  = 140;
@@ -177,4 +232,4 @@ uint16* get_overside_floor_indices( uint32* count ) {
 
 
 
-#endif //FLOOR_VERTEX_DATA_HPP
+#endif //HARDCODED_MESHES_HPP

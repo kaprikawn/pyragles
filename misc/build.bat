@@ -11,7 +11,8 @@ SET BUILD_DIR=%ROOT_DIR%\build
 SET SDL_ROOT_DIR=C:\dev\SDL2-2.0.14
 rem SET GLUT_ROOT_DIR=C:\dev\freeglut-3.2.1
 SET GLEW_ROOT_DIR=C:\dev\glew-2.2.0
-SET VCVARS_DIR=C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\
+@REM SET VCVARS_DIR=C:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\
+SET VCVARS_DIR=C:\"Program Files"\"Microsoft Visual Studio"\2022\Community\VC\Auxiliary\Build\
 
 if not exist %BUILD_DIR% mkdir %BUILD_DIR%
 
