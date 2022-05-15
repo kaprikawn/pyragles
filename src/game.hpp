@@ -299,6 +299,9 @@ void init_sdl( SDLParams* sdl_params ) {
 #endif
   
   SDL_Init( SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER );
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );
+  SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
+  SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
   
   if( launch_fullscreen ) {
     uint32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN;
@@ -328,8 +331,15 @@ void init_sdl( SDLParams* sdl_params ) {
   }
   
   sdl_params -> glContext = SDL_GL_CreateContext( sdl_params -> window );
-  if( !( sdl_params -> glContext ) ) {
-    SDL_LogError( SDL_LOG_CATEGORY_ERROR, "Failed to create GL context : %s\n", SDL_GetError());
+  if( sdl_params -> glContext ) {
+    const GLubyte* version  = glGetString( GL_VERSION );
+    const GLubyte* renderer = glGetString( GL_RENDERER );
+    
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Version string: %s\n", version );
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Renderer string: %s\n", renderer );
+    
+  } else {
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Failed to create GL context : %s\n", SDL_GetError());
   }
   
   // init glew
@@ -338,8 +348,6 @@ void init_sdl( SDLParams* sdl_params ) {
 #endif
   
   GLCall( SDL_GL_SetSwapInterval( 1 ) );
-  GLCall( SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 ) );
-  GLCall( SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 ) );
   GLCall( glEnable( GL_DEPTH_TEST ) );
   GLCall( glEnable( GL_BLEND ) );
   GLCall( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
