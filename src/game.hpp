@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include "types.hpp"
+#include "sdl.hpp"
 #include "vector_maths.hpp"
 #include "gl_debug.hpp"
 #include <stdlib.h>
@@ -9,16 +10,11 @@
 #ifdef _WIN32
 
 #include <GL/glew.h>
-#include "SDL.h"
-#include "SDL_opengl.h"
 #include <shlwapi.h>
 
 #elif __linux__
 
 #include <iostream>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengles2.h>
-
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>

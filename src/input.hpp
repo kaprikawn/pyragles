@@ -2,16 +2,7 @@
 #define INPUT_HPP
 
 #include "types.hpp"
-
-#ifdef _WIN32
-
-#include "SDL.h"
-
-#elif __linux__
-
-#include <SDL2/SDL.h>
-
-#endif
+#include "sdl.hpp"
 
 struct ButtonsPressed {
   bool32 quit       = false;
