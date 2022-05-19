@@ -53,7 +53,7 @@ fi
 mkdir -pv $BUILD_DIR
 
 if [[ $IS_PYRA -eq 1 ]]; then
-  BUILD_CALL="$BUILD_CALL -L${SDL_BUILD_DIR}/build/.libs -L/opt/omap5-sgx-ddk-um-linux/lib -D_REENTRANT -I${SDL_BUILD_DIR}/include -lSDL2 -lGLESv2"
+  BUILD_CALL="$BUILD_CALL -L${SDL_BUILD_DIR}/build/.libs -L/opt/omap5-sgx-ddk-um-linux/lib -D_REENTRANT -DPYRA -I${SDL_BUILD_DIR}/include -lSDL2 -lGLESv2"
   
   if [[ ! -e $BUILD_DIR/run.sh ]]; then
     echo '#!/bin/bash' > $BUILD_DIR/run.sh

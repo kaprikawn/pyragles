@@ -166,6 +166,11 @@ GameInput get_game_input_state( ButtonsPressed old_buttons, ButtonsPressed new_b
   return result;
 }
 
+void unknown_event( SDL_Event* event ) {
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Type is %d\n", event -> type );
+  
+}
+
 void input_on_key_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
   
   if( event -> key.repeat > 0 )
@@ -291,6 +296,30 @@ void initialise_gamepads() {
   
   if( gamepad_count == 0 ) return;
   
+#if defined(PYRA)
+  
+  //int new_mapping = SDL_GameControllerAddMapping( "03000000010000000100000001000000,pyraInput Gamepad,a:b3,b:b1,x:b0,y:b4,back:b10,start:b11,leftshoulder:b8,rightshoulder:b9,dpup:h0.1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7,platform:Linux," );
+  //SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Loading Pyra mapping - returned var is %d\n", new_mapping );
+  
+  SDL_GameController *ctrl;
+int i;
+
+
+for (i = 0; i < SDL_NumJoysticks(); ++i) {
+    if (SDL_IsGameController(i)) {
+        char *mapping;
+        SDL_Log("Index \'%i\' is a compatible controller, named \'%s\'", i, SDL_GameControllerNameForIndex(i));
+        ctrl = SDL_GameControllerOpen(i);
+        mapping = SDL_GameControllerMapping(ctrl);
+        SDL_Log("Controller %i is mapped as \"%s\".", i, mapping);
+        SDL_free(mapping);
+    } else {
+        SDL_Log("Index \'%i\' is not a compatible controller.", i);
+    }
+}
+  
+#endif
+
   SDL_Joystick* gamepad = NULL;
   
   for( uint32 i = 0; i < gamepad_count && i < MAX_CONTROLLERS; i++ ) {
@@ -306,6 +335,8 @@ void initialise_gamepads() {
 int16 deadzone = 100;
 
 void on_joy_axis_move( SDL_Event* event, ButtonsPressed* new_buttons ) {
+  
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "HERE\n" );
   
   int16   axis_value  = event -> jaxis.value;
   real32  normalised_value;
@@ -339,6 +370,8 @@ void on_joy_axis_move( SDL_Event* event, ButtonsPressed* new_buttons ) {
 
 void handle_sdl_input_event( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
   
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Event type %d\n", event -> type );
+   SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Event jaxis which %d\n", event -> jaxis.which );
   switch( event -> type ) {
     
     case SDL_JOYAXISMOTION : {

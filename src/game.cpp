@@ -130,6 +130,8 @@ int32 run_game() {
     
     GameInput game_input = get_game_input_state( old_buttons, new_buttons, game_state.invert_y );
     
+    //SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy_axis_x is %f\n", game_input.joy_axis_x );
+    
     if( game_input.quit )
       running = false;
     
