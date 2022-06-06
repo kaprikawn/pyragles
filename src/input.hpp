@@ -14,13 +14,13 @@ struct ButtonsPressed {
   bool32 arrow_down = false;
   bool32 pg_up      = false;
   bool32 pg_down    = false;
-  real32 joy_axis_x = 0.0f;
-  real32 joy_axis_y = 0.0f;
+  f32 joy_axis_x = 0.0f;
+  f32 joy_axis_y = 0.0f;
 };
 
 struct GameInput {
-  real32 joy_axis_x = 0.0f;
-  real32 joy_axis_y = 0.0f;
+  f32 joy_axis_x = 0.0f;
+  f32 joy_axis_y = 0.0f;
   
   bool quit         = false;
   
@@ -138,8 +138,8 @@ GameInput get_game_input_state( ButtonsPressed old_buttons, ButtonsPressed new_b
     result.pg_down_released = true;
   }
   
-  real32 joy_axis_x = new_buttons.joy_axis_x;
-  real32 joy_axis_y = new_buttons.joy_axis_y;
+  f32 joy_axis_x = new_buttons.joy_axis_x;
+  f32 joy_axis_y = new_buttons.joy_axis_y;
   
   if( joy_axis_x == 0.0f ) {
     if( new_buttons.d ) {
@@ -171,7 +171,7 @@ void input_on_key_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPr
   if( event -> key.repeat > 0 )
     return;
   
-  uint32 scancode = event -> key.keysym.scancode;
+  u32 scancode = event -> key.keysym.scancode;
   
   switch( scancode ) {
     
@@ -226,7 +226,7 @@ void input_on_key_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPr
 
 void input_on_key_up( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
   
-  uint32 scancode = event -> key.keysym.scancode;
+  u32 scancode = event -> key.keysym.scancode;
   
   switch( scancode ) {
     
@@ -279,8 +279,8 @@ void input_on_key_up( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPres
   }
 }
 
-uint32 gamepad_count          = 0;
-const uint32 MAX_CONTROLLERS  = 4;
+u32 gamepad_count          = 0;
+const u32 MAX_CONTROLLERS  = 4;
 SDL_Joystick* gamepads[ MAX_CONTROLLERS ];
 
 void initialise_gamepads() {
@@ -293,7 +293,7 @@ void initialise_gamepads() {
   
   SDL_Joystick* gamepad = NULL;
   
-  for( uint32 i = 0; i < gamepad_count && i < MAX_CONTROLLERS; i++ ) {
+  for( u32 i = 0; i < gamepad_count && i < MAX_CONTROLLERS; i++ ) {
     gamepad = SDL_JoystickOpen( i );
     if( gamepad ) {
       gamepads[ i ] = gamepad;
@@ -303,19 +303,21 @@ void initialise_gamepads() {
   }
 }
 
-int16 deadzone = 100;
+s16 deadzone = 100;
 
 void on_joy_axis_move( SDL_Event* event, ButtonsPressed* new_buttons ) {
   
-  int16   axis_value  = event -> jaxis.value;
-  real32  normalised_value;
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "HERE\n" );
+  
+  s16   axis_value  = event -> jaxis.value;
+  f32  normalised_value;
   
   if( axis_value < deadzone && axis_value > -deadzone ) {
     normalised_value = 0.0f;
   } else if( axis_value > 0 ) {
-    normalised_value = ( real32 )axis_value / 32767.0f;
+    normalised_value = ( f32 )axis_value / 32767.0f;
   } else if( axis_value < 0 ) {
-    normalised_value = ( real32 )axis_value / 32768.0f;
+    normalised_value = ( f32 )axis_value / 32768.0f;
   } else {
     normalised_value = 0.0f;
   }
