@@ -19,11 +19,11 @@ struct  GltfHeader {
 #elif __linux__
 
 struct __attribute__ ((__packed__)) GltfHeader {
-  uint32 magic;
-  uint32 version;
-  uint32 length;
-  uint32 json_chunk_length;
-  uint32 json_chunk_type;
+  u32 magic;
+  u32 version;
+  u32 length;
+  u32 json_chunk_length;
+  u32 json_chunk_type;
 };
 
 #endif
