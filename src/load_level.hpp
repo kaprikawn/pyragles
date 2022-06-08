@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include "../vendor/stb_image.h"
+#include "../external/stb_image.h"
 #include "object_data.hpp"
 #include "types.hpp"
 #include "game.hpp"

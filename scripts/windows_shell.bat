@@ -4,7 +4,7 @@ SET VCVARS_DIR=C:\"Program Files"\"Microsoft Visual Studio"\2022\Community\VC\Au
 SET GAME_DIR=C:\dev\pyragles
 
 rem add scripts dir to path
-set path=%GAME_DIR%\misc;%path%
+set path=%GAME_DIR%\scripts;%path%
 
 rem setup build environment
 call %VCVARS_DIR%\vcvarsall.bat x64
