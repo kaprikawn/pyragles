@@ -32,6 +32,11 @@ inline char* init_char_star( u32 length ) {
   return result;
 }
 
+inline void copy_string_into_char_star( const char* src, char* dest, u32 length ) {
+  for( u32 i = 0; i < length; i++ )
+    dest[ i ] = src[ i ];
+}
+
 inline char* concat( const char* str1, const char* str2 ) {
   ///////////////////////////////////////////////////////
   // REMEMBER TO FREE RESULT AFTER YOU'RE DONE WITH IT //

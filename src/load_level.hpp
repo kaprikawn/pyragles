@@ -413,24 +413,44 @@ void load_ship_and_target( GameState* game_state ) {
   
   ObjectLoadParameters ship;
   ship.make_immediately_active  = true;
-  ship.shader_filename          = "shaderLight.glsl";
-  ship.gltf_model_filename      = "modelShip.glb";
   ship.initial_position.x       = -2.0f;
   ship.initial_position.y       = 2.0f;
   ship.initial_position.z       = 0.0f;
+  ship.shader_filename          = init_char_star( 17 );
+  ship.gltf_model_filename      = init_char_star( 14 );
+  
+  {
+    const char* filename          = "shaderLight.glsl";
+    copy_string_into_char_star( filename, ship.shader_filename, 16 );
+  }
+  
+  {
+    const char* filename          = "modelShip.glb";
+    copy_string_into_char_star( filename, ship.gltf_model_filename, 13 );
+  }
   
   load_level_object( &ship, ship_index, game_state );
   
+  free( ship.shader_filename );
+  free( ship.gltf_model_filename );
+  
   ObjectLoadParameters target;
   target.make_immediately_active  = true;
-  target.shader_filename          = "shaderVertexColoursNoLight.glsl";
+  target.shader_filename          = init_char_star( 32 );
   target.shader_type              = SHADER_VERTEX_COLOURS_NO_LIGHT;
   target.initial_position.x       = ship.initial_position.x;
   target.initial_position.y       = ship.initial_position.y;
   target.initial_position.z       = ( ship.initial_position.z - 10.0f );
   target.mesh_source              = HM_TARGET;
   
+  {
+    const char* filename          = "shaderVertexColoursNoLight.glsl";
+    copy_string_into_char_star( filename, target.shader_filename, 31 );
+  }
+  
   load_level_object( &target, target_index, game_state );
+  
+  free( target.shader_filename );
   
   flat_colours[ target_index ].x = 0.729f;
   flat_colours[ target_index ].y = 0.129f;
@@ -446,22 +466,29 @@ void load_floor( GameState* game_state ) {
   // underside
   ObjectLoadParameters floor1;
   floor1.make_immediately_active  = true;
-  floor1.shader_filename          = "shaderVertexColoursNoLight.glsl";
+  floor1.shader_filename          = init_char_star( 32 );
   floor1.shader_type              = SHADER_VERTEX_COLOURS_NO_LIGHT;
   floor1.mesh_source              = HM_FLOOR1;
   floor1.initial_position.x       = -100.0f;
   floor1.initial_position.y       = -0.05f; // avoid z fighting
   floor1.initial_position.z       = -60.0f;
-  flat_colours[ floor1_index ].x  = 0.87f;
-  flat_colours[ floor1_index ].y  = 0.87f;
-  flat_colours[ floor1_index ].z  = 0.623f;
+  flat_colours[ floor1_index ].x  =  0.87f;
+  flat_colours[ floor1_index ].y  =  0.87f;
+  flat_colours[ floor1_index ].z  =  0.623f;
+  
+  {
+    const char* filename          = "shaderVertexColoursNoLight.glsl";
+    copy_string_into_char_star( filename, floor1.shader_filename, 31 );
+  }
   
   load_level_object( &floor1, floor1_index, game_state );
+  
+  free( floor1.shader_filename );
   
   // overside
   ObjectLoadParameters floor2;
   floor2.make_immediately_active  = true;
-  floor2.shader_filename          = "shaderVertexColoursNoLight.glsl";
+  floor2.shader_filename          = init_char_star( 32 );
   floor2.shader_type              = SHADER_VERTEX_COLOURS_NO_LIGHT;
   floor2.mesh_source              = HM_FLOOR2;
   floor2.initial_position.x       = -100.0f;
@@ -470,6 +497,11 @@ void load_floor( GameState* game_state ) {
   flat_colours[ floor2_index ].x  = 0.87f;
   flat_colours[ floor2_index ].y  = 0.733f;
   flat_colours[ floor2_index ].z  = 0.129f;
+  
+  {
+    const char* filename          = "shaderVertexColoursNoLight.glsl";
+    copy_string_into_char_star( filename, floor2.shader_filename, 31 );
+  }
   
   load_level_object( &floor2, floor2_index, game_state );
   
