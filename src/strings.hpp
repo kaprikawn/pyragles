@@ -167,6 +167,9 @@ bool32 fileExists( const char* filepath ) {
 #elif __linux__
 
 #include <sys/stat.h>
+#include <iostream>
+#include <fcntl.h>
+#include <unistd.h>
 
 bool fileExists( const char* filepath ) {
   if( FILE *file = fopen( filepath, "r" ) ) {
@@ -177,8 +180,8 @@ bool fileExists( const char* filepath ) {
   return false;
 }
 
-inline uint32 get_filesize( const char* filepath ) {
-  uint32 result = 0;
+inline u32 get_filesize( const char* filepath ) {
+  u32 result = 0;
   // TODO
   return result;
 }
@@ -214,8 +217,8 @@ ReadFileResult read_entire_file( const char* filename ) {
     return result;
   }
   
-  uint32 bytesToRead = result.contents_size;
-  uint8*  nextByteLocation = ( uint8* )result.contents;
+  u32 bytesToRead = result.contents_size;
+  u8*  nextByteLocation = ( u8* )result.contents;
   while( bytesToRead ) {
     ssize_t bytesRead = read( fh, nextByteLocation, bytesToRead );
     if( bytesRead  == -1 ) {
@@ -234,7 +237,7 @@ ReadFileResult read_entire_file( const char* filename ) {
   return result;
 }
 
-void free_memory( void* memory, uint32 size ) {
+void free_memory( void* memory, u32 size ) {
   // TODO
 }
 
