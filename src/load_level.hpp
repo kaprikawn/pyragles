@@ -622,7 +622,7 @@ inline u32 get_shader_type( const char* shader_filename ) {
   u32 result = 0;
   if( strings_are_equal( shader_filename, "shaderLight.glsl" ) ) {
     return SHADER_LIGHT;
-  } else if( strings_are_equal( shader_filename, "shaderVertexColours.glsl") ) {
+  } else if( strings_are_equal( shader_filename, "shaderVertexColours.glsl" ) ) {
     return SHADER_VERTEX_COLOURS;
   }
   return result;
