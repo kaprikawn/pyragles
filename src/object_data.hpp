@@ -15,6 +15,21 @@
 const uint32 OBJECT_COUNT = 10;
 real32 floor_start_z = 0.0f;
 
+struct GameState {
+  real32    vp_mat[ 16 ]; // view perspective matrix
+  real32    p_mat [ 16 ]; // projection matrix
+  Position  eye      = { 0.0f, 5.0f, 10.0f };
+  Position  look_at  = { 0.0f, 5.0f, 9.0f };
+  int32     vbo;
+  int32     ibo;
+  uint32    array_buffer_target           = 0;
+  uint32    element_array_buffer_target   = 0;
+  uint32    target_gl_offsets_array_data  = 0;
+  uint32    target_gl_offsets_index_data  = 0;
+  uint32    target_texture_data_array_pos = 0;
+  bool32    invert_y                      = true;
+};
+
 struct GameObject {
   bool32    active = false;
   uint32    index;

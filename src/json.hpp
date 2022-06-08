@@ -2,7 +2,8 @@
 #define JSON_HPP
 
 #include "types.hpp"
-#include "game.hpp"
+#include "strings.hpp"
+#include "object_data.hpp"
 
 #ifdef _WIN32
 

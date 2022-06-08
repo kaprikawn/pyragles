@@ -2,8 +2,8 @@
 #define CAMERA_HPP
 
 #include "types.hpp"
-#include "game.hpp"
 #include "input.hpp"
+#include "object_data.hpp"
 
 void caculate_camera( GameState* game_state, GameInput* game_input, real32 dt ) {
   

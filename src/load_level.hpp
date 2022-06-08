@@ -9,6 +9,8 @@
 #include "types.hpp"
 #include "game.hpp"
 #include "json.hpp"
+#include "strings.hpp"
+#include "shaders.hpp"
 
 void reset_data() {
   
