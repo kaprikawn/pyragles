@@ -6,7 +6,7 @@
 #include "sdl.hpp"
 #include "json.hpp"
 #include "input.hpp"
-#include "vector_maths.hpp"
+#include "maths.hpp"
 #include "object_data.hpp"
 #include "hardcoded_meshes.hpp"
 #include "ship.hpp"

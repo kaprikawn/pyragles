@@ -1,7 +1,7 @@
 #ifndef SHIP_HPP
 #define SHIP_HPP
 
-#include "vector_maths.hpp"
+#include "maths.hpp"
 #include "input.hpp"
 
 void calculate_ship_rotation( GameInput* game_input, f32 dt, u32 ship_index = 0 ) {

@@ -1,5 +1,5 @@
-#ifndef VECTOR_MATHS_HPP
-#define VECTOR_MATHS_HPP
+#ifndef MATHS_HPP
+#define MATHS_HPP
 
 #include "types.hpp"
 #include <math.h>
@@ -200,4 +200,4 @@ inline f32 tan_radians( f32 radians ) {
   return result;
 }
 
-#endif //VECTOR_MATHS_HPP
+#endif //MATHS_HPP

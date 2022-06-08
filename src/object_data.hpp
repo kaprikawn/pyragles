@@ -8,7 +8,7 @@
 
 #endif
 
-#include "vector_maths.hpp"
+#include "maths.hpp"
 #include "types.hpp"
 #include "sdl.hpp"
 
@@ -94,12 +94,12 @@ enum mesh_source { LOAD_MESH_FROM_GLTF, HM_TARGET, HM_FLOOR1, HM_FLOOR2 };
 struct ObjectLoadParameters {
   bool32    make_immediately_active = false;
   char*     shader_filename;
-  u32    shader_type             = SHADER_LIGHT;
-  u32    object_type             = OBJECT_TYPE_NONE;
+  u32       shader_type             = SHADER_LIGHT;
+  u32       object_type             = OBJECT_TYPE_NONE;
   char*     gltf_model_filename;
   bool32    is_floor                = false;
   Position  initial_position;
-  u32    mesh_source             = 0;
+  u32       mesh_source             = 0;
 };
 
 s32 get_free_object_index() {
