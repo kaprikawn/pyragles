@@ -8,25 +8,25 @@ const char* assetsDir         = "../assets/";
 
 struct ReadFileResult
 {
-    uint32  contents_size;
+    u32  contents_size;
     void*   contents;
 };
 
-inline uint32 string_length( const char* string ) {
+inline u32 string_length( const char* string ) {
   // length NOT including \0
-  uint32 result = 0;
-  for( uint32 i = 0; string[ i ] != '\0'; i++ )
+  u32 result = 0;
+  for( u32 i = 0; string[ i ] != '\0'; i++ )
     result++;
   return result;
 }
 
-inline void null_char_buffer( char* target, uint32 length ) {
-  for( uint32 i = 0; i < length; i++ ) {
+inline void null_char_buffer( char* target, u32 length ) {
+  for( u32 i = 0; i < length; i++ ) {
     target[ i ] = '\0';
   }
 }
 
-inline char* init_char_star( uint32 length ) {
+inline char* init_char_star( u32 length ) {
   char* result = ( char* )malloc( length );
   null_char_buffer( result, length );
   return result;
@@ -37,33 +37,33 @@ inline char* concat( const char* str1, const char* str2 ) {
   // REMEMBER TO FREE RESULT AFTER YOU'RE DONE WITH IT //
   ///////////////////////////////////////////////////////
   
-  uint32 len1         = string_length( str1 );
-  uint32 len2         = string_length( str2 );
-  uint32 totalLength  = len1 + len2 + 1;
-  uint32 currentIndex = 0;
+  u32 len1         = string_length( str1 );
+  u32 len2         = string_length( str2 );
+  u32 totalLength  = len1 + len2 + 1;
+  u32 currentIndex = 0;
   
   char* result = init_char_star( totalLength );
   
-  for( uint32 i = 0; i < len1; i++ )
+  for( u32 i = 0; i < len1; i++ )
     result[ currentIndex++ ] = str1[ i ];
-  for( uint32 i = 0; i < len2; i++ )
+  for( u32 i = 0; i < len2; i++ )
     result[ currentIndex++ ] = str2[ i ];
   result[ currentIndex ] = '\0';
   
   return result;
 }
 
-inline uint32 safeTruncateUInt64( uint64 value ) {
-  uint32 result = ( uint32 )value;
+inline u32 safeTruncateUInt64( u64 value ) {
+  u32 result = ( u32 )value;
   return result;
 }
 
 bool32 strings_are_equal( const char* str1, const char* str2 ) {
-  uint32 len1 = string_length( str1 );
-  uint32 len2 = string_length( str2 );
+  u32 len1 = string_length( str1 );
+  u32 len2 = string_length( str2 );
   if( len1 != len2 )
     return false;
-  for( uint32 i = 0; i < len1; i++ ) {
+  for( u32 i = 0; i < len1; i++ ) {
     char char1 = ( char )str1[ i ];
     char char2 = ( char )str2[ i ];
     if( char1 != char2 )
@@ -76,8 +76,8 @@ bool32 strings_are_equal( const char* str1, const char* str2 ) {
 
 #include <shlwapi.h>
 
-inline uint32 get_filesize( const char* filepath ) {
-  uint32 result = 0;
+inline u32 get_filesize( const char* filepath ) {
+  u32 result = 0;
   LARGE_INTEGER filesize;
   HANDLE fh = CreateFileA( filepath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0 );
   if( !( GetFileSizeEx( fh, &filesize ) ) ) {
@@ -101,7 +101,7 @@ inline ReadFileResult read_entire_file( const char* filename ) {
   
   HANDLE fh = CreateFileA( filepath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0 );
   if( fh != INVALID_HANDLE_VALUE ) {
-    uint32 filesize = get_filesize ( filepath );
+    u32 filesize = get_filesize ( filepath );
     if( filesize == 0 )
       return result;
     result.contents = VirtualAlloc( 0, filesize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE );
@@ -146,7 +146,7 @@ void read_entire_file_into_memory( const char* filename, ReadFileResult* result 
   free( filepath );
 }
 
-void free_memory( void* memory, uint32 size ) {
+void free_memory( void* memory, u32 size ) {
   VirtualFree( ( LPVOID )memory, size, MEM_RELEASE );
 }
 

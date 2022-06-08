@@ -1,11 +1,11 @@
 #ifndef SHADERS_HPP
 #define SHADERS_HPP
 
-uint32 compileShader( uint32 type, const char* source ) {
+u32 compileShader( u32 type, const char* source ) {
   
-  uint32 result;
+  u32 result;
   
-  uint32 shader_program_id = glCreateShader( type );
+  u32 shader_program_id = glCreateShader( type );
   glShaderSource( shader_program_id, 1, &source, nullptr );
   glCompileShader( shader_program_id );
   
@@ -30,27 +30,27 @@ enum ShaderCompilationTypes {
   SHADERTYPENONE = -1, VERTEXSHADER = 0, FRAGMENTSHADER = 1
 };
 
-uint32 createShader( ReadFileResult shader_file ) {
+u32 createShader( ReadFileResult shader_file ) {
   
-  uint32 result;
+  u32 result;
   
   const char* shader_source = ( const char* )shader_file.contents;
-  uint32 filesize_max       = shader_file.contents_size;
+  u32 filesize_max       = shader_file.contents_size;
   
-  uint32 type = SHADERTYPENONE;
+  u32 type = SHADERTYPENONE;
   
   char* vertex_shader_source    = ( char* )malloc( filesize_max );
   char* fragment_shader_source  = ( char* )malloc( filesize_max );
   char  current_line [ 4086 ];
   
-  uint32 current_line_index     = 0;
-  uint32 line_start            = 0;
-  uint32 line_end;
+  u32 current_line_index     = 0;
+  u32 line_start            = 0;
+  u32 line_end;
   
-  uint32 vertex_current_index   = 0;
-  uint32 fragment_current_index = 0;
+  u32 vertex_current_index   = 0;
+  u32 fragment_current_index = 0;
   
-  for( uint32 i = 0; i < filesize_max; i++ ) {
+  for( u32 i = 0; i < filesize_max; i++ ) {
     char my_char = ( char )shader_source[ i ];
     if( my_char == 10 || my_char == 13 ) {
       
@@ -62,7 +62,7 @@ uint32 createShader( ReadFileResult shader_file ) {
         type = FRAGMENTSHADER;
       } else {
         
-        for( uint32 j = line_start; j < line_end; j++ ) {
+        for( u32 j = line_start; j < line_end; j++ ) {
           
           if( type == VERTEXSHADER ) {
             vertex_shader_source[ vertex_current_index++ ] = ( char )shader_source[ j ];
@@ -79,7 +79,7 @@ uint32 createShader( ReadFileResult shader_file ) {
         }
       }
       
-      for( uint32 j = 0; j < filesize_max; j++ )
+      for( u32 j = 0; j < filesize_max; j++ )
         current_line[ j ] = '\0';
       current_line_index = 0;
       line_start = i + 1;
@@ -91,9 +91,9 @@ uint32 createShader( ReadFileResult shader_file ) {
   vertex_shader_source[ vertex_current_index ] = '\0';
   fragment_shader_source[ fragment_current_index ] = '\0';
   
-  uint32 shader_program_id  = glCreateProgram();
-  uint32 vs                 = compileShader( GL_VERTEX_SHADER   , vertex_shader_source );
-  uint32 fs                 = compileShader( GL_FRAGMENT_SHADER , fragment_shader_source );
+  u32 shader_program_id  = glCreateProgram();
+  u32 vs                 = compileShader( GL_VERTEX_SHADER   , vertex_shader_source );
+  u32 fs                 = compileShader( GL_FRAGMENT_SHADER , fragment_shader_source );
   
   glAttachShader( shader_program_id, vs );
   glAttachShader( shader_program_id, fs );

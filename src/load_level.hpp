@@ -48,7 +48,7 @@ void reset_data() {
   memset( shader_types              , 0, ( OBJECT_COUNT * sizeof( shader_types[ 0 ] ) ) );
   memset( object_active             , 0, ( OBJECT_COUNT * sizeof( object_active[ 0 ] ) ) );
   
-  for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
+  for( u32 i = 0; i < OBJECT_COUNT; i++ ) {
     slot_available[ i ] = true;
   }
 }
@@ -56,7 +56,7 @@ void reset_data() {
 void check_gltf_file( void* gltf_file_contents ) {
   GltfHeader* gltf_header = ( GltfHeader* )gltf_file_contents;
   
-  uint32 magic = gltf_header -> magic;
+  u32 magic = gltf_header -> magic;
   
   if( magic != 1179937895 ) {
     SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Error - expected gltf2 file not found\n" );
@@ -65,9 +65,9 @@ void check_gltf_file( void* gltf_file_contents ) {
   }
 }
 
-void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position, GameState* game_state ) {
+void load_level_object( ObjectLoadParameters* olp, u32 target_array_position, GameState* game_state ) {
   
-  uint32 i = target_array_position;
+  u32 i = target_array_position;
   
   if( olp -> make_immediately_active ) {
     object_active[ i ] = true;
@@ -86,18 +86,18 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
   if( olp -> object_type > 0 )
     object_types[ i ] = olp -> object_type;
   
-  uint32 shader_program_id    = createShader( shader_file );
+  u32 shader_program_id    = createShader( shader_file );
   shader_program_ids[ i ]     = shader_program_id;
   glUseProgram( shader_program_id );
   
-  int32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
-  int32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
-  int32 tex_coord0_attribute_location   = glGetAttribLocation ( shader_program_id, "aTexCoord" );
-  int32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
-  int32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
-  int32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
-  int32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
-  int32 ambient_light_uniform_location  = glGetUniformLocation( shader_program_id, "uAmbientLight" );
+  s32 position_attribute_location     = glGetAttribLocation ( shader_program_id, "aPosition" );
+  s32 normal_attribute_location       = glGetAttribLocation ( shader_program_id, "aNormal" );
+  s32 tex_coord0_attribute_location   = glGetAttribLocation ( shader_program_id, "aTexCoord" );
+  s32 colour_attribute_location       = glGetAttribLocation ( shader_program_id, "aColour" );
+  s32 mvp_uniform_location            = glGetUniformLocation( shader_program_id, "uMVP" );
+  s32 model_uniform_location          = glGetUniformLocation( shader_program_id, "uModelMatrix" );
+  s32 light_position_uniform_location = glGetUniformLocation( shader_program_id, "uLightPosition" );
+  s32 ambient_light_uniform_location  = glGetUniformLocation( shader_program_id, "uAmbientLight" );
   
   gl_id_positions[ i ]        = position_attribute_location;
   gl_id_normals[ i ]          = normal_attribute_location;
@@ -109,10 +109,10 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
   gl_id_ambient_lights[ i ]   = ambient_light_uniform_location;
   
   if( shader_types[ i ] == SHADER_VERTEX_COLOURS_NO_LIGHT ) {
-    int32 colour_uniform_location = glGetUniformLocation( shader_program_id, "uColour" );
+    s32 colour_uniform_location = glGetUniformLocation( shader_program_id, "uColour" );
     gl_id_colours[ i ]            = colour_uniform_location;
   } else if( shader_types[ i ] == SHADER_VERTEX_COLOURS ) {
-    int32 colour_uniform_location = glGetUniformLocation( shader_program_id, "aColour" );
+    s32 colour_uniform_location = glGetUniformLocation( shader_program_id, "aColour" );
     gl_id_colours[ i ]            = colour_uniform_location;
   }
   
@@ -130,7 +130,7 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     ReadFileResult gltf_file  = read_entire_file( gltf_filename );
     
     check_gltf_file( gltf_file.contents );
-    uint32 json_string_length = json_size_in_bytes( &gltf_file ); // including padding
+    u32 json_string_length = json_size_in_bytes( &gltf_file ); // including padding
     char* json_string         = ( char* )malloc( json_string_length + 1 );
     pull_out_json_string( &gltf_file, json_string, json_string_length ); // loads json_string with the json from the file
     
@@ -140,11 +140,11 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     json.json_string      = json_string;
     json.json_char_count  = string_length( json_string );
     
-    const char*         gltf_contents = ( char* )gltf_file.contents;
-    uint32              target_mesh_index = 0; // @TODO: Hardcoding for the initial mesh for now
+    const char*         gltf_contents     = ( char* ) gltf_file.contents;
+    u32                 target_mesh_index = 0; // @TODO: Hardcoding for the initial mesh for now
     void*               data;
-    uint32              byte_length;
-    uint32              count;
+    u32                 byte_length;
+    u32                 count;
     GltfbufferViewInfo  buffer_view_info;
     
     // vertex data
@@ -152,14 +152,14 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_VERTICES );
     count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_VERTICES );
     count *= 3; // three values per vertex
-    byte_length = ( count * sizeof( real32 ) );
+    byte_length = ( count * sizeof( f32 ) );
     
     counts_vertex_data[ i ]   = count;
     offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
     {
-      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
+      void*   dest  = ( void* ) &gl_array_buffer_data[ offsets_vertex_data[ i ] ];
       void*   src   = data;
-      uint32  bytes = byte_length;
+      u32     bytes = byte_length;
       memcpy( dest, src, bytes );
     }
     game_state -> array_buffer_target += count;
@@ -169,14 +169,14 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_NORMALS );
     count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_NORMALS );
     count *= 3; // three values per vertex
-    byte_length = ( count * sizeof( real32 ) );
+    byte_length = ( count * sizeof( f32 ) );
     
     counts_normal_data[ i ]   = count;
     offsets_normal_data[ i ]  = game_state -> array_buffer_target;
     {
       void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
       void*   src   = data;
-      uint32  bytes = byte_length;
+      u32     bytes = byte_length;
       memcpy( dest, src, bytes );
     }
     game_state -> array_buffer_target += count;
@@ -186,14 +186,14 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
     count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_TEX_COORD0 );
     count *= 2; // two values per uv coordinate
-    byte_length = ( count * sizeof( real32 ) );
+    byte_length = ( count * sizeof( f32 ) );
     
     counts_tex_coord0_data[ i ]   = count;
     offsets_tex_coord0_data[ i ]  = game_state -> array_buffer_target;
     {
       void*   dest  = ( void* )&gl_array_buffer_data[ offsets_tex_coord0_data[ i ] ];
       void*   src   = data;
-      uint32  bytes = byte_length;
+      u32     bytes = byte_length;
       memcpy( dest, src, bytes );
     }
     game_state -> array_buffer_target += count;
@@ -202,30 +202,28 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     buffer_view_info  = get_glft_buffer_view_info(  target_mesh_index, gltf_contents, json, GLTF_INDICES );
     data              = get_gltf_data_pointer(      target_mesh_index, gltf_contents, json, GLTF_INDICES );
     count             = get_gltf_data_count(        target_mesh_index, gltf_contents, json, GLTF_INDICES );
-    byte_length = ( count * sizeof( uint16 ) );
+    byte_length = ( count * sizeof( u16 ) );
     
     counts_index_data[ i ]   = count;
     offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
     {
       void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
       void*   src   = data;
-      uint32  bytes = byte_length;
+      u32     bytes = byte_length;
       memcpy( dest, src, bytes );
     }
     game_state -> element_array_buffer_target += count;
     
     
-    int32 image_buffer_view_index = get_image_buffer_view_index( json.json_string, json.json_char_count );
+    s32 image_buffer_view_index = get_image_buffer_view_index( json.json_string, json.json_char_count );
     if( image_buffer_view_index >= 0  ) {
       
       // don't need to store image data so just upload straight to gl
+      s32             texture_width, texture_height, texture_bpp;
       data                                = get_gltf_data_pointer( target_mesh_index, gltf_contents, json, GLTF_IMAGE );
       BufferViewData  image_buffer_view   = get_buffer_view_data( image_buffer_view_index, json.json_string, json.json_char_count );
-      uint32 image_data_bytes = image_buffer_view.byte_length;
-      
-      int32 texture_width, texture_height, texture_bpp;
-      
-      uchar* texture_data = stbi_load_from_memory( ( const uchar* )data, image_data_bytes, &texture_width, &texture_height, &texture_bpp, 4 );
+      u32             image_data_bytes    = image_buffer_view.byte_length;
+      uchar*          texture_data        = stbi_load_from_memory( ( const uchar* )data, image_data_bytes, &texture_width, &texture_height, &texture_bpp, 4 );
       
       GLCall( glGenTextures( 1, &tbos[ i ] ) );
       GLCall( glBindTexture( GL_TEXTURE_2D, tbos[ i ] ) );
@@ -243,22 +241,22 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     free( json_string );
   } else if( olp -> mesh_source == HM_TARGET ) {
     {
-      real32* vertices  = get_target_vertices( &counts_vertex_data[ i ] );
       offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
-      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
-      void*   src   = ( void* )&vertices[ 0 ];
-      uint32  bytes = ( sizeof( vertices[ 0 ] ) * counts_vertex_data[ i ] );
+      f32*  vertices  = get_target_vertices( &counts_vertex_data[ i ] );
+      void* dest      = ( void* ) &gl_array_buffer_data[ offsets_vertex_data[ i ] ];
+      void* src       = ( void* ) &vertices[ 0 ];
+      u32   bytes     = ( sizeof( vertices[ 0 ] ) * counts_vertex_data[ i ] );
       memcpy( dest, src, bytes );
       free( vertices );
       game_state -> array_buffer_target += counts_vertex_data[ i ];
     }
     
     {
-      uint16* indices   = get_target_indices( &counts_index_data[ i ] );
-      offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
-      void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
-      void*   src   = ( void* )&indices[ 0 ];
-      uint32  bytes = ( sizeof( indices[ 0 ] ) * counts_index_data[ i ] );
+      offsets_index_data[ i ] = game_state -> element_array_buffer_target;
+      u16*  indices = get_target_indices( &counts_index_data[ i ] );
+      void* dest    = ( void* ) &gl_element_array_buffer_data[ offsets_index_data[ i ] ];
+      void* src     = ( void* ) &indices[ 0 ];
+      u32   bytes   = ( sizeof( indices[ 0 ] ) * counts_index_data[ i ] );
       memcpy( dest, src, bytes );
       free( indices );
       game_state -> element_array_buffer_target += counts_index_data[ i ];
@@ -266,16 +264,16 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
   } else if( olp -> mesh_source == HM_FLOOR1 || olp -> mesh_source == HM_FLOOR2 ) {
     
     {
-      real32* vertices;
+      f32* vertices;
       if( olp -> mesh_source == HM_FLOOR1 ) {
         vertices = get_underside_floor_vertices( &counts_vertex_data[ i ] );
       } else if( olp -> mesh_source == HM_FLOOR2 ) {
         vertices = get_overside_floor_vertices( &counts_vertex_data[ i ] );
       }
       offsets_vertex_data[ i ]  = game_state -> array_buffer_target;
-      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_vertex_data[ i ] ];
-      void*   src   = ( void* )&vertices[ 0 ];
-      uint32  bytes = ( sizeof( vertices[ 0 ] ) * counts_vertex_data[ i ] );
+      void* dest  = ( void* ) &gl_array_buffer_data[ offsets_vertex_data[ i ] ];
+      void* src   = ( void* ) &vertices[ 0 ];
+      u32   bytes = ( sizeof( vertices[ 0 ] ) * counts_vertex_data[ i ] );
       memcpy( dest, src, bytes );
       free( vertices );
       game_state -> array_buffer_target += counts_vertex_data[ i ];
@@ -285,49 +283,49 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
     }
     
     { // normals
-      real32* normals;
+      f32* normals;
       if( olp -> mesh_source == HM_FLOOR1 ) {
         normals = get_underside_floor_normals( &counts_normal_data[ i ] );
       } else {
         normals = get_overside_floor_normals( counts_normal_data[ i ], &gl_array_buffer_data[ offsets_vertex_data[ i ] ] );
       }
       offsets_normal_data[ i ]  = game_state -> array_buffer_target;
-      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_normal_data[ i ] ];
-      void*   src   = ( void* )&normals[ 0 ];
-      uint32  bytes = ( sizeof( normals[ 0 ] ) * counts_normal_data[ i ] );
+      void* dest  = ( void* ) &gl_array_buffer_data[ offsets_normal_data[ i ] ];
+      void* src   = ( void* ) &normals[ 0 ];
+      u32   bytes = ( sizeof( normals[ 0 ] ) * counts_normal_data[ i ] );
       memcpy( dest, src, bytes );
       free( normals );
       game_state -> array_buffer_target += counts_normal_data[ i ];
     }
     
     { // colours
-      real32* colours;
+      f32* colours;
       if( olp -> mesh_source == HM_FLOOR1 ) {
         colours = get_underside_floor_colours( &counts_colour_data[ i ] );
       } else {
-        uint32 count = counts_vertex_data[ i ];
+        u32 count = counts_vertex_data[ i ];
         colours = get_overside_floor_colours( counts_colour_data[ i ] );
       }
       offsets_colour_data[ i ]  = game_state -> array_buffer_target;
-      void*   dest  = ( void* )&gl_array_buffer_data[ offsets_colour_data[ i ] ];
-      void*   src   = ( void* )&colours[ 0 ];
-      uint32  bytes = ( sizeof( colours[ 0 ] ) * counts_colour_data[ i ] );
+      void* dest  = ( void* ) &gl_array_buffer_data[ offsets_colour_data[ i ] ];
+      void* src   = ( void* ) &colours[ 0 ];
+      u32   bytes = ( sizeof( colours[ 0 ] ) * counts_colour_data[ i ] );
       memcpy( dest, src, bytes );
       free( colours );
       game_state -> array_buffer_target += counts_colour_data[ i ];
     }
     
     {
-      uint16* indices;
+      u16* indices;
       if( olp -> mesh_source == HM_FLOOR1 ) {
         indices = get_underside_floor_indices( &counts_index_data[ i ] );
       } else if( olp -> mesh_source == HM_FLOOR2 ) {
         indices = get_overside_floor_indices( &counts_index_data[ i ] );
       }
       offsets_index_data[ i ]  = game_state -> element_array_buffer_target;
-      void*   dest  = ( void* )&gl_element_array_buffer_data[ offsets_index_data[ i ] ];
-      void*   src   = ( void* )&indices[ 0 ];
-      uint32  bytes = ( sizeof( indices[ 0 ] ) * counts_index_data[ i ] );
+      void* dest  = ( void* ) &gl_element_array_buffer_data[ offsets_index_data[ i ] ];
+      void* src   = ( void* ) &indices[ 0 ];
+      u32   bytes = ( sizeof( indices[ 0 ] ) * counts_index_data[ i ] );
       memcpy( dest, src, bytes );
       free( indices );
       game_state -> element_array_buffer_target += counts_index_data[ i ];
@@ -340,16 +338,16 @@ void load_level_object( ObjectLoadParameters* olp, uint32 target_array_position,
 
 void upload_objects_data_to_gl( GameState* game_state ) {
   
-  for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
+  for( u32 i = 0; i < OBJECT_COUNT; i++ ) {
     
     // vertex data
     {
       gl_offsets_vertex_data[ i ] = game_state -> target_gl_offsets_array_data;
-      uint32      target          = GL_ARRAY_BUFFER;
-      uint32      offset          = gl_offsets_vertex_data[ i ];
-      uint32      size            = ( sizeof( real32 ) * counts_vertex_data[ i ] );
-      uint32      array_position  = offsets_vertex_data[ i ];
-      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      u32         target          = GL_ARRAY_BUFFER;
+      u32         offset          = gl_offsets_vertex_data[ i ];
+      u32         size            = ( sizeof( f32 ) * counts_vertex_data[ i ] );
+      u32         array_position  = offsets_vertex_data[ i ];
+      const void* data            = ( const void* ) &gl_array_buffer_data[ array_position ];
       
       GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_array_data += size;
@@ -358,11 +356,11 @@ void upload_objects_data_to_gl( GameState* game_state ) {
     // normal data
     {
       gl_offsets_normal_data[ i ] = game_state -> target_gl_offsets_array_data;
-      uint32      target          = GL_ARRAY_BUFFER;
-      uint32      offset          = gl_offsets_normal_data[ i ];
-      uint32      size            = ( sizeof( real32 ) * counts_normal_data[ i ] );
-      uint32      array_position  = offsets_normal_data[ i ];
-      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      u32         target          = GL_ARRAY_BUFFER;
+      u32         offset          = gl_offsets_normal_data[ i ];
+      u32         size            = ( sizeof( f32 ) * counts_normal_data[ i ] );
+      u32         array_position  = offsets_normal_data[ i ];
+      const void* data            = ( const void* ) &gl_array_buffer_data[ array_position ];
       
       GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_array_data += size;
@@ -371,11 +369,11 @@ void upload_objects_data_to_gl( GameState* game_state ) {
     // tex_coord0 data
     if( shader_types[ i ] == SHADER_LIGHT ) {
       gl_offsets_tex_coord0_data[ i ] = game_state -> target_gl_offsets_array_data;
-      uint32      target          = GL_ARRAY_BUFFER;
-      uint32      offset          = gl_offsets_tex_coord0_data[ i ];
-      uint32      size            = ( sizeof( real32 ) * counts_tex_coord0_data[ i ] );
-      uint32      array_position  = offsets_tex_coord0_data[ i ];
-      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      u32         target          = GL_ARRAY_BUFFER;
+      u32         offset          = gl_offsets_tex_coord0_data[ i ];
+      u32         size            = ( sizeof( f32 ) * counts_tex_coord0_data[ i ] );
+      u32         array_position  = offsets_tex_coord0_data[ i ];
+      const void* data            = ( const void* ) &gl_array_buffer_data[ array_position ];
       
       GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_array_data += size;
@@ -383,11 +381,11 @@ void upload_objects_data_to_gl( GameState* game_state ) {
     
     if( shader_types[ i ] == SHADER_VERTEX_COLOURS ) {
       gl_offsets_colour_data[ i ] = game_state -> target_gl_offsets_array_data;
-      uint32      target          = GL_ARRAY_BUFFER;
-      uint32      offset          = gl_offsets_colour_data[ i ];
-      uint32      size            = ( sizeof( real32 ) * counts_colour_data[ i ] );
-      uint32      array_position  = offsets_colour_data[ i ];
-      const void* data            = ( const void* )&gl_array_buffer_data[ array_position ];
+      u32         target          = GL_ARRAY_BUFFER;
+      u32         offset          = gl_offsets_colour_data[ i ];
+      u32         size            = ( sizeof( f32 ) * counts_colour_data[ i ] );
+      u32         array_position  = offsets_colour_data[ i ];
+      const void* data            = ( const void* ) &gl_array_buffer_data[ array_position ];
       
       GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_array_data += size;
@@ -396,11 +394,11 @@ void upload_objects_data_to_gl( GameState* game_state ) {
     // index data
     {
       gl_offsets_index_data[ i ]  = game_state -> target_gl_offsets_index_data;
-      uint32      target          = GL_ELEMENT_ARRAY_BUFFER;
-      uint32      offset          = gl_offsets_index_data[ i ];
-      uint32      size            = ( sizeof( uint16 ) * counts_index_data[ i ] );
-      uint32      array_position  = offsets_index_data[ i ];
-      const void* data            = ( const void* )&gl_element_array_buffer_data[ array_position ];
+      u32         target          = GL_ELEMENT_ARRAY_BUFFER;
+      u32         offset          = gl_offsets_index_data[ i ];
+      u32         size            = ( sizeof( u16 ) * counts_index_data[ i ] );
+      u32         array_position  = offsets_index_data[ i ];
+      const void* data            = ( const void* ) &gl_element_array_buffer_data[ array_position ];
       
       GLCall( glBufferSubData( target, offset, size, data ) );
       game_state -> target_gl_offsets_index_data += size;
@@ -410,8 +408,8 @@ void upload_objects_data_to_gl( GameState* game_state ) {
 
 void load_ship_and_target( GameState* game_state ) {
   
-  const uint32 ship_index   = 0;
-  const uint32 target_index = 1;
+  const u32 ship_index   = 0;
+  const u32 target_index = 1;
   
   ObjectLoadParameters ship;
   ship.make_immediately_active  = true;
@@ -440,8 +438,8 @@ void load_ship_and_target( GameState* game_state ) {
   
 }
 
-const uint32 floor1_index = 2;
-const uint32 floor2_index = 3;
+const u32 floor1_index = 2;
+const u32 floor2_index = 3;
 
 void load_floor( GameState* game_state ) {
   
@@ -480,23 +478,23 @@ void load_floor( GameState* game_state ) {
 }
 
 struct key_value_pair {
-  char*   key;
-  char*   value;
-  uint32  key_length;
-  uint32  value_length;
+  char* key;
+  char* value;
+  u32   key_length;
+  u32   value_length;
 };
 
 enum yaml_content_type { YAML_NULL, YAML_KEY, YAML_VALUE };
 enum yaml_section { YAML_SECTION_NULL, YAML_SECTION_LEVEL_DETAILS, YAML_SECTION_LEVEL_OBJECTS };
 enum yaml_section_sub { YAML_SECTION_SUB_NULL, YAML_SECTION_SUB_INIT_POS };
 
-const uint32  char_buffer_size = 100;
+const u32  char_buffer_size = 100;
 
 struct yaml_line_result {
   char*   key;
   char*   value;
-  uint32  key_length;
-  uint32  value_length;
+  u32     key_length;
+  u32     value_length;
   bool32  is_key_value_pair = false;
   bool32  start_new_object  = false;
   bool32  do_nothing        = false;
@@ -509,7 +507,7 @@ struct yaml_line_result {
 //   bool32 anon_array_entry = false;
 // };
 
-yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 current_yaml_section ) {
+yaml_line_result process_line( const char* yaml_line, u32 length, u32 current_yaml_section ) {
   
   yaml_line_result result;
   
@@ -519,28 +517,28 @@ yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 curr
   }
   
   bool32  passed_colon  = false;
-  uint32  content_type  = YAML_NULL;
+  u32     content_type  = YAML_NULL;
   bool32  has_key       = false;
   bool32  has_value     = false;
-  uint32  key_length    = 0;
-  uint32  value_length  = 0;
+  u32     key_length    = 0;
+  u32     value_length  = 0;
   
   char key  [ char_buffer_size ];
   char value[ char_buffer_size ];
   
-  uint32  key_index   = 0;
-  uint32  value_index = 0;
+  u32  key_index   = 0;
+  u32  value_index = 0;
   
   null_char_buffer( &key[ 0 ]   , char_buffer_size );
   null_char_buffer( &value[ 0 ] , char_buffer_size );
   
   char* line = ( char* )malloc( length + 1 );
-  for( uint32 i = 0; i < length + 1; i++ ) {
+  for( u32 i = 0; i < length + 1; i++ ) {
     line[ i ] = '\0';
   }
   memcpy( line, yaml_line, length );
   
-  for( uint32 i = 0; i < length; i++ ) {
+  for( u32 i = 0; i < length; i++ ) {
     char this_char = line[ i ];
     
     if( this_char != ASCII_CR ) {
@@ -588,8 +586,8 @@ yaml_line_result process_line( const char* yaml_line, uint32 length, uint32 curr
   return result;
 }
 
-inline uint32 get_shader_type( const char* shader_filename ) {
-  uint32 result = 0;
+inline u32 get_shader_type( const char* shader_filename ) {
+  u32 result = 0;
   if( strings_are_equal( shader_filename, "shaderLight.glsl" ) ) {
     return SHADER_LIGHT;
   } else if( strings_are_equal( shader_filename, "shaderVertexColours.glsl") ) {
@@ -605,16 +603,16 @@ void load_yaml( const char* filename, GameState* game_state ) {
   ObjectLoadParameters* to_submit = NULL;
   
   char    this_char;
-  uint32  line_start                = 0;
-  uint32  line_end                  = 0;
-  uint32  current_yaml_section      = 0;
-  uint32  current_yaml_section_sub  = 0;
+  u32     line_start                = 0;
+  u32     line_end                  = 0;
+  u32     current_yaml_section      = 0;
+  u32     current_yaml_section_sub  = 0;
   bool32  submit_olp                = false;
   bool32  is_first_object           = true;
   
   const char* data = ( const char* )yaml_file.contents;
   
-  for( uint32 i = 0; i < yaml_file.contents_size; i++ ) {
+  for( u32 i = 0; i < yaml_file.contents_size; i++ ) {
     
     this_char = data[ i ];
     if( this_char == ASCII_LF ) {
@@ -623,7 +621,7 @@ void load_yaml( const char* filename, GameState* game_state ) {
       if( data[ line_end ] == ASCII_CR || data[ line_end ] == ASCII_LF )
         line_end--;
       
-      uint32 length = ( line_end - line_start );
+      u32 length = ( line_end - line_start );
       char* line = init_char_star( length + 1 );
       memcpy( line, &data[ line_start ], length );
       
@@ -669,11 +667,11 @@ void load_yaml( const char* filename, GameState* game_state ) {
       }
       
       if( to_submit != NULL ) {
-        int32 target_array_position = get_free_object_index();
+        s32 target_array_position = get_free_object_index();
         if( target_array_position == -1 ) {
           SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "[ ERROR ] : Failed to allocate new object index\n" );
         } else {
-          uint32 index = ( uint32 )target_array_position;
+          u32 index = ( u32 )target_array_position;
           SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Submitting object index %d\n", index );
           to_submit -> make_immediately_active = true;
           to_submit -> mesh_source = LOAD_MESH_FROM_GLTF;

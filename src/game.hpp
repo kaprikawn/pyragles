@@ -52,15 +52,15 @@ enum game_memory_type {
 
 struct game_memory {
   bool32  isInitialized;
-  uint64  permanentStorageSize;
+  u64  permanentStorageSize;
   void*   permanentStorage;
-  uint32  permanentNextMemoryOffset;
-  uint64  tempStorageSize;
+  u32  permanentNextMemoryOffset;
+  u64  tempStorageSize;
   void*   tempStorage;
-  uint32  tempNextMemoryOffset;
+  u32  tempNextMemoryOffset;
 };
 
-uint32 shader_program_id;
+u32 shader_program_id;
 
 void init_sdl( SDLParams* sdl_params ) {
   
@@ -68,7 +68,7 @@ void init_sdl( SDLParams* sdl_params ) {
   int windowHeight  = 720;
   int windowX       = 50;
   int windowY       = 50;
-  uint32 sdlFlags = SDL_WINDOW_OPENGL;
+  u32 sdlFlags      = SDL_WINDOW_OPENGL;
   
 #ifdef FULLSCREEN_ONLY
   launch_fullscreen = true;
@@ -80,7 +80,7 @@ void init_sdl( SDLParams* sdl_params ) {
   SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
   
   if( launch_fullscreen ) {
-    uint32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN;
+    u32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN;
     
     // create window to native desktop size to query screen dimensions
     
@@ -137,16 +137,16 @@ void init_sdl( SDLParams* sdl_params ) {
 
 
 // for delta time ( dt )
-uint32 current_time, previous_time, before_frame_flip_time;
+u32 current_time, previous_time, before_frame_flip_time;
 
 void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   
-  real32 aspect     = ( real32 ) sdl_params.windowWidth / ( real32 ) sdl_params.windowHeight;
-  real32 v[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };    // view
-  real32 p[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; // projection
-  real32 fov        = 70.0f;
-  real32 near_plane = 0.01f;
-  real32 far_plane  = 65.0f;
+  f32 aspect     = ( f32 ) sdl_params.windowWidth / ( f32 ) sdl_params.windowHeight;
+  f32 v[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };    // view
+  f32 p[ 16 ]    = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; // projection
+  f32 fov        = 70.0f;
+  f32 near_plane = 0.01f;
+  f32 far_plane  = 65.0f;
   populate_perspective_matrix( &p[ 0 ], fov, aspect, near_plane, far_plane );
   memcpy( &game_state -> p_mat[ 0 ], &p[ 0 ], sizeof( p[ 0 ] ) * 16 );
   
@@ -169,8 +169,8 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   game_state -> ibo = ibo;
 }
 
-void update_level_object( uint32 object_index, real32 dt ) {
-  uint32 i = object_index;
+void update_level_object( u32 object_index, f32 dt ) {
+  u32 i = object_index;
   
   if( !object_active[ i ] )
     return;
@@ -203,15 +203,15 @@ void update_level_object( uint32 object_index, real32 dt ) {
   }
 }
 
-void update_level_objects( uint32 index_start, uint32 index_end, real32 dt ) {
+void update_level_objects( u32 index_start, u32 index_end, f32 dt ) {
   
-  for( uint32 i = index_start; i <= index_end; i++ ) {
+  for( u32 i = index_start; i <= index_end; i++ ) {
     update_level_object( i, dt );
   }
   
 }
 
-int32 run_game() {
+s32 run_game() {
   
   SDLParams sdl_params;
   
@@ -243,8 +243,8 @@ int32 run_game() {
     
     previous_time = current_time;
     current_time = SDL_GetTicks();
-    uint32 ms_since_last_frame  = current_time - previous_time;
-    real32 dt = ( real32 )ms_since_last_frame / 1000.0f;
+    u32 ms_since_last_frame  = current_time - previous_time;
+    f32 dt = ( f32 )ms_since_last_frame / 1000.0f;
     if( dt > 0.15f ) dt = 0.15f; // prevent weird outliers e.g. first frame
     
     reset_game_inputs_pressed( &old_buttons, &new_buttons );
@@ -268,7 +268,7 @@ int32 run_game() {
     
     GLCall( glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ) );
     
-    for( uint32 i = 0; i < OBJECT_COUNT; i++ ) {
+    for( u32 i = 0; i < OBJECT_COUNT; i++ ) {
       render_object( i, &game_state.vp_mat[ 0 ] );
     }
     
