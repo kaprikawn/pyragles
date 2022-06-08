@@ -6,9 +6,9 @@
 
 #define SCROLL_SPEED 10.0f
 
-void scroll_floor( uint32 floor_index, real32 dt ) {
+void scroll_floor( u32 floor_index, f32 dt ) {
   
-  uint32 i = floor_index;
+  u32 i = floor_index;
   
   positions[ i ].z += ( SCROLL_SPEED * dt );
   while( positions[ i ].z > ( floor_start_z + 4.0f ) ) {

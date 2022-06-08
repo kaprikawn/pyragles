@@ -1,6 +1,5 @@
 #include <sys/mman.h>
 #include "game.hpp"
-#include "game.cpp"
 
 int main( int argc, char* argv[] ) {
   
@@ -12,7 +11,7 @@ int main( int argc, char* argv[] ) {
     //   invertY = true;
   }
   
-  int32 game_ret_val = run_game();
+  s32 game_ret_val = run_game();
   
   return 0;
 }

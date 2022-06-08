@@ -2,17 +2,18 @@
 #define JSON_HPP
 
 #include "types.hpp"
-#include "game.hpp"
+#include "strings.hpp"
+#include "object_data.hpp"
 
 #ifdef _WIN32
 
 #pragma pack(1)
 struct  GltfHeader {
-  uint32 magic;
-  uint32 version;
-  uint32 length;
-  uint32 json_chunk_length;
-  uint32 json_chunk_type;
+  u32 magic;
+  u32 version;
+  u32 length;
+  u32 json_chunk_length;
+  u32 json_chunk_type;
 };
 
 #elif __linux__
@@ -38,107 +39,109 @@ enum AccessorType { ACCESSOR_VEC3, ACCESSOR_VEC2, ACCESSOR_SCALAR };
 
 struct MeshData {
   bool32  is_collider = false;
-  uint32  vertex_data_in_bytes;
-  uint32  vertex_count;
-  uint32  index_data_raw_in_bytes;
-  uint32  index_data_in_bytes;
-  uint32  index_count;
-  uint32  normal_data_in_bytes;
-  uint32  normal_count;
-  uint32  tex_coord0_data_in_bytes;
-  uint32  tex_coord0_count;
-  uint32  image_data_in_bytes;
-  real32* vertex_data;
-  real32* normal_data;
-  uint16* index_data_raw;
-  uint32* index_data;
-  real32* tex_coord0_data;
-  uint8*  image_data;
-  uint32  gl_vertex_offset;
-  uint32  gl_normal_offset;
-  uint32  gl_tex_coord0_offset;
-  uint32  gl_index_offset;
+  u32     vertex_data_in_bytes;
+  u32     vertex_count;
+  u32     index_data_raw_in_bytes;
+  u32     index_data_in_bytes;
+  u32     index_count;
+  u32     normal_data_in_bytes;
+  u32     normal_count;
+  u32     tex_coord0_data_in_bytes;
+  u32     tex_coord0_count;
+  u32     image_data_in_bytes;
+  f32*    vertex_data;
+  f32*    normal_data;
+  u16*    index_data_raw;
+  u32*    index_data;
+  f32*    tex_coord0_data;
+  u8*     image_data;
+  u32     gl_vertex_offset;
+  u32     gl_normal_offset;
+  u32     gl_tex_coord0_offset;
+  u32     gl_index_offset;
 };
 
 struct JsonString {
-  uint32  json_char_count;
-  char*   json_string;
+  u32   json_char_count;
+  char* json_string;
 };
 
 struct GltfbufferViewInfo {
-  uint32 buffer_view;
-  uint32 component_type;
-  uint32 gltf_count; // count as defined by the JSON
-  uint32 buffer;
-  uint32 byte_length;
-  uint32 byte_offset;
-  uint32 count; // count of values
-  uint32 offset;
-  int32  type;
+  u32 buffer_view;
+  u32 component_type;
+  u32 gltf_count; // count as defined by the JSON
+  u32 buffer;
+  u32 byte_length;
+  u32 byte_offset;
+  u32 count; // count of values
+  u32 offset;
+  s32 type;
 };
 
 struct MeshPositionIndices {
-  uint32 vertices;
-  uint32 normals;
-  uint32 texcoord_0;
-  uint32 indices;
-  uint32 material;
+  u32 vertices;
+  u32 normals;
+  u32 texcoord_0;
+  u32 indices;
+  u32 material;
 };
 
 struct AccessorData {
-  uint32  buffer_view;
-  uint32  component_type;
-  uint32  count;
-  int32   accessor_type;
-  char    type[ 7 ];
+  u32   buffer_view;
+  u32   component_type;
+  u32   count;
+  s32   accessor_type;
+  char  type[ 7 ];
 };
 
 struct BufferViewData {
-  uint32 buffer;
-  uint32 byte_length;
-  uint32 byte_offset;
+  u32 buffer;
+  u32 byte_length;
+  u32 byte_offset;
 };
 
-inline uint32 json_size_in_bytes( ReadFileResult* gltf_file ) {
+inline u32 json_size_in_bytes( ReadFileResult* gltf_file ) {
   GltfHeader* gltf_header = ( GltfHeader* )gltf_file -> contents;
   return gltf_header -> json_chunk_length;
 }
 
-inline uint32 get_bin_start_offset(  GltfHeader* gltf_header ) {
-  uint32 result;
-  uint32  gltf_header_size_in_bytes = 12; // magic + version + length
-  uint32  json_header_in_bytes      = 8; // 4 bytes for chunk length, 4 bytes for chunk type
-  uint32  json_string_in_bytes      = gltf_header -> json_chunk_length;
-  uint32  bin_header_in_bytes       = 8; // 4 bytes for chunk length, 4 bytes for chunk type
-  result = gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes + bin_header_in_bytes;
+inline u32 get_bin_start_offset(  GltfHeader* gltf_header ) {
+  u32 result;
+  u32 gltf_header_size_in_bytes = 12; // magic + version + length
+  u32 json_header_in_bytes      = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  u32 json_string_in_bytes      = gltf_header -> json_chunk_length;
+  u32 bin_header_in_bytes       = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  result                        = gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes + bin_header_in_bytes;
   return result;
 }
 
-inline void pull_out_json_string( ReadFileResult* gltf_file, char* json_string, uint32 json_string_length ) {
-  GltfHeader* gltf_header = ( GltfHeader* )gltf_file -> contents;
-  uint8 file_header_size_in_bytes = 12; // magic + version + length
-  uint8 json_header_size_in_bytes = 8; // 4 bytes for chunk length, 4 bytes for chunk type
-  uint32 jsonCurrentIndex         = 0;
-  const char* json_data = ( char* )( ( uint8* )gltf_file -> contents + file_header_size_in_bytes + json_header_size_in_bytes );
-  for( uint32 i = 0; i < json_string_length; i++ ) {
+inline void pull_out_json_string( ReadFileResult* gltf_file, char* json_string, u32 json_string_length ) {
+  
+  GltfHeader* gltf_header               = ( GltfHeader* )gltf_file -> contents;
+  
+  u8          file_header_size_in_bytes = 12; // magic + version + length
+  u8          json_header_size_in_bytes = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  u32         jsonCurrentIndex          = 0;
+  const char* json_data = ( char* )( ( u8* )gltf_file -> contents + file_header_size_in_bytes + json_header_size_in_bytes );
+  for( u32 i = 0; i < json_string_length; i++ ) {
     json_string[ jsonCurrentIndex++ ] = json_data[ i ];
   }
   json_string[ jsonCurrentIndex ] = '\0';
-  for( uint32 i = json_string_length + 1; i > json_string_length - 10; i-- ) {
+  for( u32 i = json_string_length + 1; i > json_string_length - 10; i-- ) {
     if( json_string[ i ] == 0x7D || json_string[ i ] == 0x5D )//   } or ]
       break;
     json_string[ i ] = '\0'; // make sure there's no erroneous padding bits at the end of the json, set to \0 if so
   }
 }
 
-uint32 count_meshes( const char* json_string, uint32 char_count ) {
-  uint32  result            = 0;
+u32 count_meshes( const char* json_string, u32 char_count ) {
+  u32     result            = 0;
   bool32  in_meshes_section = false;
-  uint32  object_depth      = 0;
-  uint32  array_depth       = 0;
+  u32     object_depth      = 0;
+  u32     array_depth       = 0;
   char    this_char;
   char    these_chars[ 11 ];
-  for( uint32 i = 0; i < char_count; i++ ) {
+  for( u32 i = 0; i < char_count; i++ ) {
     this_char = json_string[ i ];
     if( in_meshes_section && this_char == ASCII_CLOSE_SQUARE_BRACKETS && array_depth == 1 ) // if we've hit the end of the array
       return result;
@@ -152,7 +155,7 @@ uint32 count_meshes( const char* json_string, uint32 char_count ) {
       object_depth--;
     }
     if( object_depth == 1 && this_char == ASCII_DOUBLE_QUOTE && !in_meshes_section ) {
-      for( uint32 j = 0; j < 10; j++ ) {
+      for( u32 j = 0; j < 10; j++ ) {
         these_chars[ j ] = json_string[ ( i + j ) ];
       }
       these_chars[ 10 ] = '\0';
@@ -166,7 +169,7 @@ uint32 count_meshes( const char* json_string, uint32 char_count ) {
   return result;
 }
 
-inline uint32 get_element_type( char testChar, bool32 in_string ) {
+inline u32 get_element_type( char testChar, bool32 in_string ) {
   if( testChar == '\0' )
     return JSON_ELEMENT_BRACKET;
   if( testChar == 34 )
@@ -184,31 +187,31 @@ inline uint32 get_element_type( char testChar, bool32 in_string ) {
   return JSON_ELEMENT_NONE;
 }
 
-void populate_mesh_name( uint32 target_mesh_index, const char* json_string, uint32 json_char_count, char* mesh_name ) {
+void populate_mesh_name( u32 target_mesh_index, const char* json_string, u32 json_char_count, char* mesh_name ) {
   
   bool32  in_nodes_section    = false;
-  uint32  object_depth        = 0;
-  uint32  array_depth         = 0;
-  int32   current_mesh_index  = -1;
+  u32     object_depth        = 0;
+  u32     array_depth         = 0;
+  s32     current_mesh_index  = -1;
   bool32  in_string           = false;
   bool32  is_end_of_value     = false;
   bool32  is_key              = true;
-  uint32  this_element_type   = JSON_ELEMENT_NONE;
-  uint32  next_element_type   = JSON_ELEMENT_NONE;
-  uint32  this_state          = JSON_STATE_NONE;
-  uint32  last_state          = JSON_STATE_NONE;
-  uint32  current_index       = 0;
+  u32     this_element_type   = JSON_ELEMENT_NONE;
+  u32     next_element_type   = JSON_ELEMENT_NONE;
+  u32     this_state          = JSON_STATE_NONE;
+  u32     last_state          = JSON_STATE_NONE;
+  u32     current_index       = 0;
   
-  char this_char;
-  char next_char;
+  char    this_char;
+  char    next_char;
   
-  const uint32 buffer_size = 100;
-  char key[ buffer_size ];
+  const u32 buffer_size = 100;
+  char key  [ buffer_size ];
   char value[ buffer_size ];
   
   char these_chars[ 10 ];
   
-  for( uint32 i = 0; i < json_char_count; i++ ) {
+  for( u32 i = 0; i < json_char_count; i++ ) {
     
     this_char = json_string[ i ];
     
@@ -225,7 +228,7 @@ void populate_mesh_name( uint32 target_mesh_index, const char* json_string, uint
     }
     
     if( object_depth == 1 && this_char == ASCII_DOUBLE_QUOTE && !in_nodes_section ) {
-      for( uint32 j = 0; j < 9; j++ ) {
+      for( u32 j = 0; j < 9; j++ ) {
         these_chars[ j ] = json_string[ ( i + j ) ];
       }
       these_chars[ 9 ] = '\0';
@@ -268,13 +271,13 @@ void populate_mesh_name( uint32 target_mesh_index, const char* json_string, uint
         }
         
         if( last_state != JSON_STATE_READING_KEY && this_state == JSON_STATE_READING_KEY ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             key[ j ] = '\0';
           }
         }
         
         if( last_state != JSON_STATE_READING_VALUE && this_state == JSON_STATE_READING_VALUE ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             value[ j ] = '\0';
           }
         }
@@ -302,8 +305,8 @@ void populate_mesh_name( uint32 target_mesh_index, const char* json_string, uint
           // std::cout << key << " : " << value << std::endl;
           
           if( strings_are_equal( key, "name" ) ) {
-            uint32 value_length = string_length( value );
-            for( uint32 j = 0; j < value_length; j++ ) {
+            u32 value_length = string_length( value );
+            for( u32 j = 0; j < value_length; j++ ) {
               mesh_name[ j ] = value[ j ];
             }
           }
@@ -314,39 +317,39 @@ void populate_mesh_name( uint32 target_mesh_index, const char* json_string, uint
   }
 }
 
-int32 get_image_buffer_view_index( const char* json_string, uint32 json_char_count ) {
+s32 get_image_buffer_view_index( const char* json_string, u32 json_char_count ) {
   
-  int32 result = -1;
+  s32     result = -1;
   
   bool32  in_images_section   = false;
-  uint32  object_depth        = 0;
-  uint32  array_depth         = 0;
-  int32   current_mesh_index  = -1;
+  u32     object_depth        = 0;
+  u32     array_depth         = 0;
+  s32     current_mesh_index  = -1;
   bool32  in_string           = false;
   bool32  is_end_of_value     = false;
   bool32  is_key              = true;
-  uint32  this_element_type   = JSON_ELEMENT_NONE;
-  uint32  next_element_type   = JSON_ELEMENT_NONE;
-  uint32  this_state          = JSON_STATE_NONE;
-  uint32  last_state          = JSON_STATE_NONE;
-  uint32  current_index       = 0;
+  u32     this_element_type   = JSON_ELEMENT_NONE;
+  u32     next_element_type   = JSON_ELEMENT_NONE;
+  u32     this_state          = JSON_STATE_NONE;
+  u32     last_state          = JSON_STATE_NONE;
+  u32     current_index       = 0;
   
-  bool32 done_vertex      = false;
-  bool32 done_indices     = false;
-  bool32 done_normals     = false;
-  bool32 done_texcoord_0  = false;
-  bool32 done_material    = false;
+  bool32  done_vertex         = false;
+  bool32  done_indices        = false;
+  bool32  done_normals        = false;
+  bool32  done_texcoord_0     = false;
+  bool32  done_material       = false;
   
   char this_char;
   char next_char;
   
-  const uint32 buffer_size = 100;
-  char key[ buffer_size ];
+  const u32 buffer_size = 100;
+  char key  [ buffer_size ];
   char value[ buffer_size ];
   
   char these_chars[ 11 ];
   
-  for( uint32 i = 0; i < json_char_count; i++ ) {
+  for( u32 i = 0; i < json_char_count; i++ ) {
     
     this_char = json_string[ i ];
     
@@ -363,7 +366,7 @@ int32 get_image_buffer_view_index( const char* json_string, uint32 json_char_cou
     }
     
     if( object_depth == 1 && this_char == ASCII_DOUBLE_QUOTE && !in_images_section ) {
-      for( uint32 j = 0; j < 10; j++ ) {
+      for( u32 j = 0; j < 10; j++ ) {
         these_chars[ j ] = json_string[ ( i + j ) ];
       }
       these_chars[ 10 ] = '\0';
@@ -407,13 +410,13 @@ int32 get_image_buffer_view_index( const char* json_string, uint32 json_char_cou
         }
         
         if( last_state != JSON_STATE_READING_KEY && this_state == JSON_STATE_READING_KEY ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             key[ j ] = '\0';
           }
         }
         
         if( last_state != JSON_STATE_READING_VALUE && this_state == JSON_STATE_READING_VALUE ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             value[ j ] = '\0';
           }
         }
@@ -453,39 +456,39 @@ int32 get_image_buffer_view_index( const char* json_string, uint32 json_char_cou
   return result;
 }
 
-MeshPositionIndices get_mesh_position_indices( uint32 target_mesh_index, const char* json_string, uint32 json_char_count ) {
+MeshPositionIndices get_mesh_position_indices( u32 target_mesh_index, const char* json_string, u32 json_char_count ) {
   
   MeshPositionIndices result;
   
-  bool32  in_meshes_section    = false;
-  uint32  object_depth        = 0;
-  uint32  array_depth         = 0;
-  int32   current_mesh_index  = -1;
+  bool32  in_meshes_section   = false;
+  u32     object_depth        = 0;
+  u32     array_depth         = 0;
+  s32     current_mesh_index  = -1;
   bool32  in_string           = false;
   bool32  is_end_of_value     = false;
   bool32  is_key              = true;
-  uint32  this_element_type   = JSON_ELEMENT_NONE;
-  uint32  next_element_type   = JSON_ELEMENT_NONE;
-  uint32  this_state          = JSON_STATE_NONE;
-  uint32  last_state          = JSON_STATE_NONE;
-  uint32  current_index       = 0;
+  u32     this_element_type   = JSON_ELEMENT_NONE;
+  u32     next_element_type   = JSON_ELEMENT_NONE;
+  u32     this_state          = JSON_STATE_NONE;
+  u32     last_state          = JSON_STATE_NONE;
+  u32     current_index       = 0;
   
-  bool32 done_vertex      = false;
-  bool32 done_indices     = false;
-  bool32 done_normals     = false;
-  bool32 done_texcoord_0  = false;
-  bool32 done_material    = false;
+  bool32  done_vertex         = false;
+  bool32  done_indices        = false;
+  bool32  done_normals        = false;
+  bool32  done_texcoord_0     = false;
+  bool32  done_material       = false;
   
   char this_char;
   char next_char;
   
-  const uint32 buffer_size = 100;
+  const u32 buffer_size = 100;
   char key[ buffer_size ];
   char value[ buffer_size ];
   
   char these_chars[ 11 ];
   
-  for( uint32 i = 0; i < json_char_count; i++ ) {
+  for( u32 i = 0; i < json_char_count; i++ ) {
     
     this_char = json_string[ i ];
     
@@ -502,7 +505,7 @@ MeshPositionIndices get_mesh_position_indices( uint32 target_mesh_index, const c
     }
     
     if( object_depth == 1 && this_char == ASCII_DOUBLE_QUOTE && !in_meshes_section ) {
-      for( uint32 j = 0; j < 10; j++ ) {
+      for( u32 j = 0; j < 10; j++ ) {
         these_chars[ j ] = json_string[ ( i + j ) ];
       }
       these_chars[ 10 ] = '\0';
@@ -548,13 +551,13 @@ MeshPositionIndices get_mesh_position_indices( uint32 target_mesh_index, const c
         }
         
         if( last_state != JSON_STATE_READING_KEY && this_state == JSON_STATE_READING_KEY ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             key[ j ] = '\0';
           }
         }
         
         if( last_state != JSON_STATE_READING_VALUE && this_state == JSON_STATE_READING_VALUE ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             value[ j ] = '\0';
           }
         }
@@ -609,38 +612,38 @@ MeshPositionIndices get_mesh_position_indices( uint32 target_mesh_index, const c
   return result;
 }
 
-AccessorData get_accessor_data( uint32 target_accessor_index, const char* json_string, uint32 json_char_count ) {
+AccessorData get_accessor_data( u32 target_accessor_index, const char* json_string, u32 json_char_count ) {
   
   AccessorData result = {};
   
   bool32  in_accessors_section    = false;
-  uint32  object_depth            = 0;
-  uint32  array_depth             = 0;
-  int32   current_accessor_index  = -1;
+  u32     object_depth            = 0;
+  u32     array_depth             = 0;
+  s32     current_accessor_index  = -1;
   bool32  in_string               = false;
   bool32  is_end_of_value         = false;
   bool32  is_key                  = true;
-  uint32  this_element_type       = JSON_ELEMENT_NONE;
-  uint32  next_element_type       = JSON_ELEMENT_NONE;
-  uint32  this_state              = JSON_STATE_NONE;
-  uint32  last_state              = JSON_STATE_NONE;
-  uint32  current_index           = 0;
+  u32     this_element_type       = JSON_ELEMENT_NONE;
+  u32     next_element_type       = JSON_ELEMENT_NONE;
+  u32     this_state              = JSON_STATE_NONE;
+  u32     last_state              = JSON_STATE_NONE;
+  u32     current_index           = 0;
   
-  bool32 done_buffer_view         = false;
-  bool32 done_component_type      = false;
-  bool32 done_count               = false;
-  bool32 done_type                = false;
+  bool32  done_buffer_view        = false;
+  bool32  done_component_type     = false;
+  bool32  done_count              = false;
+  bool32  done_type               = false;
   
   char this_char;
   char next_char;
   
-  const uint32 buffer_size = 100;
-  char key[ buffer_size ];
+  const u32 buffer_size = 100;
+  char key  [ buffer_size ];
   char value[ buffer_size ];
   
   char these_chars[ 14 ];
   
-  for( uint32 i = 0; i < json_char_count; i++ ) {
+  for( u32 i = 0; i < json_char_count; i++ ) {
     
     this_char = json_string[ i ];
         // debug - delete for prod
@@ -666,7 +669,7 @@ AccessorData get_accessor_data( uint32 target_accessor_index, const char* json_s
     }
     
     if( object_depth == 1 && this_char == ASCII_DOUBLE_QUOTE && !in_accessors_section ) {
-      for( uint32 j = 0; j < 13; j++ ) {
+      for( u32 j = 0; j < 13; j++ ) {
         these_chars[ j ] = json_string[ ( i + j ) ];
       }
       these_chars[ 13 ] = '\0';
@@ -709,13 +712,13 @@ AccessorData get_accessor_data( uint32 target_accessor_index, const char* json_s
         }
         
         if( last_state != JSON_STATE_READING_KEY && this_state == JSON_STATE_READING_KEY ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             key[ j ] = '\0';
           }
         }
         
         if( last_state != JSON_STATE_READING_VALUE && this_state == JSON_STATE_READING_VALUE ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             value[ j ] = '\0';
           }
         }
@@ -753,9 +756,9 @@ AccessorData get_accessor_data( uint32 target_accessor_index, const char* json_s
             done_count = true;
           } else if( strings_are_equal( key, "type" ) ) {
             
-            uint32 value_length = string_length( value );
+            u32 value_length = string_length( value );
             
-            for( uint32 j = 0; j < 6; j++ ) {
+            for( u32 j = 0; j < 6; j++ ) {
               if( j < value_length ) {
                 result.type[ j ] = value[ j ];
               } else {
@@ -764,7 +767,6 @@ AccessorData get_accessor_data( uint32 target_accessor_index, const char* json_s
             }
             
             done_type = true;
-            
           }
           
           if( done_buffer_view && done_component_type && done_count && done_type )
@@ -777,39 +779,39 @@ AccessorData get_accessor_data( uint32 target_accessor_index, const char* json_s
   return result;
 }
 
-BufferViewData get_buffer_view_data( uint32 target_buffer_view_index, const char* json_string, uint32 json_char_count ) {
+BufferViewData get_buffer_view_data( u32 target_buffer_view_index, const char* json_string, u32 json_char_count ) {
   
   BufferViewData result;
   
   bool32  in_buffer_views_section   = false;
-  uint32  object_depth              = 0;
-  uint32  array_depth               = 0;
-  int32   current_buffer_view_index = -1;
+  u32     object_depth              = 0;
+  u32     array_depth               = 0;
+  s32     current_buffer_view_index = -1;
   bool32  in_string                 = false;
   bool32  is_end_of_value           = false;
   bool32  is_key                    = true;
-  uint32  this_element_type         = JSON_ELEMENT_NONE;
-  uint32  next_element_type         = JSON_ELEMENT_NONE;
-  uint32  this_state                = JSON_STATE_NONE;
-  uint32  last_state                = JSON_STATE_NONE;
-  uint32  current_index             = 0;
+  u32     this_element_type         = JSON_ELEMENT_NONE;
+  u32     next_element_type         = JSON_ELEMENT_NONE;
+  u32     this_state                = JSON_STATE_NONE;
+  u32     last_state                = JSON_STATE_NONE;
+  u32     current_index             = 0;
   
-  bool32 done_buffer      = false;
-  bool32 done_byte_length = false;
-  bool32 done_byte_offset = false;
+  bool32  done_buffer               = false;
+  bool32  done_byte_length          = false;
+  bool32  done_byte_offset          = false;
   
   char this_char;
   char next_char;
   
-  const uint32 buffer_size = 100;
-  char key[ buffer_size ];
+  const u32 buffer_size = 100;
+  char key  [ buffer_size ];
   char value[ buffer_size ];
   
   char these_chars[ 16 ];
   
   // "bufferViews":[
   
-  for( uint32 i = 0; i < json_char_count; i++ ) {
+  for( u32 i = 0; i < json_char_count; i++ ) {
     
     this_char = json_string[ i ];
     
@@ -826,7 +828,7 @@ BufferViewData get_buffer_view_data( uint32 target_buffer_view_index, const char
     }
     
     if( object_depth == 1 && this_char == ASCII_DOUBLE_QUOTE && !in_buffer_views_section ) {
-      for( uint32 j = 0; j < 15; j++ ) {
+      for( u32 j = 0; j < 15; j++ ) {
         these_chars[ j ] = json_string[ ( i + j ) ];
       }
       these_chars[ 15 ] = '\0';
@@ -867,13 +869,13 @@ BufferViewData get_buffer_view_data( uint32 target_buffer_view_index, const char
         }
         
         if( last_state != JSON_STATE_READING_KEY && this_state == JSON_STATE_READING_KEY ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             key[ j ] = '\0';
           }
         }
         
         if( last_state != JSON_STATE_READING_VALUE && this_state == JSON_STATE_READING_VALUE ) {
-          for( uint32 j = 0; j < buffer_size; j++ ) {
+          for( u32 j = 0; j < buffer_size; j++ ) {
             value[ j ] = '\0';
           }
         }
@@ -921,27 +923,27 @@ BufferViewData get_buffer_view_data( uint32 target_buffer_view_index, const char
   return result;
 }
 
-MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, ReadFileResult* gltf_file, real32 scale ) {
+MeshData populate_mesh_data( u32 target_mesh_index, const char* json_string, ReadFileResult* gltf_file, f32 scale ) {
   
   MeshData result;
   
   const char* gltf_contents = ( char* )gltf_file -> contents;
-  uint32 filesize           = gltf_file -> contents_size;
-  GltfHeader* gltf_header   = ( GltfHeader* )gltf_contents; // pulls in fixed length json stuff too
+  u32         filesize      = gltf_file -> contents_size;
+  GltfHeader* gltf_header   = ( GltfHeader* ) gltf_contents; // pulls in fixed length json stuff too
   
-  uint32  gltf_header_size_in_bytes = 12; // magic + version + length
-  uint32  json_header_in_bytes      = 8; // 4 bytes for chunk length, 4 bytes for chunk type
-  uint32  bin_header_in_bytes       = 8; // 4 bytes for chunk length, 4 bytes for chunk type
-  uint32  json_string_in_bytes      = gltf_header -> json_chunk_length;
-  uint32  json_char_count           = string_length( json_string ); // without padding
-  uint32* bin_chunk_length          = ( uint32* )( ( uint8* )gltf_contents + gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes );
-  uint32  bin_size_in_bytes         = *bin_chunk_length;
-  uint32  bin_start_offset          = gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes + bin_header_in_bytes;
-  uint32  json_chunk_in_bytes       = bin_header_in_bytes + json_string_in_bytes;
+  u32  gltf_header_size_in_bytes = 12; // magic + version + length
+  u32  json_header_in_bytes      = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  u32  bin_header_in_bytes       = 8; // 4 bytes for chunk length, 4 bytes for chunk type
+  u32  json_string_in_bytes      = gltf_header -> json_chunk_length;
+  u32  json_char_count           = string_length( json_string ); // without padding
+  u32* bin_chunk_length          = ( u32* )( ( u8* )gltf_contents + gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes );
+  u32  bin_size_in_bytes         = *bin_chunk_length;
+  u32  bin_start_offset          = gltf_header_size_in_bytes + json_header_in_bytes + json_string_in_bytes + bin_header_in_bytes;
+  u32  json_chunk_in_bytes       = bin_header_in_bytes + json_string_in_bytes;
   
-  const uint32 char_buffer_size = 100;
+  const u32 char_buffer_size = 100;
   char mesh_name[ char_buffer_size ];
-  for( uint32 i = 0; i < char_buffer_size; i++ ) {
+  for( u32 i = 0; i < char_buffer_size; i++ ) {
     mesh_name[ i ] = '\0';
   }
   populate_mesh_name( target_mesh_index, json_string, json_char_count, mesh_name );
@@ -962,10 +964,10 @@ MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, 
   BufferViewData index_buffer_view_data       = get_buffer_view_data( index_accessor_data.buffer_view, json_string, json_char_count );
   BufferViewData tex_coord0_buffer_view_data  = get_buffer_view_data( tex_coord0_accessor_data.buffer_view, json_string, json_char_count );
   
-  uint32 vertex_data_total_offset     = bin_start_offset + vertex_buffer_view_data.byte_offset;
-  uint32 normal_data_total_offset     = bin_start_offset + normal_buffer_view_data.byte_offset;
-  uint32 index_data_total_offset      = bin_start_offset + index_buffer_view_data.byte_offset;
-  uint32 tex_coord0_data_total_offset = bin_start_offset + tex_coord0_buffer_view_data.byte_offset;
+  u32 vertex_data_total_offset     = bin_start_offset + vertex_buffer_view_data.byte_offset;
+  u32 normal_data_total_offset     = bin_start_offset + normal_buffer_view_data.byte_offset;
+  u32 index_data_total_offset      = bin_start_offset + index_buffer_view_data.byte_offset;
+  u32 tex_coord0_data_total_offset = bin_start_offset + tex_coord0_buffer_view_data.byte_offset;
   
   result.vertex_data_in_bytes     = vertex_buffer_view_data.byte_length;
   result.normal_data_in_bytes     = normal_buffer_view_data.byte_length;
@@ -975,24 +977,24 @@ MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, 
   result.normal_count             = normal_accessor_data.count;
   result.index_count              = index_accessor_data.count;
   result.tex_coord0_count         = tex_coord0_accessor_data.count;
-  result.vertex_data              = ( real32* )( ( char* )gltf_contents + vertex_data_total_offset );
-  result.normal_data              = ( real32* )( ( char* )gltf_contents + normal_data_total_offset );
-  result.tex_coord0_data          = ( real32* )( ( char* )gltf_contents + tex_coord0_data_total_offset );
-  result.index_data_raw           = ( uint16* )( ( char* )gltf_contents + index_data_total_offset );
+  result.vertex_data              = ( f32* )( ( char* )gltf_contents + vertex_data_total_offset );
+  result.normal_data              = ( f32* )( ( char* )gltf_contents + normal_data_total_offset );
+  result.tex_coord0_data          = ( f32* )( ( char* )gltf_contents + tex_coord0_data_total_offset );
+  result.index_data_raw           = ( u16* )( ( char* )gltf_contents + index_data_total_offset );
   
-  int32 image_buffer_view_index = get_image_buffer_view_index( json_string, json_char_count );
+  s32 image_buffer_view_index = get_image_buffer_view_index( json_string, json_char_count );
   if( image_buffer_view_index >= 0  ) {
     BufferViewData image_buffer_view_data = get_buffer_view_data( image_buffer_view_index, json_string, json_char_count );
     result.image_data_in_bytes            = image_buffer_view_data.byte_length;
-    uint32 image_data_total_offset        = bin_start_offset + image_buffer_view_data.byte_offset;
-    result.image_data                     = ( uint8* )( ( char* )gltf_contents + image_data_total_offset );
+    u32 image_data_total_offset        = bin_start_offset + image_buffer_view_data.byte_offset;
+    result.image_data                     = ( u8* )( ( char* )gltf_contents + image_data_total_offset );
   }
   
   if( scale != 1.0f ) {
-    real32* value = result.vertex_data;
+    f32* value = result.vertex_data;
     
-    for( uint32 i = 0; i < result.vertex_count; i++ ) {
-      real32 this_float = *value;
+    for( u32 i = 0; i < result.vertex_count; i++ ) {
+      f32 this_float = *value;
       
       this_float *= scale;
       *value = this_float;
@@ -1004,12 +1006,12 @@ MeshData populate_mesh_data( uint32 target_mesh_index, const char* json_string, 
   return result;
 }
 
-GltfbufferViewInfo get_glft_buffer_view_info( uint32 target_mesh_index, const char* gltf_contents, JsonString json, int32 content_type ) {
+GltfbufferViewInfo get_glft_buffer_view_info( u32 target_mesh_index, const char* gltf_contents, JsonString json, s32 content_type ) {
   
   GltfbufferViewInfo result = {};
   
   char*   json_string     = json.json_string;
-  uint32  json_char_count = json.json_char_count;
+  u32  json_char_count = json.json_char_count;
   
   MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
   AccessorData        accessor_data;
@@ -1039,17 +1041,17 @@ GltfbufferViewInfo get_glft_buffer_view_info( uint32 target_mesh_index, const ch
   return result;
 }
 
-void* get_gltf_data_pointer( uint32 target_mesh_index, const char* gltf_contents, JsonString json, int32 content_type ) {
+void* get_gltf_data_pointer( u32 target_mesh_index, const char* gltf_contents, JsonString json, s32 content_type ) {
   
   void* result = NULL;
   
-  char* json_string       = json.json_string;
-  uint32 json_char_count  = json.json_char_count;
-  GltfHeader* gltf_header = ( GltfHeader* )gltf_contents; // pulls in fixed length json stuff too
+  char*       json_string     = json.json_string;
+  u32         json_char_count = json.json_char_count;
+  GltfHeader* gltf_header     = ( GltfHeader* ) gltf_contents; // pulls in fixed length json stuff too
   
   MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
   AccessorData        accessor_data;
-  uint32              buffer_view;
+  u32                 buffer_view;
   
   if( content_type == GLTF_VERTICES ) {
     accessor_data = get_accessor_data( mesh_position_indices.vertices, json_string, json_char_count );
@@ -1070,21 +1072,21 @@ void* get_gltf_data_pointer( uint32 target_mesh_index, const char* gltf_contents
   }
   
   BufferViewData  buffer_view_data  = get_buffer_view_data( buffer_view, json_string, json_char_count );
-  uint32          bin_start_offset  = get_bin_start_offset( gltf_header );
-  uint32          total_offset      = bin_start_offset + buffer_view_data.byte_offset;
+  u32             bin_start_offset  = get_bin_start_offset( gltf_header );
+  u32             total_offset      = bin_start_offset + buffer_view_data.byte_offset;
   
   result = ( void* )( ( char* )gltf_contents + total_offset );
   
   return result;
 }
 
-uint32 get_gltf_data_count( uint32 target_mesh_index, const char* gltf_contents, JsonString json, int32 content_type ) {
+u32 get_gltf_data_count( u32 target_mesh_index, const char* gltf_contents, JsonString json, s32 content_type ) {
   
-  uint32 result = 0;
+  u32 result = 0;
   
   char*   json_string     = json.json_string;
-  uint32  json_char_count = json.json_char_count;
-  uint32  count_per_value = 0;
+  u32  json_char_count = json.json_char_count;
+  u32  count_per_value = 0;
   
   MeshPositionIndices mesh_position_indices = get_mesh_position_indices( target_mesh_index, json_string, json_char_count );
   AccessorData        accessor_data;
