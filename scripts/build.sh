@@ -46,7 +46,7 @@ if [[ $DEBUG_BUILD -eq 1 ]]; then
   BUILD_CALL="$BUILD_CALL -g -DDEBUG"
 fi
 
-if [[ $FULLSCREEN_ONLY ]]; then
+if [[ $DEFAULT_FULLSCREEN_ONLY -eq 1 ]]; then
   BUILD_CALL="$BUILD_CALL -DFULLSCREEN_ONLY"
 fi
 
