@@ -628,6 +628,9 @@ inline u32 get_shader_type( const char* shader_filename ) {
 void load_yaml( const char* filename, GameState* game_state ) {
   
   ReadFileResult        yaml_file = read_entire_file( filename );
+  
+  remove_crlf( &yaml_file );
+  
   ObjectLoadParameters* olp       = NULL;
   ObjectLoadParameters* to_submit = NULL;
   
@@ -646,9 +649,6 @@ void load_yaml( const char* filename, GameState* game_state ) {
     this_char = data[ i ];
     if( this_char == ASCII_LF ) {
       line_end = i;
-      
-      // if( data[ line_end ] == ASCII_CR || data[ line_end ] == ASCII_LF )
-      //   line_end--;
       
       u32 length = ( line_end - line_start );
       char* line = init_char_star( length + 1 );
