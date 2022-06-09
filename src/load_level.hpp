@@ -564,10 +564,7 @@ yaml_line_result process_line( const char* yaml_line, u32 length, u32 current_ya
   null_char_buffer( &key[ 0 ]   , char_buffer_size );
   null_char_buffer( &value[ 0 ] , char_buffer_size );
   
-  char* line = ( char* )malloc( length + 1 );
-  for( u32 i = 0; i < length + 1; i++ ) {
-    line[ i ] = '\0';
-  }
+  char* line = init_char_star( length + 1 );
   memcpy( line, yaml_line, length );
   
   for( u32 i = 0; i < length; i++ ) {
@@ -650,8 +647,8 @@ void load_yaml( const char* filename, GameState* game_state ) {
     if( this_char == ASCII_LF ) {
       line_end = i;
       
-      if( data[ line_end ] == ASCII_CR || data[ line_end ] == ASCII_LF )
-        line_end--;
+      // if( data[ line_end ] == ASCII_CR || data[ line_end ] == ASCII_LF )
+      //   line_end--;
       
       u32 length = ( line_end - line_start );
       char* line = init_char_star( length + 1 );
