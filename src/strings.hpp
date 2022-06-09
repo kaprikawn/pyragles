@@ -6,10 +6,14 @@
 
 const char* assetsDir         = "../assets/";
 
+// see https://en.cppreference.com/w/cpp/language/ascii
+enum ascii_chars {ASCII_NUL,ASCII_SOH,ASCII_STX,ASCII_ETX,ASCII_EOT,ASCII_ENQ,ASCII_ACK,ASCII_BEL,ASCII_BS,ASCII_HT,ASCII_LF,ASCII_VT,ASCII_FF,ASCII_CR,ASCII_SO,ASCII_SI,ASCII_DLE,ASCII_DC1,ASCII_DC2,ASCII_DC3,ASCII_DC4,ASCII_NAK,ASCII_SYN,ASCII_ETB,ASCII_CAN,ASCII_EM,ASCII_SUB,ASCII_ESC,ASCII_FS,ASCII_GS,ASCII_RS,ASCII_US,ASCII_SPACE,ASCII_EXCLAMATION,ASCII_DOUBLE_QUOTE,ASCII_HASH,ASCII_DOLLAR,ASCII_PERCENTAGE,ASCII_AMPERSANDS,ASCII_APOSTROPHE,ASCII_OPEN_BRACKET,ASCII_CLOSE_BRACKET,ASCII_STAR,ASCII_UNK1,ASCII_COMMA,ASCII_HYPHEN,ASCII_DECIMAL_POINT,ASCII_FORWARD_SLASH,ASCII_0,ASCII_1,ASCII_2,ASCII_3,ASCII_4,ASCII_5,ASCII_6,ASCII_7,ASCII_8,ASCII_9,ASCII_COLON,ASCII_SEMI_COLON,ASCII_LESS_THAN,ASCII_EQUALS,ASCII_GREATER_THAN,ASCII_QUESTION_MARK,ASCII_AT_SYMBOL,ASCII_A,ASCII_B,ASCII_C,ASCII_D,ASCII_E,ASCII_F,ASCII_G,ASCII_H,ASCII_I,ASCII_J,ASCII_K,ASCII_L,ASCII_M,ASCII_N,ASCII_O,ASCII_P,ASCII_Q,ASCII_R,ASCII_S,ASCII_T,ASCII_U,ASCII_V,ASCII_W,ASCII_X,ASCII_Y,ASCII_Z,ASCII_OPEN_SQUARE_BRACKETS,ASCII_BACK_SLASH,ASCII_CLOSE_SQUARE_BRACKETS,ASCII_CARROT,ASCII_UNDERSCORE,ASCII_BACKTICK,ASCII_a,ASCII_b,ASCII_c,ASCII_d,ASCII_e,ASCII_f,ASCII_g,ASCII_h,ASCII_i,ASCII_j,ASCII_k,ASCII_l,ASCII_m,ASCII_n,ASCII_o,ASCII_p,ASCII_q,ASCII_r,ASCII_s,ASCII_t,ASCII_u,ASCII_v,ASCII_w,ASCII_x,ASCII_y,ASCII_z,ASCII_OPEN_CURLY_BRACKET,ASCII_PIPE,ASCII_CLOSE_CURLY_BRACKET,ASCII_TILDE,ASCII_DEL};
+
+
 struct ReadFileResult
 {
-    u32  contents_size;
-    void*   contents;
+    u32   contents_size;
+    void* contents;
 };
 
 inline u32 string_length( const char* string ) {
@@ -35,6 +39,18 @@ inline char* init_char_star( u32 length ) {
 inline void copy_string_into_char_star( const char* src, char* dest, u32 length ) {
   for( u32 i = 0; i < length; i++ )
     dest[ i ] = src[ i ];
+}
+
+inline void remove_crlf( ReadFileResult* read_file_result ) {
+  
+  uchar* this_char = ( uchar* ) read_file_result -> contents;
+  
+  for( u32 i = 0; i < read_file_result -> contents_size; i++ ) {
+    if( *this_char == ASCII_CR )
+      *this_char = '\0';
+    
+    this_char++;
+  }
 }
 
 inline char* concat( const char* str1, const char* str2 ) {
