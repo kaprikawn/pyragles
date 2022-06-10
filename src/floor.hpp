@@ -3,8 +3,8 @@
 
 #include "types.hpp"
 #include "object_data.hpp"
+#include "globals.hpp"
 
-#define SCROLL_SPEED 10.0f
 
 void scroll_floor( u32 floor_index, f32 dt ) {
   

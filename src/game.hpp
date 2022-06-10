@@ -17,7 +17,7 @@
 
 #ifdef _WIN32
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 #elif __linux__
 
@@ -28,113 +28,6 @@
 #include <cstring>
 
 #endif
-
-#if DEBUG
-#define Assert( expression ) if( !( expression ) ) {*(int * )0 = 0; }
-#else
-#define Assert( expression )
-#endif
-
-bool32      launch_fullscreen = false;
-
-
-
-struct SDLParams {
-  SDL_Window*   window;
-  SDL_GLContext glContext;
-  int windowWidth;
-  int windowHeight;
-};
-
-enum game_memory_type {
-  GAME_MEMORY_NONE, PERMANENT, TEMP
-};
-
-struct game_memory {
-  bool32  isInitialized;
-  u64  permanentStorageSize;
-  void*   permanentStorage;
-  u32  permanentNextMemoryOffset;
-  u64  tempStorageSize;
-  void*   tempStorage;
-  u32  tempNextMemoryOffset;
-};
-
-u32 shader_program_id;
-
-void init_sdl( SDLParams* sdl_params ) {
-  
-  int windowWidth   = 1280;
-  int windowHeight  = 720;
-  int windowX       = 50;
-  int windowY       = 50;
-  u32 sdlFlags      = SDL_WINDOW_OPENGL;
-  
-#ifdef FULLSCREEN_ONLY
-  launch_fullscreen = true;
-#endif
-  
-  SDL_Init( SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER );
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );
-  SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
-  SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
-  
-  if( launch_fullscreen ) {
-    u32 sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN;
-    
-    // create window to native desktop size to query screen dimensions
-    
-    SDL_Window* nullWindow = SDL_CreateWindow( "undef", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_FULLSCREEN );
-    SDL_DisplayMode dm;
-    SDL_GetDesktopDisplayMode( 0, &dm );
-    windowWidth   = dm.w;
-    windowHeight  = dm.h;
-    SDL_DestroyWindow( nullWindow );
-    
-    windowX       = SDL_WINDOWPOS_UNDEFINED;
-    windowY       = SDL_WINDOWPOS_UNDEFINED;
-    
-    SDL_ShowCursor( SDL_DISABLE );
-  }
-  
-  sdl_params -> window = SDL_CreateWindow( "Alpha Flight", windowX, windowY, windowWidth, windowHeight, sdlFlags );
-  if( !sdl_params -> window ) {
-    SDL_LogError( SDL_LOG_CATEGORY_ERROR, "The window could not be created! SDL_Error : %s\n", SDL_GetError() );
-  }
-  
-  if( launch_fullscreen ) {
-    SDL_SetWindowFullscreen( sdl_params -> window, SDL_WINDOW_FULLSCREEN );
-  }
-  
-  sdl_params -> glContext = SDL_GL_CreateContext( sdl_params -> window );
-  if( sdl_params -> glContext ) {
-    const GLubyte* version  = glGetString( GL_VERSION );
-    const GLubyte* renderer = glGetString( GL_RENDERER );
-    
-    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Version string: %s\n", version );
-    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Renderer string: %s\n", renderer );
-    
-  } else {
-    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "Failed to create GL context : %s\n", SDL_GetError());
-  }
-  
-  // init glew
-#ifdef _WIN32
-  GLenum err = glewInit();
-#endif
-  
-  GLCall( SDL_GL_SetSwapInterval( 1 ) );
-  GLCall( glEnable( GL_DEPTH_TEST ) );
-  GLCall( glEnable( GL_BLEND ) );
-  GLCall( glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) );
-  GLCall( glViewport( 0, 0, ( float )windowWidth, ( float )windowHeight ) );
-  GLCall( glClearColor( 0.0f, 0.65f, 1.0f, 1.0f ) );
-  
-  sdl_params -> windowWidth   = windowWidth;
-  sdl_params -> windowHeight  = windowHeight;
-  
-};
-
 
 // for delta time ( dt )
 u32 current_time, previous_time, before_frame_flip_time;
@@ -167,48 +60,6 @@ void initial_setup( GameState* game_state, SDLParams sdl_params ) {
   
   game_state -> vbo = vbo;
   game_state -> ibo = ibo;
-}
-
-void update_level_object( u32 object_index, f32 dt ) {
-  u32 i = object_index;
-  
-  if( !object_active[ i ] )
-    return;
-  
-  // some dirty hardcoding for now
-  if( i == 4 ) {
-    rotations[ i ].y += 200.0f * dt;
-    velocities[ i ].z = 2.0f;
-  }
-  
-  while( rotations[ i ].x > 360.0f )
-    rotations[ i ].x -= 360.0f;
-  while( rotations[ i ].x < 0.0f )
-    rotations[ i ].x += 360.0f;
-  while( rotations[ i ].y > 360.0f )
-    rotations[ i ].y -= 360.0f;
-  while( rotations[ i ].y < 0.0f )
-    rotations[ i ].y += 360.0f;
-  while( rotations[ i ].z > 360.0f )
-    rotations[ i ].z -= 360.0f;
-  while( rotations[ i ].z < 0.0f )
-    rotations[ i ].z += 360.0f;
-  
-  if( object_types[ i ] == OBJECT_TYPE_SCENARY ) {
-    positions[ i ].z += SCROLL_SPEED * dt;
-  } else {
-    positions[ i ].y = positions[ i ].y + ( velocities[ i ].y * dt );
-    positions[ i ].x = positions[ i ].x + ( velocities[ i ].x * dt );
-    positions[ i ].z = positions[ i ].z + ( velocities[ i ].z * dt );
-  }
-}
-
-void update_level_objects( u32 index_start, u32 index_end, f32 dt ) {
-  
-  for( u32 i = index_start; i <= index_end; i++ ) {
-    update_level_object( i, dt );
-  }
-  
 }
 
 s32 run_game() {
