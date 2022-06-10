@@ -13,5 +13,4 @@ void caculate_camera( GameState* game_state, GameInput* game_input, f32 dt ) {
   mat4_multiply( &game_state -> vp_mat[ 0 ], &v[ 0 ], &game_state -> p_mat[ 0 ] );
 }
 
-
 #endif //CAMERA_HPP
