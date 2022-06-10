@@ -654,7 +654,7 @@ void load_yaml( const char* filename, GameState* game_state ) {
       char* line = init_char_star( length + 1 );
       memcpy( line, &data[ line_start ], length );
       
-      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "line %s\n", line );
+      // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "line %s\n", line );
       
       yaml_line_result yaml_line = process_line( line, length, current_yaml_section );
       
@@ -673,7 +673,7 @@ void load_yaml( const char* filename, GameState* game_state ) {
       if( strings_are_equal( line, "levelObjects:" ) ) {
           current_yaml_section = YAML_SECTION_LEVEL_OBJECTS;
       } else if( yaml_line.is_key_value_pair && current_yaml_section == YAML_SECTION_LEVEL_OBJECTS ) {
-        SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key is %s - value is %s\n", yaml_line.key, yaml_line.value );
+        // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "key is %s - value is %s\n", yaml_line.key, yaml_line.value );
         
         if( strings_are_equal( yaml_line.key, "glbFile" ) ) {
           olp -> gltf_model_filename = init_char_star( yaml_line.value_length + 1 );

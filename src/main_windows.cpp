@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "globals.hpp"
 #include "game.hpp"
 
 int CALLBACK WinMain( HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CommandLine, int ShowCode ) {

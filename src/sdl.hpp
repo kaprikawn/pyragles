@@ -35,6 +35,9 @@ static bool GLLogCall( const char* function, const char* file, const int line ) 
 }
 
 bool32  launch_fullscreen = false;
+#ifdef FULLSCREEN_ONLY
+  launch_fullscreen = true;
+#endif
 
 struct SDLParams {
   SDL_Window*   window;
@@ -50,10 +53,6 @@ void init_sdl( SDLParams* sdl_params ) {
   int windowX       = 50;
   int windowY       = 50;
   u32 sdlFlags      = SDL_WINDOW_OPENGL;
-  
-#ifdef FULLSCREEN_ONLY
-  launch_fullscreen = true;
-#endif
   
   SDL_Init( SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER );
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );

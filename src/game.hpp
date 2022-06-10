@@ -74,6 +74,7 @@ s32 run_game() {
   GameState game_state;
   game_state.array_buffer_target          = 0;
   game_state.element_array_buffer_target  = 0;
+  game_state.invert_y = true;
   
   initial_setup( &game_state, sdl_params );
   initialise_gamepads();
