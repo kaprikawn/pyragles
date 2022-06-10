@@ -1,6 +1,8 @@
 #ifndef SDL_HPP
 #define SDL_HPP
 
+#include "types.hpp"
+
 #if defined DEBUG
   #define GLCall(x) GLClearError();\
                     x;\
@@ -35,9 +37,6 @@ static bool GLLogCall( const char* function, const char* file, const int line ) 
 }
 
 bool32  launch_fullscreen = false;
-#ifdef FULLSCREEN_ONLY
-  launch_fullscreen = true;
-#endif
 
 struct SDLParams {
   SDL_Window*   window;
@@ -46,8 +45,18 @@ struct SDLParams {
   int windowHeight;
 };
 
+void check_for_fullscreen() {
+
+#ifdef FULLSCREEN_ONLY
+  launch_fullscreen = true;
+#endif
+
+}
+
 void init_sdl( SDLParams* sdl_params ) {
-  
+
+  check_for_fullscreen();
+
   int windowWidth   = 1280;
   int windowHeight  = 720;
   int windowX       = 50;
