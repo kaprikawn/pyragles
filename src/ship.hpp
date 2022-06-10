@@ -136,12 +136,12 @@ void update_ship_velocity( GameInput* game_input, f32 dt, u32 ship_index = 0 ) {
   f32 target_velocity_y  = -joy_y * multiplier;
   f32 current_velocity_y = velocities[ i ].y;
   f32 new_velocity_y     = lerp_dt( current_velocity_y, target_velocity_y, lerp_smoothing, dt );
-  velocities[ i ].y         = new_velocity_y;
+  velocities[ i ].y      = new_velocity_y;
   
   f32 target_velocity_x  = joy_x * multiplier;
   f32 current_velocity_x = velocities[ i ].x;
   f32 new_velocity_x     = lerp_dt( current_velocity_x, target_velocity_x, lerp_smoothing, dt );
-  velocities[ i ].x         = new_velocity_x;
+  velocities[ i ].x      = new_velocity_x;
   
   int y = 7;
 }

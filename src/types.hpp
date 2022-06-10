@@ -23,5 +23,4 @@ typedef unsigned char uchar;
 #define Gigabytes(Value) (Megabytes(Value)*1024LL)
 #define Terabytes(Value) (Gigabytes(Value)*1024LL)
 
-
 #endif //TYPES_HPP

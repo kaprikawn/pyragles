@@ -11,6 +11,7 @@
 #include "maths.hpp"
 #include "types.hpp"
 #include "sdl.hpp"
+#include "globals.hpp"
 
 const u32 OBJECT_COUNT = 10;
 f32 floor_start_z = 0.0f;
@@ -18,8 +19,8 @@ f32 floor_start_z = 0.0f;
 struct GameState {
   f32       vp_mat[ 16 ]; // view perspective matrix
   f32       p_mat [ 16 ]; // projection matrix
-  Position  eye      = { 0.0f, 5.0f, 10.0f };
-  Position  look_at  = { 0.0f, 5.0f, 9.0f };
+  Position  eye                           = { 0.0f, 5.0f, 10.0f };
+  Position  look_at                       = { 0.0f, 5.0f, 9.0f };
   s32       vbo;
   s32       ibo;
   u32       array_buffer_target           = 0;
@@ -241,6 +242,48 @@ void render_object( u32 object_index, f32* vp_matrix ) {
     
     glDrawElements( mode, count, type, ( const GLvoid* )indices );
   }
+}
+
+void update_level_object( u32 object_index, f32 dt ) {
+  u32 i = object_index;
+  
+  if( !object_active[ i ] )
+    return;
+  
+  // some dirty hardcoding for now
+  if( i == 4 ) {
+    rotations[ i ].y += 200.0f * dt;
+    velocities[ i ].z = 2.0f;
+  }
+  
+  while( rotations[ i ].x > 360.0f )
+    rotations[ i ].x -= 360.0f;
+  while( rotations[ i ].x < 0.0f )
+    rotations[ i ].x += 360.0f;
+  while( rotations[ i ].y > 360.0f )
+    rotations[ i ].y -= 360.0f;
+  while( rotations[ i ].y < 0.0f )
+    rotations[ i ].y += 360.0f;
+  while( rotations[ i ].z > 360.0f )
+    rotations[ i ].z -= 360.0f;
+  while( rotations[ i ].z < 0.0f )
+    rotations[ i ].z += 360.0f;
+  
+  if( object_types[ i ] == OBJECT_TYPE_SCENARY ) {
+    positions[ i ].z += SCROLL_SPEED * dt;
+  } else {
+    positions[ i ].y = positions[ i ].y + ( velocities[ i ].y * dt );
+    positions[ i ].x = positions[ i ].x + ( velocities[ i ].x * dt );
+    positions[ i ].z = positions[ i ].z + ( velocities[ i ].z * dt );
+  }
+}
+
+void update_level_objects( u32 index_start, u32 index_end, f32 dt ) {
+  
+  for( u32 i = index_start; i <= index_end; i++ ) {
+    update_level_object( i, dt );
+  }
+  
 }
 
 #ifdef __linux__

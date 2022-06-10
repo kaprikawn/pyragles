@@ -4,6 +4,12 @@
 #include "types.hpp"
 #include "sdl.hpp"
 
+bool32 input_debug = false;
+#ifdef INPUT_DEBUG
+  input_debug = true;
+#endif
+
+
 struct ButtonsPressed {
   bool32  quit        = false;
   bool32  w           = false;
@@ -14,12 +20,29 @@ struct ButtonsPressed {
   bool32  arrow_down  = false;
   bool32  pg_up       = false;
   bool32  pg_down     = false;
+  bool32  dpad_up     = false;
+  bool32  dpad_down   = false;
+  bool32  dpad_left   = false;
+  bool32  dpad_right  = false;
   f32     joy_axis_x  = 0.0f;
   f32     joy_axis_y  = 0.0f;
 };
 
 struct GameInput {
   bool32  quit                = false;
+  
+  bool32  dpad_up_pressed     = false;
+  bool32  dpad_up_held        = false;
+  bool32  dpad_up_released    = false;
+  bool32  dpad_down_pressed   = false;
+  bool32  dpad_down_held      = false;
+  bool32  dpad_down_released  = false;
+  bool32  dpad_left_pressed   = false;
+  bool32  dpad_left_held      = false;
+  bool32  dpad_left_released  = false;
+  bool32  dpad_right_pressed  = false;
+  bool32  dpad_right_held     = false;
+  bool32  dpad_right_released = false;
   bool32  w_pressed           = false;
   bool32  w_held              = false;
   bool32  w_released          = false;
@@ -44,6 +67,7 @@ struct GameInput {
   bool32  pg_down_pressed     = false;
   bool32  pg_down_held        = false;
   bool32  pg_down_released    = false;
+  bool32  prefer_dpad         = false;
   f32     joy_axis_x          = 0.0f;
   f32     joy_axis_y          = 0.0f;
 };
@@ -55,6 +79,10 @@ void reset_game_inputs_pressed( ButtonsPressed* old_buttons, ButtonsPressed* new
   old_buttons -> d          = new_buttons -> d;
   old_buttons -> arrow_up   = new_buttons -> arrow_up;
   old_buttons -> arrow_down = new_buttons -> arrow_down;
+  old_buttons -> dpad_up    = new_buttons -> dpad_up;
+  old_buttons -> dpad_down  = new_buttons -> dpad_down;
+  old_buttons -> dpad_left  = new_buttons -> dpad_left;
+  old_buttons -> dpad_right = new_buttons -> dpad_right;
 }
 
 GameInput get_game_input_state( ButtonsPressed old_buttons, ButtonsPressed new_buttons, bool32 invert_y ) {
@@ -153,7 +181,18 @@ GameInput get_game_input_state( ButtonsPressed old_buttons, ButtonsPressed new_b
       joy_axis_y = -1.0f;
     }
   }
-    
+  
+  if( new_buttons.dpad_up ) {
+    joy_axis_y = -1.0f;
+  } else if( new_buttons.dpad_down ) {
+    joy_axis_y =  1.0f;
+  }
+  if( new_buttons.dpad_left ) {
+    joy_axis_x = -1.0f;
+  } else if( new_buttons.dpad_right ) {
+    joy_axis_x =  1.0f;
+  }
+  
   if( invert_y ) {
     joy_axis_y = -joy_axis_y;
   }
@@ -303,10 +342,74 @@ void initialise_gamepads() {
 
 s16 deadzone = 100;
 
+void on_hat_motion( SDL_Event* event, ButtonsPressed* new_buttons ) {
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "hat motion detected\n" );
+}
+
+void on_joy_button_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
+  
+  u8 button_index = event -> jbutton.button;
+  
+  switch( button_index ) {
+    
+    case 11 : {
+      new_buttons -> dpad_up    = true;
+      old_buttons -> dpad_up    = false;
+    } break;
+    
+    case 12 : {
+      new_buttons -> dpad_down  = true;
+      old_buttons -> dpad_down  = false;
+    } break;
+    
+    case 13 : {
+      new_buttons -> dpad_left  = true;
+      old_buttons -> dpad_left  = false;
+    } break;
+    
+    case 14 : {
+      new_buttons -> dpad_right = true;
+      old_buttons -> dpad_right = false;
+    } break;
+    
+    default : break;
+  }
+}
+
+void on_joy_button_up( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
+  
+  u8 button_index = event -> jbutton.button;
+  
+  switch( button_index ) {
+    
+    case 11 : {
+      new_buttons -> dpad_up    = false;
+      old_buttons -> dpad_up    = true;
+    } break;
+    
+    case 12 : {
+      new_buttons -> dpad_down  = false;
+      old_buttons -> dpad_down  = true;
+    } break;
+    
+    case 13 : {
+      new_buttons -> dpad_left  = false;
+      old_buttons -> dpad_left  = true;
+    } break;
+    
+    case 14 : {
+      new_buttons -> dpad_right = false;
+      old_buttons -> dpad_right = true;
+    } break;
+    
+    default : break;
+  }
+}
+
 void on_joy_axis_move( SDL_Event* event, ButtonsPressed* new_buttons ) {
   
-  s16   axis_value  = event -> jaxis.value;
-  f32  normalised_value;
+  s16 axis_value  = event -> jaxis.value;
+  f32 normalised_value;
   
   if( axis_value < deadzone && axis_value > -deadzone ) {
     normalised_value = 0.0f;
@@ -318,26 +421,40 @@ void on_joy_axis_move( SDL_Event* event, ButtonsPressed* new_buttons ) {
     normalised_value = 0.0f;
   }
   
-  // if( axis_value > 100 || axis_value < -100 ) {
-  //   real32 norm = ( real32 )axis_value / 32767.0f;
-  //   SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "raw %d = norm %f...norm orig %f\n", axis_value, norm, normalised_value );
-  // }
-  
   if( event -> jaxis.axis == 0 ) { // left and right
     new_buttons -> joy_axis_x = normalised_value;
-    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis raw reading %d\n", axis_value );
-    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis norm reading %f\n", normalised_value );
+    
+    if( input_debug ) {
+      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis raw reading %d\n", axis_value );
+      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis norm reading %f\n", normalised_value );
+    }
   } else if( event -> jaxis.axis == 1 ) { // up and down
     new_buttons -> joy_axis_y = normalised_value;
-    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis raw reading %d\n", axis_value );
-    // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis norm reading %f\n", normalised_value );
+    if( input_debug ) {
+      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis raw reading %d\n", axis_value );
+      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis norm reading %f\n", normalised_value );
+    }
   }
   
 }
 
 void handle_sdl_input_event( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
   
+  // SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "type is %d\n", event -> type );
+  
   switch( event -> type ) {
+    
+    case SDL_JOYHATMOTION : {
+      on_hat_motion( event, new_buttons );
+    } break;
+    
+    case SDL_JOYBUTTONDOWN  : {
+      on_joy_button_down( event, old_buttons, new_buttons );
+    } break;
+    
+    case SDL_JOYBUTTONUP  : {
+      on_joy_button_up( event, old_buttons, new_buttons );
+    } break;
     
     case SDL_JOYAXISMOTION : {
       on_joy_axis_move( event, new_buttons );

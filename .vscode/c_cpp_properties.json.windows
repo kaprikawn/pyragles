@@ -5,9 +5,15 @@
             "includePath": [
                 "${workspaceFolder}/**"
             , "${workspaceFolder}\\src"
+            , "${workspaceFolder}/src"
             , "${workspaceFolder}\\external"
+            , "${workspaceFolder}/external"
+            , "${workspaceFolder}/external"
             , "C:\\dev\\SDL2-2.0.14\\include"
+            , "C:/dev/SDL2-2.0.14/include"
             , "C:\\dev\\glew-2.2.0\\include"
+            , "C:/dev/glew-2.2.0/include"
+            , "C:/Program Files (x86)/Windows Kits/10/**"
         ],
         "defines": [
             "_DEBUG",
