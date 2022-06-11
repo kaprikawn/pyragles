@@ -12,56 +12,30 @@ struct ButtonsPressed {
   bool32  d           = false;
   bool32  arrow_up    = false;
   bool32  arrow_down  = false;
+  bool32  arrow_left  = false;
+  bool32  arrow_right = false;
   bool32  pg_up       = false;
   bool32  pg_down     = false;
   bool32  dpad_up     = false;
   bool32  dpad_down   = false;
   bool32  dpad_left   = false;
   bool32  dpad_right  = false;
+  bool32  btn_left    = false; // e.g. square on ps controller
+  bool32  btn_right   = false; // e.g. circle on ps controller
+  bool32  btn_up      = false; // e.g. triangle on ps controller
+  bool32  btn_down    = false; // e.g. X on ps controller
   f32     joy_axis_x  = 0.0f;
   f32     joy_axis_y  = 0.0f;
 };
 
 struct GameInput {
   bool32  quit                = false;
-  
-  bool32  dpad_up_pressed     = false;
-  bool32  dpad_up_held        = false;
-  bool32  dpad_up_released    = false;
-  bool32  dpad_down_pressed   = false;
-  bool32  dpad_down_held      = false;
-  bool32  dpad_down_released  = false;
-  bool32  dpad_left_pressed   = false;
-  bool32  dpad_left_held      = false;
-  bool32  dpad_left_released  = false;
-  bool32  dpad_right_pressed  = false;
-  bool32  dpad_right_held     = false;
-  bool32  dpad_right_released = false;
-  bool32  w_pressed           = false;
-  bool32  w_held              = false;
-  bool32  w_released          = false;
-  bool32  a_pressed           = false;
-  bool32  a_held              = false;
-  bool32  a_released          = false;
-  bool32  s_pressed           = false;
-  bool32  s_held              = false;
-  bool32  s_released          = false;
-  bool32  d_pressed           = false;
-  bool32  d_held              = false;
-  bool32  d_released          = false;
-  bool32  arrow_up_pressed    = false;
-  bool32  arrow_up_held       = false;
-  bool32  arrow_up_released   = false;
-  bool32  arrow_down_pressed  = false;
-  bool32  arrow_down_held     = false;
-  bool32  arrow_down_released = false;
-  bool32  pg_up_pressed       = false;
-  bool32  pg_up_held          = false;
-  bool32  pg_up_released      = false;
-  bool32  pg_down_pressed     = false;
-  bool32  pg_down_held        = false;
-  bool32  pg_down_released    = false;
-  bool32  prefer_dpad         = false;
+  bool32  btn_left_pressed    = false;
+  bool32  btn_right_pressed   = false;
+  bool32  btn_top_pressed     = false;
+  bool32  btn_bottom_pressed  = false;
+  bool32  btn_ltrig_pressed   = false;
+  bool32  btn_rtrig_pressed   = false;
   f32     joy_axis_x          = 0.0f;
   f32     joy_axis_y          = 0.0f;
 };
@@ -73,10 +47,16 @@ void reset_game_inputs_pressed( ButtonsPressed* old_buttons, ButtonsPressed* new
   old_buttons -> d          = new_buttons -> d;
   old_buttons -> arrow_up   = new_buttons -> arrow_up;
   old_buttons -> arrow_down = new_buttons -> arrow_down;
+  old_buttons -> pg_up      = new_buttons -> pg_up;
+  old_buttons -> pg_down    = new_buttons -> pg_down;
   old_buttons -> dpad_up    = new_buttons -> dpad_up;
   old_buttons -> dpad_down  = new_buttons -> dpad_down;
   old_buttons -> dpad_left  = new_buttons -> dpad_left;
   old_buttons -> dpad_right = new_buttons -> dpad_right;
+  old_buttons -> btn_left   = new_buttons -> btn_left;
+  old_buttons -> btn_right  = new_buttons -> btn_right;
+  old_buttons -> btn_up     = new_buttons -> btn_up;
+  old_buttons -> btn_down   = new_buttons -> btn_down;
 }
 
 GameInput get_game_input_state( ButtonsPressed old_buttons, ButtonsPressed new_buttons, bool32 invert_y ) {
@@ -86,113 +66,34 @@ GameInput get_game_input_state( ButtonsPressed old_buttons, ButtonsPressed new_b
   if( old_buttons.quit || new_buttons.quit )
     result.quit = true;
   
-  // if( !old_buttons.w && new_buttons.w ) {
-  //   result.w_pressed  = true;
-  //   result.w_held     = true;
-  // } else if( old_buttons.w && new_buttons.w ) {
-  //   result.w_held     = true;
-  // } else if( old_buttons.w && !new_buttons.w ) {
-  //   result.w_released = true;
-  // }
-  
-  // if( !old_buttons.a && new_buttons.a ) {
-  //   result.a_pressed  = true;
-  //   result.a_held     = true;
-  // } else if( old_buttons.a && new_buttons.a ) {
-  //   result.a_held     = true;
-  // } else if( old_buttons.a && !new_buttons.a ) {
-  //   result.a_released = true;
-  // }
-  
-  // if( !old_buttons.s && new_buttons.s ) {
-  //   result.s_pressed  = true;
-  //   result.s_held     = true;
-  // } else if( old_buttons.s && new_buttons.s ) {
-  //   result.s_held     = true;
-  // } else if( old_buttons.s && !new_buttons.s ) {
-  //   result.s_released = true;
-  // }
-  
-  // if( !old_buttons.d && new_buttons.d ) {
-  //   result.d_pressed  = true;
-  //   result.d_held     = true;
-  // } else if( old_buttons.d && new_buttons.d ) {
-  //   result.d_held     = true;
-  // } else if( old_buttons.d && !new_buttons.d ) {
-  //   result.d_released = true;
-  // }
-  
-  if( !old_buttons.arrow_up && new_buttons.arrow_up ) {
-    result.arrow_up_pressed  = true;
-    result.arrow_up_held     = true;
-  } else if( old_buttons.arrow_up && new_buttons.arrow_up ) {
-    result.arrow_up_held     = true;
-  } else if( old_buttons.arrow_up && !new_buttons.arrow_up ) {
-    result.arrow_up_released = true;
+  if( new_buttons.w || new_buttons.arrow_up || new_buttons.dpad_up ) {
+    result.joy_axis_y = -1.0f;
+  } else if( new_buttons.s || new_buttons.arrow_down || new_buttons.dpad_down ) {
+    result.joy_axis_y =  1.0f;
+  } else {
+    result.joy_axis_y =  new_buttons.joy_axis_y;
   }
   
-  if( !old_buttons.arrow_down && new_buttons.arrow_down ) {
-    result.arrow_down_pressed  = true;
-    result.arrow_down_held     = true;
-  } else if( old_buttons.arrow_down && new_buttons.arrow_down ) {
-    result.arrow_down_held     = true;
-  } else if( old_buttons.arrow_down && !new_buttons.arrow_down ) {
-    result.arrow_down_released = true;
-  }
-  
-  if( !old_buttons.pg_up && new_buttons.pg_up ) {
-    result.pg_up_pressed  = true;
-    result.pg_up_held     = true;
-  } else if( old_buttons.pg_up && new_buttons.pg_up ) {
-    result.pg_up_held     = true;
-  } else if( old_buttons.pg_up && !new_buttons.pg_up ) {
-    result.pg_up_released = true;
-  }
-  
-  if( !old_buttons.pg_down && new_buttons.pg_down ) {
-    result.pg_down_pressed  = true;
-    result.pg_down_held     = true;
-  } else if( old_buttons.pg_down && new_buttons.pg_down ) {
-    result.pg_down_held     = true;
-  } else if( old_buttons.pg_down && !new_buttons.pg_down ) {
-    result.pg_down_released = true;
-  }
-  
-  f32 joy_axis_x = new_buttons.joy_axis_x;
-  f32 joy_axis_y = new_buttons.joy_axis_y;
-  
-  if( joy_axis_x == 0.0f ) {
-    if( new_buttons.d ) {
-      joy_axis_x = 1.0f;
-    } else if( new_buttons.a ) {
-      joy_axis_x = -1.0f;
-    }
-  }
-  if( joy_axis_y == 0.0f ) {
-    if( new_buttons.s ) {
-      joy_axis_y = 1.0f;
-    } else if( new_buttons.w ) {
-      joy_axis_y = -1.0f;
-    }
-  }
-  
-  if( new_buttons.dpad_up ) {
-    joy_axis_y = -1.0f;
-  } else if( new_buttons.dpad_down ) {
-    joy_axis_y =  1.0f;
-  }
-  if( new_buttons.dpad_left ) {
-    joy_axis_x = -1.0f;
-  } else if( new_buttons.dpad_right ) {
-    joy_axis_x =  1.0f;
+  if( new_buttons.a || new_buttons.arrow_left || new_buttons.dpad_left ) {
+    result.joy_axis_x = -1.0f;
+  } else if( new_buttons.d || new_buttons.arrow_right || new_buttons.dpad_right ) {
+    result.joy_axis_x =  1.0f;
+  } else {
+    result.joy_axis_x =  new_buttons.joy_axis_x;
   }
   
   if( invert_y ) {
+    f32 joy_axis_y = result.joy_axis_y;
     joy_axis_y = -joy_axis_y;
+    result.joy_axis_y = joy_axis_y;
   }
   
-  result.joy_axis_x = joy_axis_x;
-  result.joy_axis_y = joy_axis_y;
+  if( !old_buttons.btn_left && new_buttons.btn_left ) {
+    result.btn_left_pressed = true;
+#ifdef INPUT_DEBUG
+    SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "fire button pressed\n" );
+#endif
+  }
   
   return result;
 }
@@ -358,6 +259,7 @@ void on_joy_button_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsP
   
   switch( button_index ) {
     
+    // wasd
     case 11 : {
       new_buttons -> dpad_up    = true;
       old_buttons -> dpad_up    = false;
@@ -374,6 +276,27 @@ void on_joy_button_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsP
     } break;
     
     case 14 : {
+      new_buttons -> dpad_right = true;
+      old_buttons -> dpad_right = false;
+    } break;
+    
+    // arrow keys, is the dpad on the pyra
+    case 82 : {
+      new_buttons -> dpad_up    = true;
+      old_buttons -> dpad_up    = false;
+    } break;
+    
+    case 81 : {
+      new_buttons -> dpad_down  = true;
+      old_buttons -> dpad_down  = false;
+    } break;
+    
+    case 80 : {
+      new_buttons -> dpad_left  = true;
+      old_buttons -> dpad_left  = false;
+    } break;
+    
+    case 79 : {
       new_buttons -> dpad_right = true;
       old_buttons -> dpad_right = false;
     } break;
@@ -408,6 +331,26 @@ void on_joy_button_up( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPre
       old_buttons -> dpad_right = true;
     } break;
     
+    case 82 : {
+      new_buttons -> dpad_up    = false;
+      old_buttons -> dpad_up    = true;
+    } break;
+    
+    case 81 : {
+      new_buttons -> dpad_down  = false;
+      old_buttons -> dpad_down  = true;
+    } break;
+    
+    case 80 : {
+      new_buttons -> dpad_left  = false;
+      old_buttons -> dpad_left  = true;
+    } break;
+    
+    case 79 : {
+      new_buttons -> dpad_right = false;
+      old_buttons -> dpad_right = true;
+    } break;
+    
     default : break;
   }
 }
@@ -420,9 +363,9 @@ void on_joy_axis_move( SDL_Event* event, ButtonsPressed* new_buttons ) {
   if( axis_value < deadzone && axis_value > -deadzone ) {
     normalised_value = 0.0f;
   } else if( axis_value > 0 ) {
-    normalised_value = ( f32 )axis_value / 32767.0f;
+    normalised_value = ( f32 ) axis_value / 32767.0f;
   } else if( axis_value < 0 ) {
-    normalised_value = ( f32 )axis_value / 32768.0f;
+    normalised_value = ( f32 ) axis_value / 32768.0f;
   } else {
     normalised_value = 0.0f;
   }
