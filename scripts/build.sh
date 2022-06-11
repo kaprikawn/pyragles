@@ -62,12 +62,18 @@ if [[ $IS_PYRA -eq 1 ]]; then
   
   if [[ ! -e $BUILD_DIR/run.sh ]]; then
     echo '#!/bin/bash'                                                                                     > $BUILD_DIR/run.sh
+    echo 'set -x'                                                                                         >> $BUILD_DIR/run.sh
+    echo 'SCRIPT_DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"'                                >> $BUILD_DIR/run.sh
+    echo 'cd $SCRIPT_DIR'                                                                                 >> $BUILD_DIR/run.sh
     echo 'sudo /usr/sbin/pyrainputctl enable gamepad'                                                     >> $BUILD_DIR/run.sh
     echo 'sudo /usr/sbin/pyrainputctl disable mouse'                                                      >> $BUILD_DIR/run.sh
     echo 'export SDL_OPENGL_ES_DRIVER=1 SDL_VIDEO_EGL_DRIVER=/opt/omap5-sgx-ddk-um-linux/lib/libEGL.so.1' >> $BUILD_DIR/run.sh
     echo './AlphaFlight'                                                                                  >> $BUILD_DIR/run.sh
     echo 'sudo /usr/sbin/pyrainputctl disable gamepad'                                                    >> $BUILD_DIR/run.sh
     echo 'sudo /usr/sbin/pyrainputctl enable mouse'                                                       >> $BUILD_DIR/run.sh
+    echo 'echo Exiting program'                                                                           >> $BUILD_DIR/run.sh
+    echo 'exit 0'                                                                                         >> $BUILD_DIR/run.sh
+    echo ''                                                                                               >> $BUILD_DIR/run.sh
     chmod +x $BUILD_DIR/run.sh
   fi
 
