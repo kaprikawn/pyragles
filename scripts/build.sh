@@ -61,9 +61,13 @@ if [[ $IS_PYRA -eq 1 ]]; then
   BUILD_CALL="$BUILD_CALL -L${SDL_BUILD_DIR}/build/.libs -L/opt/omap5-sgx-ddk-um-linux/lib -D_REENTRANT -I${SDL_BUILD_DIR}/include -lSDL2 -lGLESv2"
   
   if [[ ! -e $BUILD_DIR/run.sh ]]; then
-    echo '#!/bin/bash' > $BUILD_DIR/run.sh
-    echo 'export SDL_OPENGL_ES_DRIVER=1 SDL_VIDEO_EGL_DRIVER=/opt/omap5-sgx-ddk-um-linux/lib/libEGL.so.1' >>  $BUILD_DIR/run.sh
-    echo './AlphaFlight' >> $BUILD_DIR/run.sh
+    echo '#!/bin/bash'                                                                                     > $BUILD_DIR/run.sh
+    echo 'sudo /usr/sbin/pyrainputctl enable gamepad'                                                     >> $BUILD_DIR/run.sh
+    echo 'sudo /usr/sbin/pyrainputctl disable mouse'                                                      >> $BUILD_DIR/run.sh
+    echo 'export SDL_OPENGL_ES_DRIVER=1 SDL_VIDEO_EGL_DRIVER=/opt/omap5-sgx-ddk-um-linux/lib/libEGL.so.1' >> $BUILD_DIR/run.sh
+    echo './AlphaFlight'                                                                                  >> $BUILD_DIR/run.sh
+    echo 'sudo /usr/sbin/pyrainputctl disable gamepad'                                                    >> $BUILD_DIR/run.sh
+    echo 'sudo /usr/sbin/pyrainputctl enable mouse'                                                       >> $BUILD_DIR/run.sh
     chmod +x $BUILD_DIR/run.sh
   fi
 
