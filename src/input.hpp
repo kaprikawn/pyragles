@@ -4,12 +4,6 @@
 #include "types.hpp"
 #include "sdl.hpp"
 
-bool32 input_debug = false;
-#ifdef INPUT_DEBUG
-  input_debug = true;
-#endif
-
-
 struct ButtonsPressed {
   bool32  quit        = false;
   bool32  w           = false;
@@ -210,6 +204,10 @@ void input_on_key_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPr
   
   u32 scancode = event -> key.keysym.scancode;
   
+#ifdef INPUT_DEBUG
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "input_on_key_down %d\n", scancode );
+#endif
+  
   switch( scancode ) {
     
     case SDL_SCANCODE_ESCAPE : {
@@ -343,12 +341,20 @@ void initialise_gamepads() {
 s16 deadzone = 100;
 
 void on_hat_motion( SDL_Event* event, ButtonsPressed* new_buttons ) {
+
+#ifdef INPUT_DEBUG
   SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "hat motion detected\n" );
+#endif
+  
 }
 
 void on_joy_button_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPressed* new_buttons ) {
   
   u8 button_index = event -> jbutton.button;
+  
+#ifdef INPUT_DEBUG
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "on_joy_button_down %d pressed\n", button_index );
+#endif
   
   switch( button_index ) {
     
@@ -424,17 +430,16 @@ void on_joy_axis_move( SDL_Event* event, ButtonsPressed* new_buttons ) {
   if( event -> jaxis.axis == 0 ) { // left and right
     new_buttons -> joy_axis_x = normalised_value;
     
-    if( input_debug ) {
-      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis raw reading %d\n", axis_value );
-      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis norm reading %f\n", normalised_value );
-    }
   } else if( event -> jaxis.axis == 1 ) { // up and down
     new_buttons -> joy_axis_y = normalised_value;
-    if( input_debug ) {
-      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis raw reading %d\n", axis_value );
-      SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis norm reading %f\n", normalised_value );
-    }
   }
+  
+#ifdef INPUT_DEBUG
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis raw reading %d\n", axis_value );
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy x axis norm reading %f\n", normalised_value );
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis raw reading %d\n", axis_value );
+  SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "joy y axis norm reading %f\n", normalised_value );
+#endif
   
 }
 
