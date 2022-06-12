@@ -111,50 +111,15 @@ void input_on_key_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPr
   
   switch( scancode ) {
     
-    case SDL_SCANCODE_ESCAPE : {
-      new_buttons -> quit = true;
-      old_buttons -> quit = false;
-    } break;
-    
-    case SDL_SCANCODE_W : {
-      new_buttons -> w = true;
-      old_buttons -> w = false;
-    } break;
-    
-    case SDL_SCANCODE_A : {
-      new_buttons -> a = true;
-      old_buttons -> a = false;
-    } break;
-    
-    case SDL_SCANCODE_S : {
-      new_buttons -> s = true;
-      old_buttons -> s = false;
-    } break;
-    
-    case SDL_SCANCODE_D : {
-      new_buttons -> d = true;
-      old_buttons -> d = false;
-    } break;
-    
-    case SDL_SCANCODE_UP : {
-      new_buttons -> arrow_up = true;
-      old_buttons -> arrow_up = false;
-    } break;
-    
-    case SDL_SCANCODE_DOWN : {
-      new_buttons -> arrow_down = true;
-      old_buttons -> arrow_down = false;
-    } break;
-    
-    case SDL_SCANCODE_PAGEUP : {
-      new_buttons -> pg_up = true;
-      old_buttons -> pg_up = false;
-    } break;
-    
-    case SDL_SCANCODE_PAGEDOWN : {
-      new_buttons -> pg_down = true;
-      old_buttons -> pg_down = false;
-    } break;
+    case SDL_SCANCODE_ESCAPE    : { new_buttons -> quit       = true; } break;
+    case SDL_SCANCODE_W         : { new_buttons -> w          = true; } break;
+    case SDL_SCANCODE_A         : { new_buttons -> a          = true; } break;
+    case SDL_SCANCODE_S         : { new_buttons -> s          = true; } break;
+    case SDL_SCANCODE_D         : { new_buttons -> d          = true; } break;
+    case SDL_SCANCODE_UP        : { new_buttons -> dpad_up    = true; } break;
+    case SDL_SCANCODE_DOWN      : { new_buttons -> dpad_down  = true; } break;
+    case SDL_SCANCODE_LEFT      : { new_buttons -> dpad_left  = true; } break;
+    case SDL_SCANCODE_RIGHT     : { new_buttons -> dpad_right = true; } break;
     
     default : break;
   }
@@ -166,50 +131,14 @@ void input_on_key_up( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPres
   
   switch( scancode ) {
     
-    case SDL_SCANCODE_ESCAPE : {
-      new_buttons -> quit = false;
-      old_buttons -> quit = true;
-    } break;
-    
-    case SDL_SCANCODE_W : {
-      new_buttons -> w = false;
-      old_buttons -> w = true;
-    } break;
-    
-    case SDL_SCANCODE_A : {
-      new_buttons -> a = false;
-      old_buttons -> a = true;
-    } break;
-    
-    case SDL_SCANCODE_S : {
-      new_buttons -> s = false;
-      old_buttons -> s = true;
-    } break;
-    
-    case SDL_SCANCODE_D : {
-      new_buttons -> d = false;
-      old_buttons -> d = true;
-    } break;
-    
-    case SDL_SCANCODE_UP : {
-      new_buttons -> arrow_up = false;
-      old_buttons -> arrow_up = true;
-    } break;
-    
-    case SDL_SCANCODE_DOWN : {
-      new_buttons -> arrow_down = false;
-      old_buttons -> arrow_down = true;
-    } break;
-    
-    case SDL_SCANCODE_PAGEUP : {
-      new_buttons -> pg_up = false;
-      old_buttons -> pg_up = true;
-    } break;
-    
-    case SDL_SCANCODE_PAGEDOWN : {
-      new_buttons -> pg_down = false;
-      old_buttons -> pg_down = true;
-    } break;
+    case SDL_SCANCODE_W         : { new_buttons -> w          = false; } break;
+    case SDL_SCANCODE_A         : { new_buttons -> a          = false; } break;
+    case SDL_SCANCODE_S         : { new_buttons -> s          = false; } break;
+    case SDL_SCANCODE_D         : { new_buttons -> d          = false; } break;
+    case SDL_SCANCODE_UP        : { new_buttons -> dpad_up    = false; } break;
+    case SDL_SCANCODE_DOWN      : { new_buttons -> dpad_down  = false; } break;
+    case SDL_SCANCODE_LEFT      : { new_buttons -> dpad_left  = false; } break;
+    case SDL_SCANCODE_RIGHT     : { new_buttons -> dpad_right = false; } break;
     
     default : break;
   }
@@ -258,48 +187,16 @@ void on_joy_button_down( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsP
 #endif
   
   switch( button_index ) {
-    
     // wasd
-    case 11 : {
-      new_buttons -> dpad_up    = true;
-      old_buttons -> dpad_up    = false;
-    } break;
-    
-    case 12 : {
-      new_buttons -> dpad_down  = true;
-      old_buttons -> dpad_down  = false;
-    } break;
-    
-    case 13 : {
-      new_buttons -> dpad_left  = true;
-      old_buttons -> dpad_left  = false;
-    } break;
-    
-    case 14 : {
-      new_buttons -> dpad_right = true;
-      old_buttons -> dpad_right = false;
-    } break;
-    
+    case 11 : { new_buttons -> dpad_up    = true; } break;
+    case 12 : { new_buttons -> dpad_down  = true; } break;
+    case 13 : { new_buttons -> dpad_left  = true; } break;
+    case 14 : { new_buttons -> dpad_right = true; } break;
     // arrow keys, is the dpad on the pyra
-    case 82 : {
-      new_buttons -> dpad_up    = true;
-      old_buttons -> dpad_up    = false;
-    } break;
-    
-    case 81 : {
-      new_buttons -> dpad_down  = true;
-      old_buttons -> dpad_down  = false;
-    } break;
-    
-    case 80 : {
-      new_buttons -> dpad_left  = true;
-      old_buttons -> dpad_left  = false;
-    } break;
-    
-    case 79 : {
-      new_buttons -> dpad_right = true;
-      old_buttons -> dpad_right = false;
-    } break;
+    case 82 : { new_buttons -> dpad_up    = true; } break;
+    case 81 : { new_buttons -> dpad_down  = true; } break;
+    case 80 : { new_buttons -> dpad_left  = true; } break;
+    case 79 : { new_buttons -> dpad_right = true; SDL_LogInfo( SDL_LOG_CATEGORY_APPLICATION, "right pressed %d pressed\n", button_index ); } break;
     
     default : break;
   }
@@ -310,47 +207,14 @@ void on_joy_button_up( SDL_Event* event, ButtonsPressed* old_buttons, ButtonsPre
   u8 button_index = event -> jbutton.button;
   
   switch( button_index ) {
-    
-    case 11 : {
-      new_buttons -> dpad_up    = false;
-      old_buttons -> dpad_up    = true;
-    } break;
-    
-    case 12 : {
-      new_buttons -> dpad_down  = false;
-      old_buttons -> dpad_down  = true;
-    } break;
-    
-    case 13 : {
-      new_buttons -> dpad_left  = false;
-      old_buttons -> dpad_left  = true;
-    } break;
-    
-    case 14 : {
-      new_buttons -> dpad_right = false;
-      old_buttons -> dpad_right = true;
-    } break;
-    
-    case 82 : {
-      new_buttons -> dpad_up    = false;
-      old_buttons -> dpad_up    = true;
-    } break;
-    
-    case 81 : {
-      new_buttons -> dpad_down  = false;
-      old_buttons -> dpad_down  = true;
-    } break;
-    
-    case 80 : {
-      new_buttons -> dpad_left  = false;
-      old_buttons -> dpad_left  = true;
-    } break;
-    
-    case 79 : {
-      new_buttons -> dpad_right = false;
-      old_buttons -> dpad_right = true;
-    } break;
-    
+    case 11 : { new_buttons -> dpad_up    = false; } break;
+    case 12 : { new_buttons -> dpad_down  = false; } break;
+    case 13 : { new_buttons -> dpad_left  = false; } break;
+    case 14 : { new_buttons -> dpad_right = false; } break;
+    case 82 : { new_buttons -> dpad_up    = false; } break;
+    case 81 : { new_buttons -> dpad_down  = false; } break;
+    case 80 : { new_buttons -> dpad_left  = false; } break;
+    case 79 : { new_buttons -> dpad_right = false; } break;
     default : break;
   }
 }
